@@ -63,7 +63,7 @@ app.use(session({
   secret: secrets.sessionSecret,
   store: new MySQLStore({
     config: secrets.mysql,
-    table: 'pl_sessions'
+    table: secrets.mysql.sessionTable
   })
 }));
 app.use(passport.initialize());

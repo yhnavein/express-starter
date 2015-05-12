@@ -30,7 +30,8 @@ module.exports = {
     user: 'root',
     password: '',
     database: 'test_db',
-    dialect: 'mysql'
+    dialect: 'mysql',
+    sessionTable: 'sessions'
   },
 
   mailgun: {

@@ -1,65 +1,89 @@
 var bcrypt = require('bcrypt-nodejs');
 var crypto = require('crypto');
-var mongoose = require('mongoose');
 
-var userSchema = new mongoose.Schema({
-  email: { type: String, unique: true, lowercase: true },
-  password: String,
+//HMAC version
+// var secrets = require('../config/secrets');
+// function createHash(string) {
+//   if(!string)
+//     return null;
 
-  facebook: String,
-  twitter: String,
-  google: String,
-  github: String,
-  instagram: String,
-  linkedin: String,
-  tokens: Array,
+//   var hashKey = secrets.localAuth.hashKey;
+//   var hmac = crypto.createHmac(secrets.localAuth.hashMethod, new Buffer(hashKey, 'utf-8'));
+//   return hmac.update(new Buffer(string, 'utf-8')).digest('hex');
+// }
 
-  profile: {
-    name: { type: String, default: '' },
-    gender: { type: String, default: '' },
-    location: { type: String, default: '' },
-    website: { type: String, default: '' },
-    picture: { type: String, default: '' }
+var instanceMethods = {
+  authenticate: function(plainText){
+    return this.encryptPassword(plainText) === this.password;
   },
-
-  resetPasswordToken: String,
-  resetPasswordExpires: Date
-});
-
-/**
- * Password hash middleware.
- */
-userSchema.pre('save', function(next) {
-  var user = this;
-  if (!user.isModified('password')) return next();
-  bcrypt.genSalt(10, function(err, salt) {
-    if (err) return next(err);
-    bcrypt.hash(user.password, salt, null, function(err, hash) {
-      if (err) return next(err);
-      user.password = hash;
-      next();
+  encryptPassword: function(password, cb) {
+    if (!password) return '';
+    bcrypt.genSalt(10, function(err, salt) {
+      if (err) { cb(null, err); return; }
+      bcrypt.hash(password, salt, null, function(err, hash) {
+        if (err) { cb(null, err); return; }
+        cb(hash, null);
+      });
     });
-  });
-});
+  },
+  getFullname: function() {
+    return [this.firstname, this.lastname].join(' ');
+  },
+  getGravatarUrl: function(size) {
+    if (!size) size = 200;
 
-/**
- * Helper method for validating user's password.
- */
-userSchema.methods.comparePassword = function(candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-    if (err) return cb(err);
-    cb(null, isMatch);
-  });
+    if (!this.email) {
+      return 'https://gravatar.com/avatar/?s=' + size + '&d=retro';
+    }
+
+    var md5 = crypto.createHash('md5').update(this.email).digest('hex');
+    return 'https://gravatar.com/avatar/' + md5 + '?s=' + size + '&d=retro';
+  }
 };
 
-/**
- * Helper method for getting user's gravatar.
- */
-userSchema.methods.gravatar = function(size) {
-  if (!size) size = 200;
-  if (!this.email) return 'https://gravatar.com/avatar/?s=' + size + '&d=retro';
-  var md5 = crypto.createHash('md5').update(this.email).digest('hex');
-  return 'https://gravatar.com/avatar/' + md5 + '?s=' + size + '&d=retro';
-};
+module.exports = function(db, DataTypes) {
+  var User = db.define('User', {
+    id_user: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true
+    },
+    userName: {
+      type: DataTypes.STRING,
+      unique: true,
+      notNull: true
+    },
+    password: DataTypes.STRING,
+    googleId: DataTypes.STRING,
+    facebookId: DataTypes.STRING,
+    twitterId: DataTypes.STRING,
+    date_created: DataTypes.DATE,
+    date_modified: DataTypes.DATE,
+    logins: DataTypes.INTEGER,
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+      notNull: true,
+      isEmail: true
+    }
+  }, {
+    tableName: 'pl_users',
+    updatedAt: 'date_modified',
+    createdAt: 'date_created',
+    instanceMethods: instanceMethods,
+    classMethods: {
+      associate: function(models) {
+        //User.hasMany(models.Role);
+      },
+      getByEmailOrUserName: function(name, password, callback) {
+        User.find({ where: db.or(
+          { email: name },
+          { userName: name }
+        )}).then(callback);
+      }
+    }
+  });
 
-module.exports = mongoose.model('User', userSchema);
+  return User;
+};

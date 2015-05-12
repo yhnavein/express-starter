@@ -1,9 +1,9 @@
 {
-  "name": "hackathon-starter",
-  "version": "3.0.2",
+  "name": "express-starter",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sahat/hackathon-starter.git"
+    "url": "https://github.com/yhnavein/express-starter.git"
   },
   "scripts": {
     "start": "node app.js",
@@ -62,7 +62,8 @@
     "neo-async": "~1.1.1",
     "mysql": "~2.6.2",
     "connect-mysql": "~2.1.1",
-    "knex": "~0.8.3"
+    "knex": "~0.8.3",
+    "sequelize": "~2.1.3"
   },
   "devDependencies": {
     "blessed": "^0.1.56",
