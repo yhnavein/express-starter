@@ -11,13 +11,11 @@ var logger = require('morgan');
 var errorHandler = require('errorhandler');
 var lusca = require('lusca');
 var methodOverride = require('method-override');
-var multer  = require('multer');
+var multer = require('multer');
 
-var _ = require('lodash');
-var MongoStore = require('connect-mongo')(session);
+var MySQLStore = require('connect-mysql')({ session: session });
 var flash = require('express-flash');
 var path = require('path');
-var mongoose = require('mongoose');
 var passport = require('passport');
 var expressValidator = require('express-validator');
 var connectAssets = require('connect-assets');
@@ -42,14 +40,6 @@ var passportConf = require('./config/passport');
 var app = express();
 
 /**
- * Connect to MongoDB.
- */
-mongoose.connect(secrets.db);
-mongoose.connection.on('error', function() {
-  console.error('MongoDB Connection Error. Please make sure that MongoDB is running.');
-});
-
-/**
  * Express configuration.
  */
 app.set('port', process.env.PORT || 3000);
@@ -71,7 +61,10 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   secret: secrets.sessionSecret,
-  store: new MongoStore({ url: secrets.db, autoReconnect: true })
+  store: new MySQLStore({
+    config: secrets.mysql,
+    table: 'pl_sessions'
+  })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
