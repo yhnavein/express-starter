@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var async = require('async');
+var async = require('neo-async');
 var crypto = require('crypto');
 var nodemailer = require('nodemailer');
 var passport = require('passport');
