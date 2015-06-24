@@ -10,10 +10,10 @@ var tumblr = require('tumblr.js');
 var foursquare = require('node-foursquare')({ secrets: secrets.foursquare });
 var Github = require('github-api');
 var Twit = require('twit');
-var ordrin = require('ordrin-api');
 var stripe = require('stripe')(secrets.stripe.secretKey);
 var twilio = require('twilio')(secrets.twilio.sid, secrets.twilio.token);
 var Linkedin = require('node-linkedin')(secrets.linkedin.clientID, secrets.linkedin.clientSecret, secrets.linkedin.callbackURL);
+var BitGo = require('bitgo');
 var clockwork = require('clockwork')({ key: secrets.clockwork.apiKey });
 var paypal = require('paypal-rest-sdk');
 var lob = require('lob')(secrets.lob.apiKey);
@@ -581,26 +581,6 @@ exports.getYahoo = function(req, res) {
 };
 
 /**
- * GET /api/ordrin
- * Ordr.in API example.
- */
-exports.getOrdrin = function(req, res, next) {
-  var ordrin_api = new ordrin.APIs(secrets.ordrin.secretKey);
-  ordrin_api.delivery_list({
-    datetime: 'ASAP',
-    addr: '199 Chambers St',
-    city: 'New York, NY',
-    zip: '10007'
-  }, function(err, deliveries) {
-    if (err) return next(err);
-    res.render('api/ordrin', {
-      title: 'Ordr.in API',
-      deliveries: deliveries
-    });
-  });
-};
-
-/**
  * GET /api/paypal
  * PayPal SDK example.
  */
@@ -691,4 +671,74 @@ exports.getLob = function(req, res, next) {
       routes: routes.data[0].routes
     });
   });
+};
+
+/**
+ * GET /api/bitgo
+ * BitGo wallet example
+ */
+exports.getBitGo = function(req, res, next) {
+  var bitgo = new BitGo.BitGo({ env: 'test', accessToken: secrets.bitgo.accessToken });
+  var walletId = req.session.walletId; // we use the session to store the walletid, but you should store it elsewhere
+
+  var renderWalletInfo = function(walletId) {
+    bitgo.wallets().get({id: walletId}, function(err, walletRes) {
+      walletRes.createAddress({}, function(err, addressRes) {
+        walletRes.transactions({}, function(err, transactionsRes) {
+          res.render('api/bitgo', {
+            title: 'BitGo API',
+            wallet: walletRes.wallet,
+            address: addressRes.address,
+            transactions: transactionsRes.transactions
+          });
+        });
+      });
+    });
+  };
+
+  if (walletId) {
+    // wallet was created in the session already, just load it up
+    renderWalletInfo(walletId);
+  } else {
+    bitgo.wallets().createWalletWithKeychains(
+      {
+        passphrase: req.sessionID, // change this!
+        label: 'wallet for session ' + req.sessionID,
+        backupXpub: 'xpub6AHA9hZDN11k2ijHMeS5QqHx2KP9aMBRhTDqANMnwVtdyw2TDYRmF8PjpvwUFcL1Et8Hj59S3gTSMcUQ5gAqTz3Wd8EsMTmF3DChhqPQBnU'
+      },
+      function(err, res) {
+        req.session.walletId = res.wallet.wallet.id;
+        renderWalletInfo(req.session.walletId);
+      }
+    );
+  }
+};
+
+/**
+ * POST /api/bitgo
+ * BitGo send coins example
+ */
+exports.postBitGo = function(req, res, next) {
+  var bitgo = new BitGo.BitGo({ env: 'test', accessToken: secrets.bitgo.accessToken });
+  var walletId = req.session.walletId; // we use the session to store the walletid, but you should store it elsewhere
+  var amount = parseInt(req.body.amount);
+
+  try {
+    bitgo.wallets().get({id: walletId}, function (err, wallet) {
+      wallet.sendCoins(
+      { address: req.body.address, amount: parseInt(req.body.amount), walletPassphrase: req.sessionID },
+      function (e, result) {
+        if (e) {
+          console.dir(e);
+          req.flash('errors', { msg: e.message });
+          return res.redirect('/api/bitgo');
+        }
+        req.flash('info', { msg: 'txid: ' + result.hash + ', hex: ' + result.tx });
+        return res.redirect('/api/bitgo');
+      });
+    });
+  } catch(e) {
+    req.flash('errors', { msg: e.message });
+    return res.redirect('/api/bitgo');
+  }
 };

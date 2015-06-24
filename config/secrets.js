@@ -137,11 +137,6 @@ module.exports = {
     redirectUrl: process.env.VENMO_REDIRECT_URL || 'http://localhost:3000/auth/venmo/callback'
   },
 
-  ordrin: {
-    publicKey: process.env.ORDRIN_PUBLIC || 'G35-rSt76CXpUEOlqXYNMC84ZbdFUKN_plHVHVYhdeU',
-    secretKey: process.env.ORDRIN_SECRET || 'bcoOR_2z6gQDZuEOcw1yTt6THFPK9KmvywG7UJD7pqQ'
-  },
-
   paypal: {
     host: 'api.sandbox.paypal.com',
     client_id: process.env.PAYPAL_ID || 'AdGE8hDyixVoHmbhASqAThfbBcrbcgiJPBwlAM7u7Kfq3YU-iPGc6BXaTppt',
@@ -152,5 +147,9 @@ module.exports = {
 
   lob: {
     apiKey: process.env.LOB_KEY || 'test_814e892b199d65ef6dbb3e4ad24689559ca'
+  },
+
+  bitgo: {
+    accessToken: process.env.BITGO_ACCESS_TOKEN || '4fca3ed3c2839be45b03bbd330e5ab1f9b3989ddd949bf6b8765518bc6a0e709'
   }
 };
