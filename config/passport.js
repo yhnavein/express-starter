@@ -13,14 +13,15 @@ var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 // var OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 
 var secrets = require('./secrets');
-var User = require('../models/User');
+var db = require('../models/sequelize');
+//var User = require('../models/sequelize/User');
 
 passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  User.findById(id, function(err, user) {
+  db.User.findById(id, function(err, user) {
     done(err, user);
   });
 });

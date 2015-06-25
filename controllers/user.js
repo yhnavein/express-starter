@@ -3,7 +3,8 @@ var async = require('neo-async');
 var crypto = require('crypto');
 var nodemailer = require('nodemailer');
 var passport = require('passport');
-var User = require('../models/User');
+var db = require('../models/sequelize');
+// var User = require('../models/User');
 var secrets = require('../config/secrets');
 
 /**

@@ -21,8 +21,6 @@
 
 module.exports = {
 
-  db: process.env.MONGODB || 'mongodb://localhost:27017/test',
-
   sessionSecret: process.env.SESSION_SECRET || 'Your Session Secret goes here',
 
   mysql: {
@@ -31,7 +29,19 @@ module.exports = {
     password: '',
     database: 'test_db',
     dialect: 'mysql',
-    sessionTable: 'sessions'
+    sessionTable: 'session'
+  },
+
+  postgres: {
+    host: '127.0.0.1',
+    user: 'yhnavein',
+    password: '123',
+    database: 'test',
+    dialect: 'postgres',
+    sessionTable: 'session',
+    connectionString: function() {
+      return "postgres://" + this.user + ":" + this.password + "@" + this.host + "/" + this.database;
+    }
   },
 
   mailgun: {
@@ -65,12 +75,12 @@ module.exports = {
     passReqToCallback: true
   },
 
-  instagram: {
-    clientID: process.env.INSTAGRAM_ID || '9f5c39ab236a48e0aec354acb77eee9b',
-    clientSecret: process.env.INSTAGRAM_SECRET || '5920619aafe842128673e793a1c40028',
-    callbackURL: '/auth/instagram/callback',
-    passReqToCallback: true
-  },
+  // instagram: {
+  //   clientID: process.env.INSTAGRAM_ID || '9f5c39ab236a48e0aec354acb77eee9b',
+  //   clientSecret: process.env.INSTAGRAM_SECRET || '5920619aafe842128673e793a1c40028',
+  //   callbackURL: '/auth/instagram/callback',
+  //   passReqToCallback: true
+  // },
 
   github: {
     clientID: process.env.GITHUB_ID || 'cb448b1d4f0c743a1e36',

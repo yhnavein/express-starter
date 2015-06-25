@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var compress = require('compression');
 var favicon = require('serve-favicon');
 var session = require('express-session');
+var pgSession = require('connect-pg-simple')(session);
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 var errorHandler = require('errorhandler');
@@ -13,7 +14,7 @@ var lusca = require('lusca');
 var methodOverride = require('method-override');
 var multer = require('multer');
 
-var MySQLStore = require('connect-mysql')({ session: session });
+//var MySQLStore = require('connect-mysql')({ session: session });
 var flash = require('express-flash');
 var path = require('path');
 var passport = require('passport');
@@ -57,6 +58,11 @@ app.use(multer({ dest: path.join(__dirname, 'uploads') }));
 app.use(expressValidator());
 app.use(methodOverride());
 app.use(cookieParser());
+
+var db = require('./models/sequelize');
+
+//MySQL Store
+/*
 app.use(session({
   resave: true,
   saveUninitialized: true,
@@ -65,6 +71,16 @@ app.use(session({
     config: secrets.mysql,
     table: secrets.mysql.sessionTable
   })
+}));
+*/
+//PostgreSQL Store
+app.use(session({
+  store: new pgSession({
+    conString: secrets.postgres.connectionString(),
+    tableName: secrets.postgres.sessionTable
+  }),
+  secret: secrets.sessionSecret,
+  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -83,6 +99,7 @@ app.use(function(req, res, next) {
   next();
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
+
 
 /**
  * Primary app routes.
@@ -194,14 +211,10 @@ app.use(errorHandler());
 db
   .sequelize
   .sync({ force: false })
-  .complete(function(err) {
-    if (err) {
-      throw err[0];
-    } else {
+  .then(function() {
       app.listen(app.get('port'), function() {
         console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
       });
-    }
   });
 
 module.exports = app;

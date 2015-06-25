@@ -54,6 +54,7 @@
     "passport-twitter": "^1.0.3",
     "paypal-rest-sdk": "^1.5.3",
     "pg": "^4.4.0",
+    "pg-hstore": "^2.3.2",
     "request": "^2.58.0",
     "sequelize": "^3.3.1",
     "serve-favicon": "^2.3.0",
