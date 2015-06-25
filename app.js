@@ -141,10 +141,10 @@ app.post('/api/bitgo', apiController.postBitGo);
 /**
  * OAuth authentication routes. (Sign in)
  */
-app.get('/auth/instagram', passport.authenticate('instagram'));
-app.get('/auth/instagram/callback', passport.authenticate('instagram', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
+// app.get('/auth/instagram', passport.authenticate('instagram'));
+// app.get('/auth/instagram/callback', passport.authenticate('instagram', { failureRedirect: '/login' }), function(req, res) {
+//   res.redirect(req.session.returnTo || '/');
+// });
 app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email', 'user_location'] }));
 app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), function(req, res) {
   res.redirect(req.session.returnTo || '/');
@@ -169,18 +169,18 @@ app.get('/auth/linkedin/callback', passport.authenticate('linkedin', { failureRe
 /**
  * OAuth authorization routes. (API examples)
  */
-app.get('/auth/foursquare', passport.authorize('foursquare'));
-app.get('/auth/foursquare/callback', passport.authorize('foursquare', { failureRedirect: '/api' }), function(req, res) {
-  res.redirect('/api/foursquare');
-});
-app.get('/auth/tumblr', passport.authorize('tumblr'));
-app.get('/auth/tumblr/callback', passport.authorize('tumblr', { failureRedirect: '/api' }), function(req, res) {
-  res.redirect('/api/tumblr');
-});
-app.get('/auth/venmo', passport.authorize('venmo', { scope: 'make_payments access_profile access_balance access_email access_phone' }));
-app.get('/auth/venmo/callback', passport.authorize('venmo', { failureRedirect: '/api' }), function(req, res) {
-  res.redirect('/api/venmo');
-});
+// app.get('/auth/foursquare', passport.authorize('foursquare'));
+// app.get('/auth/foursquare/callback', passport.authorize('foursquare', { failureRedirect: '/api' }), function(req, res) {
+//   res.redirect('/api/foursquare');
+// });
+// app.get('/auth/tumblr', passport.authorize('tumblr'));
+// app.get('/auth/tumblr/callback', passport.authorize('tumblr', { failureRedirect: '/api' }), function(req, res) {
+//   res.redirect('/api/tumblr');
+// });
+// app.get('/auth/venmo', passport.authorize('venmo', { scope: 'make_payments access_profile access_balance access_email access_phone' }));
+// app.get('/auth/venmo/callback', passport.authorize('venmo', { failureRedirect: '/api' }), function(req, res) {
+//   res.redirect('/api/venmo');
+// });
 
 /**
  * Error Handler.
@@ -190,8 +190,18 @@ app.use(errorHandler());
 /**
  * Start Express server.
  */
-app.listen(app.get('port'), function() {
-  console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
-});
+
+db
+  .sequelize
+  .sync({ force: false })
+  .complete(function(err) {
+    if (err) {
+      throw err[0];
+    } else {
+      app.listen(app.get('port'), function() {
+        console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
+      });
+    }
+  });
 
 module.exports = app;
