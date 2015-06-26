@@ -32,13 +32,13 @@ passport.deserializeUser(function(id, done) {
  */
 // passport.use(new InstagramStrategy(secrets.instagram,function(req, accessToken, refreshToken, profile, done) {
 //   if (req.user) {
-//     User.findOne({ instagram: profile.id }, function(err, existingUser) {
+//     User.findOne({ instagram: profile.id.toString() }, function(err, existingUser) {
 //       if (existingUser) {
 //         req.flash('errors', { msg: 'There is already an Instagram account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
 //         done(err);
 //       } else {
 //         User.findById(req.user.id, function(err, user) {
-//           user.instagram = profile.id;
+//           user.instagram = profile.id.toString();
 //           user.tokens.push({ kind: 'instagram', accessToken: accessToken });
 //           user.profile.name = user.profile.name || profile.displayName;
 //           user.profile.picture = user.profile.picture || profile._json.data.profile_picture;
@@ -51,11 +51,11 @@ passport.deserializeUser(function(id, done) {
 //       }
 //     });
 //   } else {
-//     User.findOne({ instagram: profile.id }, function(err, existingUser) {
+//     User.findOne({ instagram: profile.id.toString() }, function(err, existingUser) {
 //       if (existingUser) return done(null, existingUser);
 
 //       var user = new User();
-//       user.instagram = profile.id;
+//       user.instagram = profile.id.toString();
 //       user.tokens.push({ kind: 'instagram', accessToken: accessToken });
 //       user.profile.name = profile.displayName;
 //       // Similar to Twitter API, assigns a temporary e-mail address
@@ -103,19 +103,19 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, function(email, passw
  */
 passport.use(new FacebookStrategy(secrets.facebook, function(req, accessToken, refreshToken, profile, done) {
   if (req.user) {
-    db.User.findOne({ where: { facebookId: profile.id } }).then(function(existingUser) {
+    db.User.findOne({ where: { facebookId: profile.id.toString() } }).then(function(existingUser) {
       if (existingUser) {
         req.flash('errors', { msg: 'There is already a Facebook account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
         done('UserExists');
       } else {
         db.User.findById(req.user.id).then(function(user) {
-          user.facebookId = profile.id;
+          user.facebookId = profile.id.toString();
           if(!user.tokens) user.tokens = {};
           if(!user.profile) user.profile = {};
           user.tokens.facebook = accessToken;
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.gender = user.profile.gender || profile._json.gender;
-          user.profile.picture = user.profile.picture || 'https://graph.facebook.com/' + profile.id + '/picture?type=large';
+          user.profile.picture = user.profile.picture || 'https://graph.facebook.com/' + profile.id.toString() + '/picture?type=large';
           user.save()
             .then(function(savedUser) {
               req.flash('info', { msg: 'Facebook account has been linked.' });
@@ -126,20 +126,20 @@ passport.use(new FacebookStrategy(secrets.facebook, function(req, accessToken, r
       }
     });
   } else {
-    db.User.findOne({ where: { facebookId: profile.id } }).then(function(existingUser) {
+    db.User.findOne({ where: { facebookId: profile.id.toString() } }).then(function(existingUser) {
       if (existingUser) return done(null, existingUser);
       db.User.findOne({ where: { email: profile._json.email } }).then(function(existingEmailUser) {
         if (existingEmailUser) {
           req.flash('errors', { msg: 'There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings.' });
           done('UserExists');
         } else {
-          var user = db.User.build({ facebookId: profile.id });
+          var user = db.User.build({ facebookId: profile.id.toString() });
           user.email = profile._json.email;
           user.tokens = { facebook: accessToken };
           user.profile = {
             name: profile.displayName,
             gender: profile._json.gender,
-            picture: 'https://graph.facebook.com/' + profile.id + '/picture?type=large',
+            picture: 'https://graph.facebook.com/' + profile.id.toString() + '/picture?type=large',
             location: (profile._json.location) ? profile._json.location.name : ''
           };
           user.save()
@@ -156,44 +156,47 @@ passport.use(new FacebookStrategy(secrets.facebook, function(req, accessToken, r
  */
 passport.use(new GitHubStrategy(secrets.github, function(req, accessToken, refreshToken, profile, done) {
   if (req.user) {
-    User.findOne({ github: profile.id }, function(err, existingUser) {
+    db.User.findOne({ where: { githubId: profile.id.toString() } }).then(function(existingUser) {
       if (existingUser) {
         req.flash('errors', { msg: 'There is already a GitHub account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
-        done(err);
+        done('UserExists');
       } else {
-        User.findById(req.user.id, function(err, user) {
-          user.github = profile.id;
-          user.tokens.push({ kind: 'github', accessToken: accessToken });
+        db.User.findById(req.user.id).then(function(user) {
+          user.githubId = profile.id.toString();
+          user.tokens.github = accessToken;
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.picture = user.profile.picture || profile._json.avatar_url;
           user.profile.location = user.profile.location || profile._json.location;
           user.profile.website = user.profile.website || profile._json.blog;
-          user.save(function(err) {
-            req.flash('info', { msg: 'GitHub account has been linked.' });
-            done(err, user);
-          });
+          user.save()
+            .then(function(savedUser) {
+              req.flash('info', { msg: 'GitHub account has been linked.' });
+              done(null, savedUser);
+            })
+            .catch(function(error) { done(error); });
         });
       }
     });
   } else {
-    User.findOne({ github: profile.id }, function(err, existingUser) {
+    db.User.findOne({ where: { githubId: profile.id.toString() } }).then(function(existingUser) {
       if (existingUser) return done(null, existingUser);
-      User.findOne({ email: profile._json.email }, function(err, existingEmailUser) {
+      db.User.findOne({ where: { email: profile._json.email } }).then(function(existingEmailUser) {
         if (existingEmailUser) {
           req.flash('errors', { msg: 'There is already an account using this email address. Sign in to that account and link it with GitHub manually from Account Settings.' });
-          done(err);
+          done('UserExists');
         } else {
-          var user = new User();
+          var user = db.User.build({ githubId: profile.id.toString() });
           user.email = profile._json.email;
-          user.github = profile.id;
-          user.tokens.push({ kind: 'github', accessToken: accessToken });
-          user.profile.name = profile.displayName;
-          user.profile.picture = profile._json.avatar_url;
-          user.profile.location = profile._json.location;
-          user.profile.website = profile._json.blog;
-          user.save(function(err) {
-            done(err, user);
-          });
+          user.tokens = { github: accessToken };
+          user.profile = {
+            name: profile.displayName,
+            picture: profile._json.avatar_url,
+            location: profile._json.location,
+            website: profile._json.blog
+          };
+          user.save()
+            .then(function(savedUser) { done(null, savedUser); })
+            .catch(function(error) { done(error); });
         }
       });
     });
@@ -204,41 +207,42 @@ passport.use(new GitHubStrategy(secrets.github, function(req, accessToken, refre
 
 passport.use(new TwitterStrategy(secrets.twitter, function(req, accessToken, tokenSecret, profile, done) {
   if (req.user) {
-    User.findOne({ twitter: profile.id }, function(err, existingUser) {
+    db.User.findOne({ where: { twitterId: profile.id.toString() } }).then(function(existingUser) {
       if (existingUser) {
         req.flash('errors', { msg: 'There is already a Twitter account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
-        done(err);
+        done('UserExists');
       } else {
-        User.findById(req.user.id, function(err, user) {
-          user.twitter = profile.id;
-          user.tokens.push({ kind: 'twitter', accessToken: accessToken, tokenSecret: tokenSecret });
+        db.User.findById(req.user.id).then(function(user) {
+          user.twitterId = profile.id.toString();
+          user.tokens.twitter = accessToken;
+          user.tokens.twitterSecret = tokenSecret;
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.location = user.profile.location || profile._json.location;
           user.profile.picture = user.profile.picture || profile._json.profile_image_url_https;
-          user.save(function(err) {
-            req.flash('info', { msg: 'Twitter account has been linked.' });
-            done(err, user);
-          });
+          user.save()
+            .then(function(savedUser) {
+              req.flash('info', { msg: 'Twitter account has been linked.' });
+              done(null, savedUser);
+            })
+            .catch(function(error) { done(error); });
         });
       }
     });
 
   } else {
-    User.findOne({ twitter: profile.id }, function(err, existingUser) {
+    db.User.findOne({ where: { twitterId: profile.id.toString() } }).then(function(existingUser) {
       if (existingUser) return done(null, existingUser);
-      var user = new User();
-      // Twitter will not provide an email address.  Period.
-      // But a person’s twitter username is guaranteed to be unique
-      // so we can "fake" a twitter email address as follows:
+      var user = db.User.build({ twitterId: profile.id.toString() });
       user.email = profile.username + "@twitter.com";
-      user.twitter = profile.id;
-      user.tokens.push({ kind: 'twitter', accessToken: accessToken, tokenSecret: tokenSecret });
-      user.profile.name = profile.displayName;
-      user.profile.location = profile._json.location;
-      user.profile.picture = profile._json.profile_image_url_https;
-      user.save(function(err) {
-        done(err, user);
-      });
+      user.tokens = { twitter: accessToken, twitterSecret: tokenSecret };
+      user.profile = {
+        name: profile.displayName,
+        picture: profile._json.profile_image_url_https,
+        location: profile._json.location
+      };
+      user.save()
+        .then(function(savedUser) { done(null, savedUser); })
+        .catch(function(error) { done(error); });
     });
   }
 }));
@@ -248,42 +252,45 @@ passport.use(new TwitterStrategy(secrets.twitter, function(req, accessToken, tok
  */
 passport.use(new GoogleStrategy(secrets.google, function(req, accessToken, refreshToken, profile, done) {
   if (req.user) {
-    User.findOne({ google: profile.id }, function(err, existingUser) {
+    db.User.findOne({ where: { googleId: profile.id.toString() } }).then(function(existingUser) {
       if (existingUser) {
         req.flash('errors', { msg: 'There is already a Google account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
-        done(err);
+        done('UserExists');
       } else {
-        User.findById(req.user.id, function(err, user) {
-          user.google = profile.id;
-          user.tokens.push({ kind: 'google', accessToken: accessToken });
+        db.User.findById(req.user.id).then(function(user) {
+          user.googleId = profile.id.toString();
+          user.tokens.google = accessToken;
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.gender = user.profile.gender || profile._json.gender;
           user.profile.picture = user.profile.picture || profile._json.picture;
-          user.save(function(err) {
-            req.flash('info', { msg: 'Google account has been linked.' });
-            done(err, user);
-          });
+          user.save()
+            .then(function(savedUser) {
+              req.flash('info', { msg: 'Google account has been linked.' });
+              done(null, savedUser);
+            })
+            .catch(function(error) { done(error); });
         });
       }
     });
   } else {
-    User.findOne({ google: profile.id }, function(err, existingUser) {
+    db.User.findOne({ where: { googleId: profile.id.toString() } }).then(function(existingUser) {
       if (existingUser) return done(null, existingUser);
-      User.findOne({ email: profile.emails[0].value }, function(err, existingEmailUser) {
+      db.User.findOne({ where: { email: profile.emails[0].value } }).then(function(existingEmailUser) {
         if (existingEmailUser) {
           req.flash('errors', { msg: 'There is already an account using this email address. Sign in to that account and link it with Google manually from Account Settings.' });
-          done(err);
+          done('UserExists');
         } else {
-          var user = new User();
+          var user = db.User.build({ googleId: profile.id.toString() });
           user.email = profile.emails[0].value;
-          user.google = profile.id;
-          user.tokens.push({ kind: 'google', accessToken: accessToken });
-          user.profile.name = profile.displayName;
-          user.profile.gender = profile._json.gender;
-          user.profile.picture = profile._json.picture;
-          user.save(function(err) {
-            done(err, user);
-          });
+          user.tokens = { google: accessToken };
+          user.profile = {
+            name: profile.displayName,
+            gender: profile._json.gender,
+            picture: profile._json.picture
+          };
+          user.save()
+            .then(function(savedUser) { done(null, savedUser); })
+            .catch(function(error) { done(error); });
         }
       });
     });
@@ -295,44 +302,47 @@ passport.use(new GoogleStrategy(secrets.google, function(req, accessToken, refre
  */
 passport.use(new LinkedInStrategy(secrets.linkedin, function(req, accessToken, refreshToken, profile, done) {
   if (req.user) {
-    User.findOne({ linkedin: profile.id }, function(err, existingUser) {
+    db.User.findOne({ where: { linkedin: profile.id.toString() } }).then(function(existingUser) {
       if (existingUser) {
         req.flash('errors', { msg: 'There is already a LinkedIn account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
-        done(err);
+        done('UserExists');
       } else {
-        User.findById(req.user.id, function(err, user) {
-          user.linkedin = profile.id;
-          user.tokens.push({ kind: 'linkedin', accessToken: accessToken });
+        db.User.findById(req.user.id).then(function(user) {
+          user.linkedin = profile.id.toString();
+          user.tokens.linkedin = accessToken;
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.location = user.profile.location || profile._json.location.name;
           user.profile.picture = user.profile.picture || profile._json.pictureUrl;
           user.profile.website = user.profile.website || profile._json.publicProfileUrl;
-          user.save(function(err) {
-            req.flash('info', { msg: 'LinkedIn account has been linked.' });
-            done(err, user);
-          });
+          user.save()
+            .then(function(savedUser) {
+              req.flash('info', { msg: 'Google account has been linked.' });
+              done(null, savedUser);
+            })
+            .catch(function(error) { done(error); });
         });
       }
     });
   } else {
-    User.findOne({ linkedin: profile.id }, function(err, existingUser) {
+    db.User.findOne({ where: { linkedin: profile.id.toString() } }).then(function(existingUser) {
       if (existingUser) return done(null, existingUser);
-      User.findOne({ email: profile._json.emailAddress }, function(err, existingEmailUser) {
+      db.User.findOne({ where: { email: profile._json.emailAddress } }).then(function(existingEmailUser) {
         if (existingEmailUser) {
           req.flash('errors', { msg: 'There is already an account using this email address. Sign in to that account and link it with LinkedIn manually from Account Settings.' });
-          done(err);
+          done('UserExists');
         } else {
-          var user = new User();
-          user.linkedin = profile.id;
-          user.tokens.push({ kind: 'linkedin', accessToken: accessToken });
+          var user = db.User.build({ linkedinId: profile.id.toString() });
           user.email = profile._json.emailAddress;
-          user.profile.name = profile.displayName;
-          user.profile.location = profile._json.location.name;
-          user.profile.picture = profile._json.pictureUrl;
-          user.profile.website = profile._json.publicProfileUrl;
-          user.save(function(err) {
-            done(err, user);
-          });
+          user.tokens = { linkedin: accessToken };
+          user.profile = {
+            name: profile.displayName,
+            location: profile._json.location.name,
+            picture: profile._json.pictureUrl,
+            website: profile._json.publicProfileUrl
+          };
+          user.save()
+            .then(function(savedUser) { done(null, savedUser); })
+            .catch(function(error) { done(error); });
         }
       });
     });

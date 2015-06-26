@@ -101,22 +101,21 @@ module.exports = function(db, DataTypes) {
       },
       findUser: function(email, password, cb) {
         User.findOne({
-            where: { email: email }
-          })
-          .then(function(user) {
-              if(user == null || user.password == null || user.password.length === 0) {
-                cb('User / Password combination is not correct', null);
-                return;
-              }
-            bcrypt.compare(password, user.password, function(err, res) {
-              if(res) {
-                cb(null, user);
-              } else {
-                cb(err, null);
-              }
-            });
-          })
-          .catch(function(serr) { cb(serr, null); });
+          where: { email: email }
+        })
+        .then(function(user) {
+          if(user == null || user.password == null || user.password.length === 0) {
+            cb('User / Password combination is not correct', null);
+            return;
+          }
+          bcrypt.compare(password, user.password, function(err, res) {
+            if(res)
+              cb(null, user);
+            else
+              cb(err, null);
+          });
+        })
+        .catch(function(serr) { cb(serr, null); });
       }
     },
     hooks: {
