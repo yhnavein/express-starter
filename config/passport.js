@@ -76,13 +76,11 @@ passport.deserializeUser(function(id, done) {
  */
 passport.use(new LocalStrategy({ usernameField: 'email' }, function(email, password, done) {
   email = email.toLowerCase();
-  db.User.findUser(email, password)
-    .then(function(user) {
-      return done(null, user);
-    })
-    .catch(function(error) {
-      return done(error, null);
-    });
+  db.User.findUser(email, password, function(err, user) {
+    if(err)
+      return done(err, null);
+    return done(null, user);
+  });
 }));
 
 /**

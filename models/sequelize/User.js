@@ -15,16 +15,6 @@ var crypto = require('crypto');
 // }
 
 var instanceMethods = {
-  encryptPassword: function(password, cb) {
-    if (!password) return '';
-    bcrypt.genSalt(10, function(err, salt) {
-      if (err) { cb(null, err); return; }
-      bcrypt.hash(password, salt, null, function(hErr, hash) {
-        if (hErr) { cb(null, hErr); return; }
-        cb(hash, null);
-      });
-    });
-  },
   getGravatarUrl: function(size) {
     if (!size) size = 200;
 
@@ -95,15 +85,38 @@ module.exports = function(db, DataTypes) {
       associate: function(models) {
         //User.hasMany(models.Role);
       },
-      findUser: function(email, password) {
-        this.encryptPassword(password, function(hashPsw, err) {
-          return User.find({
-            where: db.and(
-                { email: email },
-                { password: hashPsw }
-            )
+      encryptPassword: function(password, cb) {
+        if (!password) {
+          cb('', null);
+          return;
+        }
+
+        bcrypt.genSalt(10, function(err, salt) {
+          if (err) { cb(null, err); return; }
+          bcrypt.hash(password, salt, null, function(hErr, hash) {
+            if (hErr) { cb(null, hErr); return; }
+            cb(hash, null);
           });
         });
+      },
+      findUser: function(email, password, cb) {
+        User.findOne({
+            where: { email: email }
+          })
+          .then(function(user) {
+              if(user == null || user.password == null || user.password.length === 0) {
+                cb('User / Password combination is not correct', null);
+                return;
+              }
+            bcrypt.compare(password, user.password, function(err, res) {
+              if(res) {
+                cb(null, user);
+              } else {
+                cb(err, null);
+              }
+            });
+          })
+          .catch(function(serr) { cb(serr, null); });
       }
     },
     hooks: {
