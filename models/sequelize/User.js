@@ -15,9 +15,6 @@ var crypto = require('crypto');
 // }
 
 var instanceMethods = {
-  authenticate: function(plainText){
-    return this.encryptPassword(plainText) === this.password;
-  },
   encryptPassword: function(password, cb) {
     if (!password) return '';
     bcrypt.genSalt(10, function(err, salt) {
@@ -27,9 +24,6 @@ var instanceMethods = {
         cb(hash, null);
       });
     });
-  },
-  getFullname: function() {
-    return [this.firstname, this.lastname].join(' ');
   },
   getGravatarUrl: function(size) {
     if (!size) size = 200;
@@ -43,6 +37,17 @@ var instanceMethods = {
   }
 };
 
+var beforeSaveHook = function(user, options, fn) {
+  if(user.changed('password')) {
+    user.encryptPassword(user.password, function(hash, err) {
+      user.password = hash;
+      fn(null, user);
+    });
+    return;
+  }
+  fn(null, user);
+};
+
 module.exports = function(db, DataTypes) {
   var User = db.define('User', {
     id: {
@@ -50,11 +55,6 @@ module.exports = function(db, DataTypes) {
       autoIncrement: true,
       allowNull: false,
       primaryKey: true
-    },
-    userName: {
-      type: DataTypes.STRING,
-      unique: true,
-      notNull: true
     },
     password: DataTypes.STRING,
     googleId: {
@@ -83,10 +83,11 @@ module.exports = function(db, DataTypes) {
     email: {
       type: DataTypes.STRING,
       unique: true,
-      notNull: true,
+      allowNull: false,
       isEmail: true
     },
-    profile: DataTypes.JSON
+    profile: DataTypes.JSON,
+    tokens: DataTypes.JSON
   }, {
     tableName: 'pl_users',
     instanceMethods: instanceMethods,
@@ -94,12 +95,20 @@ module.exports = function(db, DataTypes) {
       associate: function(models) {
         //User.hasMany(models.Role);
       },
-      getByEmailOrUserName: function(nameOrPassword) {
-        return User.find({ where: db.or(
-          { email: name },
-          { userName: name }
-        )});
+      findUser: function(email, password) {
+        this.encryptPassword(password, function(hashPsw, err) {
+          return User.find({
+            where: db.and(
+                { email: email },
+                { password: hashPsw }
+            )
+          });
+        });
       }
+    },
+    hooks: {
+      beforeUpdate: beforeSaveHook,
+      beforeCreate: beforeSaveHook
     },
     indexes: [
       {

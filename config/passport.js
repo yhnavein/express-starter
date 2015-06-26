@@ -14,15 +14,16 @@ var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 
 var secrets = require('./secrets');
 var db = require('../models/sequelize');
-//var User = require('../models/sequelize/User');
 
 passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  db.User.findById(id, function(err, user) {
-    done(err, user);
+  db.User.findById(id).then(function(user) {
+    done(null, user);
+  }).catch(function(error) {
+    done(error);
   });
 });
 
@@ -75,16 +76,13 @@ passport.deserializeUser(function(id, done) {
  */
 passport.use(new LocalStrategy({ usernameField: 'email' }, function(email, password, done) {
   email = email.toLowerCase();
-  User.findOne({ email: email }, function(err, user) {
-    if (!user) return done(null, false, { message: 'Email ' + email + ' not found'});
-    user.comparePassword(password, function(err, isMatch) {
-      if (isMatch) {
-        return done(null, user);
-      } else {
-        return done(null, false, { message: 'Invalid email or password.' });
-      }
+  db.User.findUser(email, password)
+    .then(function(user) {
+      return done(null, user);
+    })
+    .catch(function(error) {
+      return done(error, null);
     });
-  });
 }));
 
 /**
@@ -107,43 +105,48 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, function(email, passw
  */
 passport.use(new FacebookStrategy(secrets.facebook, function(req, accessToken, refreshToken, profile, done) {
   if (req.user) {
-    User.findOne({ facebook: profile.id }, function(err, existingUser) {
+    db.User.findOne({ where: { facebookId: profile.id } }).then(function(existingUser) {
       if (existingUser) {
         req.flash('errors', { msg: 'There is already a Facebook account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
-        done(err);
+        done('UserExists');
       } else {
-        User.findById(req.user.id, function(err, user) {
-          user.facebook = profile.id;
-          user.tokens.push({ kind: 'facebook', accessToken: accessToken });
+        db.User.findById(req.user.id).then(function(user) {
+          user.facebookId = profile.id;
+          if(!user.tokens) user.tokens = {};
+          if(!user.profile) user.profile = {};
+          user.tokens.facebook = accessToken;
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.gender = user.profile.gender || profile._json.gender;
           user.profile.picture = user.profile.picture || 'https://graph.facebook.com/' + profile.id + '/picture?type=large';
-          user.save(function(err) {
-            req.flash('info', { msg: 'Facebook account has been linked.' });
-            done(err, user);
-          });
+          user.save()
+            .then(function(savedUser) {
+              req.flash('info', { msg: 'Facebook account has been linked.' });
+              done(null, savedUser);
+            })
+            .catch(function(error) { done(error); });
         });
       }
     });
   } else {
-    User.findOne({ facebook: profile.id }, function(err, existingUser) {
+    db.User.findOne({ where: { facebookId: profile.id } }).then(function(existingUser) {
       if (existingUser) return done(null, existingUser);
-      User.findOne({ email: profile._json.email }, function(err, existingEmailUser) {
+      db.User.findOne({ where: { email: profile._json.email } }).then(function(existingEmailUser) {
         if (existingEmailUser) {
           req.flash('errors', { msg: 'There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings.' });
-          done(err);
+          done('UserExists');
         } else {
-          var user = new User();
+          var user = db.User.build({ facebookId: profile.id });
           user.email = profile._json.email;
-          user.facebook = profile.id;
-          user.tokens.push({ kind: 'facebook', accessToken: accessToken });
-          user.profile.name = profile.displayName;
-          user.profile.gender = profile._json.gender;
-          user.profile.picture = 'https://graph.facebook.com/' + profile.id + '/picture?type=large';
-          user.profile.location = (profile._json.location) ? profile._json.location.name : '';
-          user.save(function(err) {
-            done(err, user);
-          });
+          user.tokens = { facebook: accessToken };
+          user.profile = {
+            name: profile.displayName,
+            gender: profile._json.gender,
+            picture: 'https://graph.facebook.com/' + profile.id + '/picture?type=large',
+            location: (profile._json.location) ? profile._json.location.name : ''
+          };
+          user.save()
+            .then(function(savedUser) { done(null, savedUser); })
+            .catch(function(error) { done(error); });
         }
       });
     });

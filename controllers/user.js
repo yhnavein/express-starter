@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash');
 var async = require('neo-async');
 var crypto = require('crypto');
@@ -84,22 +86,25 @@ exports.postSignup = function(req, res, next) {
     return res.redirect('/signup');
   }
 
-  var user = new User({
-    email: req.body.email,
-    password: req.body.password
-  });
-
-  User.findOne({ email: req.body.email }, function(err, existingUser) {
+  db.User.findOne({ where: { email: req.body.email } }).then(function(existingUser) {
     if (existingUser) {
       req.flash('errors', { msg: 'Account with that email address already exists.' });
       return res.redirect('/signup');
     }
-    user.save(function(err) {
-      if (err) return next(err);
+
+    db.User.create({
+      email: req.body.email,
+      password: req.body.password,
+      profile: {},
+      tokens: {}
+    }).then(function(user) {
       req.logIn(user, function(err) {
         if (err) return next(err);
         res.redirect('/');
       });
+    })
+    .catch(function(err) {
+      return next(err);
     });
   });
 };
@@ -182,16 +187,17 @@ exports.postDeleteAccount = function(req, res, next) {
  */
 exports.getOauthUnlink = function(req, res, next) {
   var provider = req.params.provider;
-  User.findById(req.user.id, function(err, user) {
-    if (err) return next(err);
+  db.User.findById(req.user.id).then(function(user) {
+    user[provider + 'Id'] = undefined;
+    if(user.tokens)
+      user.tokens[provider] = undefined;
 
-    user[provider] = undefined;
-    user.tokens = _.reject(user.tokens, function(token) { return token.kind === provider; });
-
-    user.save(function(err) {
-      if (err) return next(err);
+    user.save().then(function(savedUser) {
       req.flash('info', { msg: provider + ' account has been unlinked.' });
       res.redirect('/account');
+      return;
+    }).catch(function(err) {
+      return next(err);
     });
   });
 };

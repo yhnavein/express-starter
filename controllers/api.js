@@ -7,7 +7,6 @@ var request = require('request');
 var graph = require('fbgraph');
 var LastFmNode = require('lastfm').LastFmNode;
 var tumblr = require('tumblr.js');
-var foursquare = require('node-foursquare')({ secrets: secrets.foursquare });
 var Github = require('github-api');
 var Twit = require('twit');
 var stripe = require('stripe')(secrets.stripe.secretKey);
@@ -17,7 +16,6 @@ var BitGo = require('bitgo');
 var clockwork = require('clockwork')({ key: secrets.clockwork.apiKey });
 var paypal = require('paypal-rest-sdk');
 var lob = require('lob')(secrets.lob.apiKey);
-var ig = require('instagram-node').instagram();
 var Y = require('yui/yql');
 var _ = require('lodash');
 
@@ -28,40 +26,6 @@ var _ = require('lodash');
 exports.getApi = function(req, res) {
   res.render('api/index', {
     title: 'API Examples'
-  });
-};
-
-/**
- * GET /api/foursquare
- * Foursquare API example.
- */
-exports.getFoursquare = function(req, res, next) {
-  var token = _.find(req.user.tokens, { kind: 'foursquare' });
-  async.parallel({
-    trendingVenues: function(callback) {
-      foursquare.Venues.getTrending('40.7222756', '-74.0022724', { limit: 50 }, token.accessToken, function(err, results) {
-        callback(err, results);
-      });
-    },
-    venueDetail: function(callback) {
-      foursquare.Venues.getVenue('49da74aef964a5208b5e1fe3', token.accessToken, function(err, results) {
-        callback(err, results);
-      });
-    },
-    userCheckins: function(callback) {
-      foursquare.Users.getCheckins('self', null, token.accessToken, function(err, results) {
-        callback(err, results);
-      });
-    }
-  },
-  function(err, results) {
-    if (err) return next(err);
-    res.render('api/foursquare', {
-      title: 'Foursquare API',
-      trendingVenues: results.trendingVenues,
-      venueDetail: results.venueDetail,
-      userCheckins: results.userCheckins
-    });
   });
 };
 
@@ -524,47 +488,6 @@ exports.getLinkedin = function(req, res, next) {
 };
 
 /**
- * GET /api/instagram
- * Instagram API example.
- */
-exports.getInstagram = function(req, res, next) {
-  var token = _.find(req.user.tokens, { kind: 'instagram' });
-  ig.use({ client_id: secrets.instagram.clientID, client_secret: secrets.instagram.clientSecret });
-  ig.use({ access_token: token.accessToken });
-  async.parallel({
-    searchByUsername: function(done) {
-      ig.user_search('richellemead', function(err, users, limit) {
-        done(err, users);
-      });
-    },
-    searchByUserId: function(done) {
-      ig.user('175948269', function(err, user) {
-        done(err, user);
-      });
-    },
-    popularImages: function(done) {
-      ig.media_popular(function(err, medias) {
-        done(err, medias);
-      });
-    },
-    myRecentMedia: function(done) {
-      ig.user_self_media_recent(function(err, medias, pagination, limit) {
-        done(err, medias);
-      });
-    }
-  }, function(err, results) {
-    if (err) return next(err);
-    res.render('api/instagram', {
-      title: 'Instagram API',
-      usernames: results.searchByUsername,
-      userById: results.searchByUserId,
-      popularImages: results.popularImages,
-      myRecentMedia: results.myRecentMedia
-    });
-  });
-};
-
-/**
  * GET /api/yahoo
  * Yahoo API example.
  */
@@ -663,9 +586,9 @@ exports.getPayPalCancel = function(req, res) {
  */
 exports.getLob = function(req, res, next) {
   lob.routes.list({
-    zip_codes: ['10007'] 
+    zip_codes: ['10007']
   }, function(err, routes) {
-    if(err) return next(err); 
+    if(err) return next(err);
     res.render('api/lob', {
       title: 'Lob API',
       routes: routes.data[0].routes
