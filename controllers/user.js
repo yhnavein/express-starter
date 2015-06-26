@@ -187,11 +187,10 @@ exports.postDeleteAccount = function(req, res, next) {
 exports.getOauthUnlink = function(req, res, next) {
   var provider = req.params.provider;
   db.User.findById(req.user.id).then(function(user) {
-    user[provider + 'Id'] = undefined;
-    if(user.tokens)
-      user.tokens[provider] = undefined;
+    var attrInfo = {};
+    attrInfo[provider + 'Id'] = null;
 
-    user.save().then(function(savedUser) {
+    user.updateAttributes(attrInfo).then(function(savedUser) {
       req.flash('info', { msg: provider + ' account has been unlinked.' });
       res.redirect('/account');
       return;
