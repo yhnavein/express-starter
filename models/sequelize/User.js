@@ -1,3 +1,5 @@
+'use strict';
+
 var bcrypt = require('bcrypt-nodejs');
 var crypto = require('crypto');
 
@@ -20,8 +22,8 @@ var instanceMethods = {
     if (!password) return '';
     bcrypt.genSalt(10, function(err, salt) {
       if (err) { cb(null, err); return; }
-      bcrypt.hash(password, salt, null, function(err, hash) {
-        if (err) { cb(null, err); return; }
+      bcrypt.hash(password, salt, null, function(hErr, hash) {
+        if (hErr) { cb(null, hErr); return; }
         cb(hash, null);
       });
     });
@@ -43,7 +45,7 @@ var instanceMethods = {
 
 module.exports = function(db, DataTypes) {
   var User = db.define('User', {
-    id_user: {
+    id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       allowNull: false,
@@ -55,34 +57,77 @@ module.exports = function(db, DataTypes) {
       notNull: true
     },
     password: DataTypes.STRING,
-    googleId: DataTypes.STRING,
-    facebookId: DataTypes.STRING,
-    twitterId: DataTypes.STRING,
-    date_created: DataTypes.DATE,
-    date_modified: DataTypes.DATE,
+    googleId: {
+      type: DataTypes.STRING,
+      unique: true
+    },
+    facebookId: {
+      type: DataTypes.STRING,
+      unique: true
+    },
+    twitterId: {
+      type: DataTypes.STRING,
+      unique: true
+    },
+    linkedInId: {
+      type: DataTypes.STRING,
+      unique: true
+    },
+    githubId: {
+      type: DataTypes.STRING,
+      unique: true
+    },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
     logins: DataTypes.INTEGER,
     email: {
       type: DataTypes.STRING,
       unique: true,
       notNull: true,
       isEmail: true
-    }
+    },
+    profile: DataTypes.JSON
   }, {
     tableName: 'pl_users',
-    updatedAt: 'date_modified',
-    createdAt: 'date_created',
     instanceMethods: instanceMethods,
     classMethods: {
       associate: function(models) {
         //User.hasMany(models.Role);
       },
-      getByEmailOrUserName: function(name, password, callback) {
-        User.find({ where: db.or(
+      getByEmailOrUserName: function(nameOrPassword) {
+        return User.find({ where: db.or(
           { email: name },
           { userName: name }
-        )}).then(callback);
+        )});
       }
-    }
+    },
+    indexes: [
+      {
+        name: 'facebookIdIndex',
+        method: 'BTREE',
+        fields: ['facebookId']
+      },
+      {
+        name: 'googleIdIndex',
+        method: 'BTREE',
+        fields: ['googleId']
+      },
+      {
+        name: 'twitterIdIndex',
+        method: 'BTREE',
+        fields: ['twitterId']
+      },
+      {
+        name: 'linkedInIdIndex',
+        method: 'BTREE',
+        fields: ['linkedInId']
+      },
+      {
+        name: 'githubIdIndex',
+        method: 'BTREE',
+        fields: ['githubId']
+      }
+    ]
   });
 
   return User;

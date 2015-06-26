@@ -16,6 +16,7 @@ exports.getLogin = function(req, res) {
   res.render('account/login', {
     title: 'Login'
   });
+  // db.User.
 };
 
 /**
