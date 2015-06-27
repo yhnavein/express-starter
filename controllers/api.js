@@ -34,7 +34,7 @@ exports.getApi = function(req, res) {
  * Tumblr API example.
  */
 exports.getTumblr = function(req, res, next) {
-  var token = _.find(req.user.tokens, { kind: 'tumblr' });
+  var token = req.user.tokens.tumblr;
   var client = tumblr.createClient({
     consumer_key: secrets.tumblr.consumerKey,
     consumer_secret: secrets.tumblr.consumerSecret,
@@ -56,7 +56,7 @@ exports.getTumblr = function(req, res, next) {
  * Facebook API example.
  */
 exports.getFacebook = function(req, res, next) {
-  var token = _.find(req.user.tokens, { kind: 'facebook' });
+  var token = req.user.tokens.facebook;
   graph.setAccessToken(token.accessToken);
   async.parallel({
     getMe: function(done) {
@@ -104,7 +104,7 @@ exports.getScraping = function(req, res, next) {
  * GitHub API Example.
  */
 exports.getGithub = function(req, res, next) {
-  var token = _.find(req.user.tokens, { kind: 'github' });
+  var token = req.user.tokens.github;
   var github = new Github({ token: token.accessToken });
   var repo = github.getRepo('sahat', 'requirejs-library');
   repo.show(function(err, repo) {
@@ -224,12 +224,13 @@ exports.getLastfm = function(req, res, next) {
  * Twiter API example.
  */
 exports.getTwitter = function(req, res, next) {
-  var token = _.find(req.user.tokens, { kind: 'twitter' });
+  var accessToken = req.user.tokens.twitter;
+  var secretToken = req.user.tokens.twitterSecret;
   var T = new Twit({
     consumer_key: secrets.twitter.consumerKey,
     consumer_secret: secrets.twitter.consumerSecret,
-    access_token: token.accessToken,
-    access_token_secret: token.tokenSecret
+    access_token: accessToken,
+    access_token_secret: secretToken
   });
   T.get('search/tweets', { q: 'nodejs since:2013-01-01', geocode: '40.71448,-74.00598,5mi', count: 10 }, function(err, reply) {
     if (err) return next(err);
@@ -251,12 +252,13 @@ exports.postTwitter = function(req, res, next) {
     req.flash('errors', errors);
     return res.redirect('/api/twitter');
   }
-  var token = _.find(req.user.tokens, { kind: 'twitter' });
+  var accessToken = req.user.tokens.twitter;
+  var secretToken = req.user.tokens.twitterSecret;
   var T = new Twit({
     consumer_key: secrets.twitter.consumerKey,
     consumer_secret: secrets.twitter.consumerSecret,
-    access_token: token.accessToken,
-    access_token_secret: token.tokenSecret
+    access_token: accessToken,
+    access_token_secret: secretToken
   });
   T.post('statuses/update', { status: req.body.tweet }, function(err, data, response) {
     if (err) return next(err);
@@ -409,7 +411,7 @@ exports.postClockwork = function(req, res, next) {
  * Venmo API example.
  */
 exports.getVenmo = function(req, res, next) {
-  var token = _.find(req.user.tokens, { kind: 'venmo' });
+  var token = req.user.tokens.venmo;
   var query = querystring.stringify({ access_token: token.accessToken });
   async.parallel({
     getProfile: function(done) {
@@ -446,7 +448,7 @@ exports.postVenmo = function(req, res, next) {
     req.flash('errors', errors);
     return res.redirect('/api/venmo');
   }
-  var token = _.find(req.user.tokens, { kind: 'venmo' });
+  var token = req.user.tokens.venmo;
   var formData = {
     access_token: token.accessToken,
     note: req.body.note,
@@ -476,7 +478,7 @@ exports.postVenmo = function(req, res, next) {
  * LinkedIn API example.
  */
 exports.getLinkedin = function(req, res, next) {
-  var token = _.find(req.user.tokens, { kind: 'linkedin' });
+  var token = req.user.tokens.linkedin;
   var linkedin = Linkedin.init(token.accessToken);
   linkedin.people.me(function(err, $in) {
     if (err) return next(err);

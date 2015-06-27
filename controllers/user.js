@@ -6,7 +6,6 @@ var crypto = require('crypto');
 var nodemailer = require('nodemailer');
 var passport = require('passport');
 var db = require('../models/sequelize');
-// var User = require('../models/User');
 var secrets = require('../config/secrets');
 
 /**
@@ -41,10 +40,12 @@ exports.postLogin = function(req, res, next) {
       req.flash('errors', { msg: info.message });
       return res.redirect('/login');
     }
-    req.logIn(user, function(err) {
-      if (err) return next(err);
+    req.logIn(user, function(loginErr) {
+      if (loginErr) return next(loginErr);
       req.flash('success', { msg: 'Success! You are logged in.' });
-      res.redirect(req.session.returnTo || '/');
+      var redirectTo = req.session.returnTo || '/';
+      delete req.session.returnTo;
+      res.redirect(redirectTo);
     });
   })(req, res, next);
 };
@@ -123,19 +124,26 @@ exports.getAccount = function(req, res) {
  * Update profile information.
  */
 exports.postUpdateProfile = function(req, res, next) {
-  User.findById(req.user.id, function(err, user) {
-    if (err) return next(err);
+  db.User.findById(req.user.id).then(function(user) {
     user.email = req.body.email || '';
+    user.logins = Math.floor(Math.random() * 100);
     user.profile.name = req.body.name || '';
     user.profile.gender = req.body.gender || '';
     user.profile.location = req.body.location || '';
     user.profile.website = req.body.website || '';
+    user.set('profile', user.profile);
 
-    user.save(function(err) {
-      if (err) return next(err);
+    console.log('changed', user.changed('profile'));
+    user.save().then(function() {
       req.flash('success', { msg: 'Profile information updated.' });
       res.redirect('/account');
+    })
+    .catch(function(err) {
+      return next(err);
     });
+  })
+  .catch(function(err) {
+    return next(err);
   });
 };
 
@@ -154,17 +162,16 @@ exports.postUpdatePassword = function(req, res, next) {
     return res.redirect('/account');
   }
 
-  User.findById(req.user.id, function(err, user) {
-    if (err) return next(err);
+  db.User.findById(req.user.id)
+    .then(function(user) {
+      user.password = req.body.password;
 
-    user.password = req.body.password;
-
-    user.save(function(err) {
-      if (err) return next(err);
-      req.flash('success', { msg: 'Password has been changed.' });
-      res.redirect('/account');
-    });
-  });
+      user.save().then(function() {
+        req.flash('success', { msg: 'Password has been changed.' });
+        res.redirect('/account');
+      });
+    })
+    .catch(function(err) { return next(err); });
 };
 
 /**
@@ -172,12 +179,12 @@ exports.postUpdatePassword = function(req, res, next) {
  * Delete user account.
  */
 exports.postDeleteAccount = function(req, res, next) {
-  User.remove({ _id: req.user.id }, function(err) {
-    if (err) return next(err);
-    req.logout();
-    req.flash('info', { msg: 'Your account has been deleted.' });
-    res.redirect('/');
-  });
+  db.User.destroy({ where: { id: req.user.id } })
+    .then(function() {
+      req.logout();
+      req.flash('info', { msg: 'Your account has been deleted.' });
+      res.redirect('/');
+    });
 };
 
 /**
@@ -208,17 +215,16 @@ exports.getReset = function(req, res) {
   if (req.isAuthenticated()) {
     return res.redirect('/');
   }
-  User
-    .findOne({ resetPasswordToken: req.params.token })
-    .where('resetPasswordExpires').gt(Date.now())
-    .exec(function(err, user) {
-      if (!user) {
-        req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
-        return res.redirect('/forgot');
-      }
+  db.User
+    .findOne({ where: { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } } })
+    .then(function(user) {
       res.render('account/reset', {
         title: 'Password Reset'
       });
+    })
+    .catch(function(err) {
+      req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
+      return res.redirect('/forgot');
     });
 };
 

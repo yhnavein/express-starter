@@ -24,12 +24,21 @@ var instanceMethods = {
 
     var md5 = crypto.createHash('md5').update(this.email).digest('hex');
     return 'https://gravatar.com/avatar/' + md5 + '?s=' + size + '&d=retro';
+  },
+  getProfilePicture: function(size) {
+    if(this.profile && this.profile.picture != null)
+      return this.profile.picture;
+
+    return this.getGravatarUrl(size);
+  },
+  hasSetPassword: function() {
+    return this.password != null && this.password.length > 0;
   }
 };
 
 var beforeSaveHook = function(user, options, fn) {
   if(user.changed('password')) {
-    user.encryptPassword(user.password, function(hash, err) {
+    this.encryptPassword(user.password, function(hash, err) {
       user.password = hash;
       fn(null, user);
     });

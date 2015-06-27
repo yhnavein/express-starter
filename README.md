@@ -477,10 +477,6 @@ added to `package.json` as well. For example, `npm install --save moment`.
 asynchronous tasks, and then render a page, but only when all tasks are completed. For example, you might
 want to scrape 3 different websites for some data and render the results in a template
 after all 3 websites have been scraped.
-- Need to find a specific object inside an Array? Use [_.find](http://lodash.com/docs#find)
-function from Lodash. For example, this is how you would retrieve a
-Twitter token from database: `var token = _.find(req.user.tokens, { kind: 'twitter' });`,
-where 1st parameter is an array, and a 2nd parameter is an object to search for.
 
 FAQ
 ---

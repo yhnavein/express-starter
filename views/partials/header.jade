@@ -26,11 +26,8 @@
         else
           li.dropdown(class=title=='Account Management'?'active':undefined)
             a.dropdown-toggle(href='#', data-toggle='dropdown')
-              if user.profile.picture
-                img(src='#{user.profile.picture}')
-              else
-                img(src='#{user.getGravatarUrl(60)}')
-              | #{user.profile.name || user.email || user.id}&nbsp;
+              img(src='#{user.getProfilePicture(60)}')
+              | #{user.profile.name || user.email}&nbsp;
               i.caret
             ul.dropdown-menu
               li

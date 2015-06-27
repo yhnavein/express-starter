@@ -116,6 +116,9 @@ passport.use(new FacebookStrategy(secrets.facebook, function(req, accessToken, r
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.gender = user.profile.gender || profile._json.gender;
           user.profile.picture = user.profile.picture || 'https://graph.facebook.com/' + profile.id.toString() + '/picture?type=large';
+          user.set('tokens', user.tokens);
+          user.set('profile', user.profile);
+
           user.save()
             .then(function(savedUser) {
               req.flash('info', { msg: 'Facebook account has been linked.' });
@@ -168,6 +171,9 @@ passport.use(new GitHubStrategy(secrets.github, function(req, accessToken, refre
           user.profile.picture = user.profile.picture || profile._json.avatar_url;
           user.profile.location = user.profile.location || profile._json.location;
           user.profile.website = user.profile.website || profile._json.blog;
+          user.set('tokens', user.tokens);
+          user.set('profile', user.profile);
+
           user.save()
             .then(function(savedUser) {
               req.flash('info', { msg: 'GitHub account has been linked.' });
@@ -219,6 +225,9 @@ passport.use(new TwitterStrategy(secrets.twitter, function(req, accessToken, tok
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.location = user.profile.location || profile._json.location;
           user.profile.picture = user.profile.picture || profile._json.profile_image_url_https;
+          user.set('tokens', user.tokens);
+          user.set('profile', user.profile);
+
           user.save()
             .then(function(savedUser) {
               req.flash('info', { msg: 'Twitter account has been linked.' });
@@ -263,6 +272,9 @@ passport.use(new GoogleStrategy(secrets.google, function(req, accessToken, refre
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.gender = user.profile.gender || profile._json.gender;
           user.profile.picture = user.profile.picture || profile._json.picture;
+          user.set('tokens', user.tokens);
+          user.set('profile', user.profile);
+
           user.save()
             .then(function(savedUser) {
               req.flash('info', { msg: 'Google account has been linked.' });
@@ -314,6 +326,9 @@ passport.use(new LinkedInStrategy(secrets.linkedin, function(req, accessToken, r
           user.profile.location = user.profile.location || profile._json.location.name;
           user.profile.picture = user.profile.picture || profile._json.pictureUrl;
           user.profile.website = user.profile.website || profile._json.publicProfileUrl;
+          user.set('tokens', user.tokens);
+          user.set('profile', user.profile);
+
           user.save()
             .then(function(savedUser) {
               req.flash('info', { msg: 'Google account has been linked.' });
@@ -427,7 +442,7 @@ exports.isAuthenticated = function(req, res, next) {
 exports.isAuthorized = function(req, res, next) {
   var provider = req.path.split('/').slice(-1)[0];
 
-  if (_.find(req.user.tokens, { kind: provider })) {
+  if (req.user.tokens[provider]) {
     next();
   } else {
     res.redirect('/auth/' + provider);
