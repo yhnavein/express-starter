@@ -2,7 +2,7 @@
 
 process.env.NODE_ENV = 'test';
 
-var expect = require('chai').expect;
+var expect = require('expect.js');
 var userRepo = require('../../repositories/UserRepository');
 var reqMock = { flash: function() {} };
 
@@ -18,11 +18,11 @@ describe('User Repository', function() {
     };
 
     userRepo.createAccFromFacebook(reqMock, accessToken, refreshToken, profile, function(err, user) {
-      expect(err).to.be.null;
-      expect(user).to.exist;
-      expect(user.facebookId).to.be.equal(uniqueness.toString());
-      expect(user.password).to.be.null;
-      expect(user.email).to.be.equal(email);
+      expect(err).to.be(null);
+      expect(user).to.be.a('object');
+      expect(user.facebookId).to.be(uniqueness.toString());
+      expect(user.password).to.be(null);
+      expect(user.email).to.be(email);
       done();
     });
   });
@@ -38,10 +38,10 @@ describe('User Repository', function() {
     };
 
     userRepo.createAccFromFacebook(reqMock, accessToken, refreshToken, profile, function(err, user) {
-      expect(err).to.be.null;
-      expect(user).to.exist;
-      expect(user.profile).to.be.notNull;
-      expect(user.profile.location).to.be.equal('Warsaw');
+      expect(err).to.be(null);
+      expect(user).to.be.a('object');
+      expect(user.profile).to.be.a('object');
+      expect(user.profile.location).to.be('Warsaw');
       done();
     });
   });

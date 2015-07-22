@@ -70,8 +70,8 @@ repo.createAccFromFacebook = function(req, accessToken, refreshToken, profile, d
           location: (profile._json.location) ? profile._json.location.name : ''
         };
         user.save()
-          .then(function(savedUser) { console.log('Nice!', savedUser); done(null, savedUser); })
-          .catch(function(error) { console.log('Buu!', error); done(error); });
+          .then(function(savedUser) { done(null, savedUser); })
+          .catch(function(error) { done(error); });
       }
     });
   });
