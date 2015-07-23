@@ -89,6 +89,8 @@ repo.linkGithubProfile = function(req, accessToken, tokenSecret, profile, done) 
     } else {
       db.User.findById(req.user.id).then(function(user) {
         user.githubId = profile.id.toString();
+        if(!user.tokens) user.tokens = {};
+        if(!user.profile) user.profile = {};
         user.tokens.github = accessToken;
         user.profile.name = user.profile.name || profile.displayName;
         user.profile.picture = user.profile.picture || profile._json.avatar_url;
@@ -145,6 +147,8 @@ repo.linkTwitterProfile = function(req, accessToken, tokenSecret, profile, done)
     } else {
       db.User.findById(req.user.id).then(function(user) {
         user.twitterId = profile.id.toString();
+        if(!user.tokens) user.tokens = {};
+        if(!user.profile) user.profile = {};
         user.tokens.twitter = accessToken;
         user.tokens.twitterSecret = tokenSecret;
         user.profile.name = user.profile.name || profile.displayName;
@@ -193,6 +197,8 @@ repo.linkGoogleProfile = function(req, accessToken, tokenSecret, profile, done) 
     } else {
       db.User.findById(req.user.id).then(function(user) {
         user.googleId = profile.id.toString();
+        if(!user.tokens) user.tokens = {};
+        if(!user.profile) user.profile = {};
         user.tokens.google = accessToken;
         user.profile.name = user.profile.name || profile.displayName;
         user.profile.gender = user.profile.gender || profile._json.gender;
@@ -247,6 +253,8 @@ repo.linkLinkedInProfile = function(req, accessToken, tokenSecret, profile, done
     } else {
       db.User.findById(req.user.id).then(function(user) {
         user.linkedin = profile.id.toString();
+        if(!user.tokens) user.tokens = {};
+        if(!user.profile) user.profile = {};
         user.tokens.linkedin = accessToken;
         user.profile.name = user.profile.name || profile.displayName;
         user.profile.location = user.profile.location || profile._json.location.name;
