@@ -1,3 +1,5 @@
+'use strict';
+
 var secrets = require('../config/secrets');
 var querystring = require('querystring');
 var validator = require('validator');
@@ -85,7 +87,7 @@ exports.getFacebook = function(req, res, next) {
  * Web scraping example using Cheerio library.
  */
 exports.getScraping = function(req, res, next) {
-  request.get('https://news.ycombinator.com/', function(err, request, body) {
+  request.get('https://news.ycombinator.com/', function(err, reqInner, body) {
     if (err) return next(err);
     var $ = cheerio.load(body);
     var links = [];
@@ -105,13 +107,13 @@ exports.getScraping = function(req, res, next) {
  */
 exports.getGithub = function(req, res, next) {
   var token = req.user.tokens.github;
-  var github = new Github({ token: token.accessToken });
+  var github = new Github({ token: token });
   var repo = github.getRepo('sahat', 'requirejs-library');
-  repo.show(function(err, repo) {
+  repo.show(function(err, repository) {
     if (err) return next(err);
     res.render('api/github', {
       title: 'GitHub API',
-      repo: repo
+      repo: repository
     });
   });
 
@@ -134,9 +136,9 @@ exports.getAviary = function(req, res) {
 exports.getNewYorkTimes = function(req, res, next) {
   var query = querystring.stringify({ 'api-key': secrets.nyt.key, 'list-name': 'young-adult' });
   var url = 'http://api.nytimes.com/svc/books/v2/lists?' + query;
-  request.get(url, function(err, request, body) {
+  request.get(url, function(err, reqInner, body) {
     if (err) return next(err);
-    if (request.statusCode === 403) return next(Error('Missing or Invalid New York Times API Key'));
+    if (reqInner.statusCode === 403) return next(Error('Missing or Invalid New York Times API Key'));
     var bestsellers = JSON.parse(body);
     res.render('api/nyt', {
       title: 'New York Times API',
@@ -278,16 +280,16 @@ exports.getSteam = function(req, res, next) {
     playerAchievements: function(done) {
       query.appid = '49520';
       var qs = querystring.stringify(query);
-      request.get({ url: 'http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?' + qs, json: true }, function(error, request, body) {
-        if (request.statusCode === 401) return done(new Error('Missing or Invalid Steam API Key'));
+      request.get({ url: 'http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?' + qs, json: true }, function(error, req1, body) {
+        if (req1.statusCode === 401) return done(new Error('Missing or Invalid Steam API Key'));
         done(error, body);
       });
     },
     playerSummaries: function(done) {
       query.steamids = steamId;
       var qs = querystring.stringify(query);
-      request.get({ url: 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?' + qs, json: true }, function(err, request, body) {
-        if (request.statusCode === 401) return done(new Error('Missing or Invalid Steam API Key'));
+      request.get({ url: 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?' + qs, json: true }, function(err, req1, body) {
+        if (req1.statusCode === 401) return done(new Error('Missing or Invalid Steam API Key'));
         done(err, body);
       });
     },
@@ -295,8 +297,8 @@ exports.getSteam = function(req, res, next) {
       query.include_appinfo = 1;
       query.include_played_free_games = 1;
       var qs = querystring.stringify(query);
-      request.get({ url: 'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?' + qs, json: true }, function(err, request, body) {
-        if (request.statusCode === 401) return done(new Error('Missing or Invalid Steam API Key'));
+      request.get({ url: 'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?' + qs, json: true }, function(err, req1, body) {
+        if (req1.statusCode === 401) return done(new Error('Missing or Invalid Steam API Key'));
         done(err, body);
       });
     }
@@ -415,12 +417,12 @@ exports.getVenmo = function(req, res, next) {
   var query = querystring.stringify({ access_token: token.accessToken });
   async.parallel({
     getProfile: function(done) {
-      request.get({ url: 'https://api.venmo.com/v1/me?' + query, json: true }, function(err, request, body) {
+      request.get({ url: 'https://api.venmo.com/v1/me?' + query, json: true }, function(err, req1, body) {
         done(err, body);
       });
     },
     getRecentPayments: function(done) {
-      request.get({ url: 'https://api.venmo.com/v1/payments?' + query, json: true }, function(err, request, body) {
+      request.get({ url: 'https://api.venmo.com/v1/payments?' + query, json: true }, function(err, req1, body) {
         done(err, body);
       });
     }
@@ -462,9 +464,9 @@ exports.postVenmo = function(req, res, next) {
   } else {
     formData.user_id = req.body.user;
   }
-  request.post('https://api.venmo.com/v1/payments', { form: formData }, function(err, request, body) {
+  request.post('https://api.venmo.com/v1/payments', { form: formData }, function(err, req1, body) {
     if (err) return next(err);
-    if (request.statusCode !== 200) {
+    if (req1.statusCode !== 200) {
       req.flash('errors', { msg: JSON.parse(body).error.message });
       return res.redirect('/api/venmo');
     }
@@ -479,7 +481,7 @@ exports.postVenmo = function(req, res, next) {
  */
 exports.getLinkedin = function(req, res, next) {
   var token = req.user.tokens.linkedin;
-  var linkedin = Linkedin.init(token.accessToken);
+  var linkedin = Linkedin.init(token);
   linkedin.people.me(function(err, $in) {
     if (err) return next(err);
     res.render('api/linkedin', {
@@ -606,10 +608,10 @@ exports.getBitGo = function(req, res, next) {
   var bitgo = new BitGo.BitGo({ env: 'test', accessToken: secrets.bitgo.accessToken });
   var walletId = req.session.walletId; // we use the session to store the walletid, but you should store it elsewhere
 
-  var renderWalletInfo = function(walletId) {
-    bitgo.wallets().get({id: walletId}, function(err, walletRes) {
-      walletRes.createAddress({}, function(err, addressRes) {
-        walletRes.transactions({}, function(err, transactionsRes) {
+  var renderWalletInfo = function(wId) {
+    bitgo.wallets().get({id: wId}, function(err, walletRes) {
+      walletRes.createAddress({}, function(err1, addressRes) {
+        walletRes.transactions({}, function(err2, transactionsRes) {
           res.render('api/bitgo', {
             title: 'BitGo API',
             wallet: walletRes.wallet,
@@ -631,8 +633,8 @@ exports.getBitGo = function(req, res, next) {
         label: 'wallet for session ' + req.sessionID,
         backupXpub: 'xpub6AHA9hZDN11k2ijHMeS5QqHx2KP9aMBRhTDqANMnwVtdyw2TDYRmF8PjpvwUFcL1Et8Hj59S3gTSMcUQ5gAqTz3Wd8EsMTmF3DChhqPQBnU'
       },
-      function(err, res) {
-        req.session.walletId = res.wallet.wallet.id;
+      function(err, res1) {
+        req.session.walletId = res1.wallet.wallet.id;
         renderWalletInfo(req.session.walletId);
       }
     );

@@ -53,6 +53,9 @@ repo.linkFacebookProfile = function(req, accessToken, refreshToken, profile, don
 };
 
 repo.createAccFromFacebook = function(req, accessToken, refreshToken, profile, done) {
+  if(!profile._json) {
+    return done('Facebook profile is missing _json property!', null);
+  }
   db.User.findOne({ where: { facebookId: profile.id.toString() } }).then(function(existingUser) {
     if (existingUser) return done(null, existingUser);
     db.User.findOne({ where: { email: profile._json.email } }).then(function(existingEmailUser) {
@@ -60,14 +63,14 @@ repo.createAccFromFacebook = function(req, accessToken, refreshToken, profile, d
         req.flash('errors', { msg: 'There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings.' });
         done('UserExists');
       } else {
+        console.log('Facebook Profile', profile);
         var user = db.User.build({ facebookId: profile.id.toString() });
         user.email = profile._json.email;
         user.tokens = { facebook: accessToken };
         user.profile = {
           name: profile.displayName,
-          gender: profile._json.gender,
-          picture: 'https://graph.facebook.com/' + profile.id.toString() + '/picture?type=large',
-          location: (profile._json.location) ? profile._json.location.name : ''
+          gender: profile.gender,
+          picture: 'https://graph.facebook.com/' + profile.id.toString() + '/picture?type=large'
         };
         user.save()
           .then(function(savedUser) { done(null, savedUser); })

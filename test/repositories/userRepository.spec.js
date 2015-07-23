@@ -47,21 +47,67 @@ describe('User Repository', function() {
       });
     });
 
-    it('should create properly a new user from facebook with location', function (done) {
+    it('should respond with error when empty json property is passed from facebook', function (done) {
       var uniqueness = Date.now();
+      var accessToken = 'accToken' + uniqueness;
+      var refreshToken = 'refToken' + uniqueness;
+      var profile = { id: uniqueness };
+
+      userRepo.createAccFromFacebook(reqMock, accessToken, refreshToken, profile, function (err, user) {
+        expect(err).to.not.be(null);
+        expect(user).to.be(null);
+        done();
+      });
+    });
+
+    it('should create properly a new user from facebook with a full profile', function (done) {
+      var uniqueness = Date.now();
+      var profileId = uniqueness.toString();
       var email = 'test-fb-' + uniqueness + '@puredev.eu';
       var accessToken = 'accToken' + uniqueness;
       var refreshToken = 'refToken' + uniqueness;
-      var profile = {
-        id: uniqueness,
-        _json: {email: email, location: {name: 'Warsaw'}}
+      //structure of the profile is from the actual request, yet data is totally randomized
+      //Sorry, Garrett Alexion!
+      var sampleProfile = {
+        id: profileId,
+        username:undefined,
+        displayName:'Garrett Alexion',
+        name:{
+          familyName:'Alexion',
+          givenName:'Garrett',
+          middleName:undefined
+        },
+        gender:'male',
+        profileUrl:'http://www.facebook.com/297638351',
+        emails:[
+          {
+            value:email
+          }
+        ],
+        provider:'facebook',
+        _json:{
+          id: profileId,
+          email:email,
+          first_name:'Garrett',
+          gender:'male',
+          last_name:'Alexion',
+          link:'http://www.facebook.com/297638351',
+          locale:'en_US',
+          name:'Garrett Alexion',
+          timezone:2,
+          updated_time:'2015-06-06T15:55:07+0000',
+          verified:true
+        }
       };
 
-      userRepo.createAccFromFacebook(reqMock, accessToken, refreshToken, profile, function (err, user) {
+      userRepo.createAccFromFacebook(reqMock, accessToken, refreshToken, sampleProfile, function (err, user) {
         expect(err).to.be(null);
         expect(user).to.be.a('object');
+        expect(user.facebookId).to.be(sampleProfile.id);
+        expect(user.email).to.be(email);
         expect(user.profile).to.be.a('object');
-        expect(user.profile.location).to.be('Warsaw');
+        expect(user.profile.name).to.be(sampleProfile.displayName);
+        expect(user.profile.gender).to.be(sampleProfile.gender);
         done();
       });
     });
@@ -287,6 +333,7 @@ describe('User Repository', function() {
       var uniqueness = Date.now();
       var accessToken = 'accToken' + uniqueness;
       var tokenSecret = 'secToken' + uniqueness;
+
       var profile = {
         id: uniqueness,
         username: 'Twitter-' + uniqueness,
