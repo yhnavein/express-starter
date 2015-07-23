@@ -246,18 +246,18 @@ repo.createAccFromGoogle = function(req, accessToken, tokenSecret, profile, done
  * LinkedIn
  */
 repo.linkLinkedInProfile = function(req, accessToken, tokenSecret, profile, done) {
-  db.User.findOne({ where: { linkedin: profile.id.toString() } }).then(function(existingUser) {
+  db.User.findOne({ where: { linkedInId: profile.id.toString() } }).then(function(existingUser) {
     if (existingUser) {
       req.flash('errors', { msg: 'There is already a LinkedIn account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
       done('UserExists');
     } else {
       db.User.findById(req.user.id).then(function(user) {
-        user.linkedin = profile.id.toString();
+        user.linkedInId = profile.id.toString();
         if(!user.tokens) user.tokens = {};
         if(!user.profile) user.profile = {};
         user.tokens.linkedin = accessToken;
         user.profile.name = user.profile.name || profile.displayName;
-        user.profile.location = user.profile.location || profile._json.location.name;
+        user.profile.location = user.profile.location || (profile._json.location) ? profile._json.location.name : '';
         user.profile.picture = user.profile.picture || profile._json.pictureUrl;
         user.profile.website = user.profile.website || profile._json.publicProfileUrl;
         user.set('tokens', user.tokens);
@@ -275,19 +275,19 @@ repo.linkLinkedInProfile = function(req, accessToken, tokenSecret, profile, done
 };
 
 repo.createAccFromLinkedIn = function(req, accessToken, tokenSecret, profile, done) {
-  db.User.findOne({ where: { linkedin: profile.id.toString() } }).then(function(existingUser) {
+  db.User.findOne({ where: { linkedInId: profile.id.toString() } }).then(function(existingUser) {
     if (existingUser) return done(null, existingUser);
     db.User.findOne({ where: { email: profile._json.emailAddress } }).then(function(existingEmailUser) {
       if (existingEmailUser) {
         req.flash('errors', { msg: 'There is already an account using this email address. Sign in to that account and link it with LinkedIn manually from Account Settings.' });
         done('UserExists');
       } else {
-        var user = db.User.build({ linkedinId: profile.id.toString() });
+        var user = db.User.build({ linkedInId: profile.id.toString() });
         user.email = profile._json.emailAddress;
         user.tokens = { linkedin: accessToken };
         user.profile = {
           name: profile.displayName,
-          location: profile._json.location.name,
+          location: (profile._json.location) ? profile._json.location.name : '',
           picture: profile._json.pictureUrl,
           website: profile._json.publicProfileUrl
         };

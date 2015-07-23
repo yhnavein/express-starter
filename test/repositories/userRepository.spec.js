@@ -258,4 +258,161 @@ describe('User Repository', function() {
     });
   });
 
+  describe('Twitter OAuth', function() {
+    it('should create properly a new user from twitter', function (done) {
+      var uniqueness = Date.now();
+      var accessToken = 'accToken' + uniqueness;
+      var tokenSecret = 'secToken' + uniqueness;
+      var profile = {
+        id: uniqueness,
+        username: 'Twitter-' + uniqueness,
+        _json: {}
+      };
+
+      userRepo.createAccFromTwitter(reqMock, accessToken, tokenSecret, profile, function (err, user) {
+        expect(err).to.be(null);
+        expect(user).to.be.a('object');
+        expect(user.facebookId).to.be(null);
+        expect(user.twitterId).to.be(uniqueness.toString());
+        expect(user.password).to.be(null);
+        expect(user.email).to.be(profile.username + '@twitter.com');
+        expect(user.tokens).to.be.a('object');
+        expect(user.tokens.twitter).to.be(accessToken);
+        expect(user.tokens.twitterSecret).to.be(tokenSecret);
+        done();
+      });
+    });
+
+    it('should create properly a new user from twitter with picture', function (done) {
+      var uniqueness = Date.now();
+      var accessToken = 'accToken' + uniqueness;
+      var tokenSecret = 'secToken' + uniqueness;
+      var profile = {
+        id: uniqueness,
+        username: 'Twitter-' + uniqueness,
+        _json: {profile_image_url_https: 'PICTURE_URL'}
+      };
+
+      userRepo.createAccFromTwitter(reqMock, accessToken, tokenSecret, profile, function (err, user) {
+        expect(err).to.be(null);
+        expect(user).to.be.a('object');
+        expect(user.profile).to.be.a('object');
+        expect(user.profile.picture).to.be('PICTURE_URL');
+        done();
+      });
+    });
+
+    it('should properly link twitter account to the existing local account', function (done) {
+      var uniqueness = Date.now();
+      var sampleUser = {
+        email: 'test-local2-' + uniqueness + '@puredev.eu',
+        password: 'admin1' //:D
+      };
+      userRepo.createUser(sampleUser, function (err, user) {
+        var localReqMock = {
+          flash: function () {
+          }, user: user
+        };
+        var accessToken = 'accToken' + uniqueness;
+        var tokenSecret = 'secToken' + uniqueness;
+        var profile = {
+          id: uniqueness,
+          username: 'Twitter-' + uniqueness,
+          displayName: "Test TW UserName",
+          _json: {}
+        };
+
+        userRepo.linkTwitterProfile(localReqMock, accessToken, tokenSecret, profile, function (twErr, twUser) {
+          expect(twErr).to.be(null);
+          expect(twUser).to.be.a('object');
+          expect(twUser.email).to.be(sampleUser.email);
+          expect(twUser.profile).to.be.a('object');
+          expect(twUser.profile.name).to.be(profile.displayName);
+          expect(twUser.tokens).to.be.a('object');
+          expect(twUser.tokens.twitter).to.be(accessToken);
+          expect(twUser.tokens.twitterSecret).to.be(tokenSecret);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('LinkedIn OAuth', function() {
+    it('should create properly a new user from linkedin', function (done) {
+      var uniqueness = Date.now();
+      var email = 'test-li-' + uniqueness + '@puredev.eu';
+      var accessToken = 'accToken' + uniqueness;
+      var tokenSecret = 'secToken' + uniqueness;
+      var profile = {
+        id: uniqueness,
+        _json: {emailAddress: email }
+      };
+
+      userRepo.createAccFromLinkedIn(reqMock, accessToken, tokenSecret, profile, function (err, user) {
+        expect(err).to.be(null);
+        expect(user).to.be.a('object');
+        expect(user.facebookId).to.be(null);
+        expect(user.linkedInId).to.be(uniqueness.toString());
+        expect(user.password).to.be(null);
+        expect(user.email).to.be(email);
+        expect(user.tokens).to.be.a('object');
+        expect(user.tokens.linkedin).to.be(accessToken);
+        done();
+      });
+    });
+
+    it('should create properly a new user from linkedin with picture', function (done) {
+      var uniqueness = Date.now();
+      var email = 'test-li-' + uniqueness + '@puredev.eu';
+      var accessToken = 'accToken' + uniqueness;
+      var tokenSecret = 'secToken' + uniqueness;
+      var profile = {
+        id: uniqueness,
+        _json: {emailAddress: email, pictureUrl: 'PICTURE_URL', location: { name: 'Warsaw' }}
+      };
+
+      userRepo.createAccFromLinkedIn(reqMock, accessToken, tokenSecret, profile, function (err, user) {
+        expect(err).to.be(null);
+        expect(user).to.be.a('object');
+        expect(user.profile).to.be.a('object');
+        expect(user.profile.picture).to.be('PICTURE_URL');
+        expect(user.profile.location).to.be('Warsaw');
+        done();
+      });
+    });
+
+    it('should properly link linkedin account to the existing local account', function (done) {
+      var uniqueness = Date.now();
+      var sampleUser = {
+        email: 'test-local2-' + uniqueness + '@puredev.eu',
+        password: 'admin1' //:D
+      };
+      userRepo.createUser(sampleUser, function (err, user) {
+        var localReqMock = {
+          flash: function () {
+          }, user: user
+        };
+        var email = 'test-li-' + uniqueness + '@puredev.eu';
+        var accessToken = 'accToken' + uniqueness;
+        var tokenSecret = 'secToken' + uniqueness;
+        var profile = {
+          id: uniqueness,
+          displayName: "Test TW UserName",
+          _json: {emailAddress: email}
+        };
+
+        userRepo.linkLinkedInProfile(localReqMock, accessToken, tokenSecret, profile, function (liErr, liUser) {
+          expect(liErr).to.be(null);
+          expect(liUser).to.be.a('object');
+          expect(liUser.email).to.be(sampleUser.email);
+          expect(liUser.profile).to.be.a('object');
+          expect(liUser.profile.name).to.be(profile.displayName);
+          expect(liUser.tokens).to.be.a('object');
+          expect(liUser.tokens.linkedin).to.be(accessToken);
+          done();
+        });
+      });
+    });
+  });
+
 });
