@@ -4,6 +4,8 @@ process.env.NODE_ENV = 'test';
 
 var expect = require('expect.js');
 var userRepo = require('../../repositories/UserRepository');
+var bcrypt = require('bcrypt-nodejs');
+
 var reqMock = { flash: function() {} };
 
 describe('User Repository', function() {
@@ -457,6 +459,36 @@ describe('User Repository', function() {
           expect(liUser.tokens).to.be.a('object');
           expect(liUser.tokens.linkedin).to.be(accessToken);
           done();
+        });
+      });
+    });
+  });
+
+  describe('Reset Password Functionality', function() {
+    it('should remove token after assigning new password', function(done) {
+      var uniqueness = Date.now();
+      var newPassword = 'admin2';
+      var token = 'abcdef0123456789' + uniqueness;
+      var sampleUser = {
+        email: 'test-local123-' + uniqueness + '@puredev.eu',
+        resetPasswordToken: token,
+        resetPasswordExpires: Date.now() + 36000000,
+        password: 'admin1' //:D
+      };
+
+      userRepo.createUser(sampleUser, function (err) {
+        expect(err).to.be(null);
+
+        userRepo.changeUserPswAndResetToken(token, newPassword, function(err2, user) {
+          expect(err2).to.be(null);
+          expect(user).to.not.be(null);
+          expect(user.resetPasswordToken).to.be(null);
+          expect(user.resetPasswordExpires).to.be(null);
+
+          bcrypt.compare(newPassword, user.password, function(err3, res) {
+            expect(res).to.not.be(null);
+            done();
+          });
         });
       });
     });

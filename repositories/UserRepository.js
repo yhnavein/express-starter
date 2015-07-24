@@ -52,8 +52,8 @@ repo.changeUserPswAndResetToken = function(token, newPassword, done) {
   })
   .then(function(user) {
     user.password = newPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
+    user.set('resetPasswordToken', null);
+    user.set('resetPasswordExpires', null);
 
     return user.save();
   })

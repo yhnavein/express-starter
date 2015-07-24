@@ -215,7 +215,7 @@ exports.getReset = function(req, res) {
     return res.redirect('/');
   }
   db.User
-    .findOne({ where: { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } } })
+    .findOne({ where: { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: new Date() } } })
     .then(function(user) {
       res.render('account/reset', {
         title: 'Password Reset'
@@ -252,7 +252,7 @@ exports.postReset = function(req, res, next) {
     },
     function(user, done) {
       emailService.sendPasswordChangeNotificationEmail(user.email, function(err) {
-        req.flash('info', { msg: 'An e-mail has been sent to ' + user.email + ' with further instructions.' });
+        req.flash('info', { msg: 'Password has been successfully changed. Notification e-mail has been sent to ' + user.email + ' to inform about this fact.' });
         done(err, 'done');
       });
     }
