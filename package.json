@@ -40,7 +40,7 @@
     "lusca": "^1.1.1",
     "method-override": "^2.3.3",
     "morgan": "^1.6.1",
-    "multer": "^0.1.8",
+    "multer": "^1.0.1",
     "mysql": "~2.7.0",
     "neo-async": "^1.1.2",
     "node-foursquare": "^0.3.0",

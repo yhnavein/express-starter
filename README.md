@@ -1,7 +1,8 @@
 ![Alt](http://i480.photobucket.com/albums/rr168/Mania_Stacia/express-starter.png)
 Express Starter 
-[![Dependency Status](https://david-dm.org/yhnavein/express-starter/status.svg?style=flat)](https://david-dm.org/yhnavein/express-starter) 
-[![Build Status](http://img.shields.io/yhnavein/express-starter.svg?style=flat)](https://travis-ci.org/yhnavein/express-starter)
+[![Dependency Status](https://david-dm.org/yhnavein/express-starter/status.svg?style=flat)](https://david-dm.org/yhnavein/express-starter)
+[![Build Status](https://travis-ci.org/yhnavein/express-starter.svg)](https://travis-ci.org/yhnavein/express-starter)
+[![GitHub license](https://img.shields.io/github/license/yhnavein/express-starter.svg)](https://github.com/yhnavein/express-starter)
 =======================
 
 **Live Demo**: http://hackathonstarter.herokuapp.com
@@ -21,9 +22,6 @@ I also tried to make it as **generic** and **reusable** as possible to cover mos
 without being too specific. In the worst case you can use this as a learning guide for your projects,
 if for example you are only interested in **Sign in with Google** authentication and nothing else.
 
-Chances are you do not need all authentication methods or API examples. As of **Hackathon Starter 2.1**
-it is possible to selectively check which authentication methods you need by running `node setup.js`.
-
 <h4 align="center">Modern Theme</h4>
 
 ![](https://lh6.googleusercontent.com/-KQTmCFNK6MM/U7OZpznjDuI/AAAAAAAAERc/h3jR27Uy1lE/w1366-h1006-no/Screenshot+2014-07-02+01.32.22.png)
@@ -35,10 +33,6 @@ it is possible to selectively check which authentication methods you need by run
 <h4 align="center">API Examples</h4>
 
 ![](https://lh5.googleusercontent.com/-BJD2wK8CvC8/VLodBsyL-NI/AAAAAAAAEx0/SafE6o_qq_I/w1818-h1186-no/Screenshot%2B2015-01-17%2B00.25.49.png)
-
-<h4 align="center">Hackathon Starter Generator</h4>
-
-![](https://lh4.googleusercontent.com/-ncBLUzq6czE/U3KkYE0UXsI/AAAAAAAAEEM/YsZeIqOlZg8/w1288-h874-no/Screenshot+2014-05-13+19.01.15.png)
 
 Table of Contents
 -----------------
@@ -110,7 +104,7 @@ The easiest way to get started is to clone the repository:
 
 ```bash
 # Get the latest snapshot
-$ git clone --bare https://github.com/sahat/hackathon-starter.git myproject
+$ git clone https://github.com/yhnavein/express-starter.git myproject
 $ cd myproject
 $ git remote rm origin
 
