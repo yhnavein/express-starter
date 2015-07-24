@@ -72,33 +72,33 @@ describe('User Repository', function() {
       //Sorry, Garrett Alexion!
       var sampleProfile = {
         id: profileId,
-        username:undefined,
-        displayName:'Garrett Alexion',
-        name:{
-          familyName:'Alexion',
-          givenName:'Garrett',
-          middleName:undefined
+        username: undefined,
+        displayName: 'Garrett Alexion',
+        name: {
+          familyName: 'Alexion',
+          givenName: 'Garrett',
+          middleName: undefined
         },
-        gender:'male',
-        profileUrl:'http://www.facebook.com/297638351',
-        emails:[
+        gender: 'male',
+        profileUrl: 'http://www.facebook.com/297638351',
+        emails: [
           {
-            value:email
+            value: email
           }
         ],
-        provider:'facebook',
-        _json:{
+        provider: 'facebook',
+        _json: {
           id: profileId,
-          email:email,
-          first_name:'Garrett',
-          gender:'male',
-          last_name:'Alexion',
-          link:'http://www.facebook.com/297638351',
-          locale:'en_US',
-          name:'Garrett Alexion',
-          timezone:2,
-          updated_time:'2015-06-06T15:55:07+0000',
-          verified:true
+          email: email,
+          first_name: 'Garrett',
+          gender: 'male',
+          last_name: 'Alexion',
+          link: 'http://www.facebook.com/297638351',
+          locale: 'en_US',
+          name: 'Garrett Alexion',
+          timezone: 2,
+          updated_time: '2015-06-06T15:55:07+0000',
+          verified: true
         }
       };
 
