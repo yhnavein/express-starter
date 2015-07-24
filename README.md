@@ -1,4 +1,4 @@
-![Alt](https://lh4.googleusercontent.com/-PVw-ZUM9vV8/UuWeH51os0I/AAAAAAAAD6M/0Ikg7viJftQ/w1286-h566-no/hackathon-starter-logo.jpg)
+![Alt](http://i480.photobucket.com/albums/rr168/Mania_Stacia/express-starter.png)
 Express Starter 
 [![Dependency Status](https://david-dm.org/yhnavein/express-starter/status.svg?style=flat)](https://david-dm.org/yhnavein/express-starter) 
 [![Build Status](http://img.shields.io/yhnavein/express-starter.svg?style=flat)](https://travis-ci.org/yhnavein/express-starter)
@@ -57,7 +57,6 @@ Table of Contents
 - [Pro Tips](#pro-tips)
 - [FAQ](#faq)
 - [How It Works](#how-it-works-mini-guides)
-- [Mongoose Cheatsheet](#mongoose-cheatsheet)
 - [Deployment](#deployment)
 - [Changelog](#changelog)
 - [Contributing](#contributing)
@@ -68,7 +67,7 @@ Features
 
 - **Local Authentication** using Email and Password
 - **OAuth 1.0a Authentication** via Twitter
-- **OAuth 2.0 Authentication** via Facebook, Google, GitHub, LinkedIn, Instagram
+- **OAuth 2.0 Authentication** via Facebook, Google, GitHub, LinkedIn
 - Flash notifications
 - MVC Project Structure
 - Node.js clusters support
@@ -274,16 +273,6 @@ The same goes for other providers.
 - For **Redirect URI**: http://localhost:3000/auth/foursquare/callback
 - Click **Save Changes**
 - Copy and paste *Client ID* and *Client Secret* keys into `config/secrets.js`
-
-<hr>
-
-<img src="http://img4.wikia.nocookie.net/__cb20130520163346/logopedia/images/8/8d/Tumblr_logo_by_x_1337_x-d5ikwpp.png" width="200">
-- Go to http://www.tumblr.com/oauth/apps
-- Once signed in, click **+Register application**
-- Fill in all the details
-- For **Default Callback URL**: http://localhost:3000/auth/tumblr/callback
-- Click **✔Register**
-- Copy and paste *OAuth consumer key* and *OAuth consumer secret* keys into `config/secrets.js`
 
 <hr>
 
@@ -569,25 +558,6 @@ When you deploy your app, it will run in production mode, and so **connect-asset
 will automatically serve a single concatenated & minified `application.js`.
 For more information see [Sprockets-style concatenation](https://github.com/adunkman/connect-assets/#sprockets-style-concatenation)
 section.
-
-### I am getting MongoDB Connection Error, how do I fix it?
-That's a custom error message defined in `app.js` to indicate that there was a
-problem connecting to MongoDB:
-
-```js
-mongoose.connection.on('error', function() {
-  console.error('✗ MongoDB Connection Error. Please make sure MongoDB is running.');
-});
-```
-You need to have a MongoDB server running before launching `app.js`. You can
-download MongoDB [here](mongodb.org/downloads), or install it via a package manager.
-<img src="http://dc942d419843af05523b-ff74ae13537a01be6cfec5927837dcfe.r14.cf1.rackcdn.com/wp-content/uploads/windows-8-50x50.jpg" height="17">
-Windows users, read [Install MongoDB on Windows](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/).
-
-**Tip:** If you are always connected to the internet, you could just use
-[MongoLab](https://mongolab.com/) or [Compose](https://www.compose.io/) instead
-of downloading and installing MongoDB locally. You will only need to update the
-`db` property in `config/secrets.js`.
 
 ### I get an error when I deploy my app, why?
 Chances are you haven't changed the *Database URI* in `secrets.js`. If `db` is
@@ -1053,45 +1023,45 @@ If you want to see a really cool real-time dashboard check out this
 [pull request #23](https://github.com/sahat/hackathon-starter/pull/23/files) to
 see how it is implemented.
 
-Mongoose Cheatsheet
+Sequelize Cheatsheet
 -------------------
 
 #### Find all users:
 ```js
-User.find(function(err, users) {
-  console.log(users);
-});
+db.User.findAll()
+  .then(function(users) {
+    console.log(users);
+  })
+  .catch(function(err) {
+    console.error(err);
+  });
 ```
 
 #### Find a user by email:
 ```js
 var userEmail = 'example@gmail.com';
-User.findOne({ email: userEmail }, function(err, user) {
-  console.log(user);
-});
+db.User.findOne({ where: { email: userEmail }})
+  .then(function(user) {
+    console.log(user);
+  })
+  .catch(function(err) {
+    console.error(err);
+  });
 ```
 
 #### Find 5 most recent user accounts:
 ```js
-User
-  .find()
-  .sort({ _id: -1 })
-  .limit(5)
-  .exec(function(err, users) {
+db.User
+  .findAll({ 
+    limit: 5,
+    order: [ ['id', 'DESC'] ]
+  })
+  .then(function(users) {
     console.log(users);
+  })
+  .catch(function(err) {
+    console.error(err);
   });
-```
-
-#### Get total count of a field from all documents:
-Let's suppose that each user has a `votes` field and you would like to count
-the total number of votes in your database across all users. One very
-inefficient way would be to loop through each document and manually accumulate
-the count. Or you could use [MongoDB Aggregation Framework](http://docs.mongodb.org/manual/core/aggregation-introduction/) instead:
-
-```js
-User.aggregate({ $group: { _id: null, total: { $sum: '$votes' } } }, function(err, votesCount) {
-  console.log(votesCount.total);
-});
 ```
 
 Deployment
