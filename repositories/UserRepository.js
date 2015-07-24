@@ -2,6 +2,8 @@
 
 var db = require('../models/sequelize');
 
+var PSW_RESET_TOKEN_VALID_FOR = 3; //hours
+var ONE_HOUR = 3600000;
 var repo = {};
 
 repo.getUserById = function(id) {
@@ -19,6 +21,49 @@ repo.createUser = function(user, done) {
       return done('User was not created correctly!', null);
     });
 };
+
+repo.assignResetPswToken = function(email, token, done) {
+  db.User.findOne({
+    where: { email: email }
+  })
+  .then(function(user) {
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + PSW_RESET_TOKEN_VALID_FOR * ONE_HOUR;
+
+    return user.save();
+  })
+  .then(function(savedUser) {
+      return done(null, savedUser);
+    })
+  .catch(function(err) {
+    return done('User was not found!', null);
+  });
+};
+
+repo.changeUserPswAndResetToken = function(token, newPassword, done) {
+  if(token == null || token.length < 1)
+    return done('Token cannot be empty!', null);
+
+  db.User.findOne({
+    where: {
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() }
+    }
+  })
+  .then(function(user) {
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    return user.save();
+  })
+  .then(function(savedUser) { return done(null, savedUser); })
+  .catch(function() {
+    return done('User was not found!', null);
+  });
+};
+
+
 
 
 /**

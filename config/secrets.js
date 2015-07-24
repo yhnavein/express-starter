@@ -18,6 +18,7 @@
 
  * IMPORTANT  IMPORTANT  IMPORTANT  IMPORTANT  IMPORTANT  IMPORTANT  IMPORTANT
  */
+'use strict';
 
 module.exports = {
 
@@ -55,8 +56,8 @@ module.exports = {
   },
 
   sendgrid: {
-    user: process.env.SENDGRID_USER || 'hslogin',
-    password: process.env.SENDGRID_PASSWORD || 'hspassword00'
+    //api_user: process.env.SENDGRID_APIUSER || 'expressstarter',
+    api_key: process.env.SENDGRID_APIKEY || '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'
   },
 
   nyt: {

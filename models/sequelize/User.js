@@ -76,6 +76,8 @@ module.exports = function(db, DataTypes) {
       type: DataTypes.STRING,
       unique: true
     },
+    resetPasswordExpires: DataTypes.DATE,
+    resetPasswordToken: DataTypes.STRING,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
     logins: DataTypes.INTEGER,
