@@ -1,12 +1,4 @@
 var secrets = require('../config/secrets');
-var nodemailer = require("nodemailer");
-var transporter = nodemailer.createTransport({
-  service: 'SendGrid',
-  auth: {
-    user: secrets.sendgrid.user,
-    pass: secrets.sendgrid.password
-  }
-});
 
 /**
  * GET /contact
@@ -34,25 +26,8 @@ exports.postContact = function(req, res) {
     return res.redirect('/contact');
   }
 
-  var from = req.body.email;
-  var name = req.body.name;
-  var body = req.body.message;
-  var to = 'your@email.com';
-  var subject = 'Contact Form | Hackathon Starter';
-
-  var mailOptions = {
-    to: to,
-    from: from,
-    subject: subject,
-    text: body
-  };
-
-  transporter.sendMail(mailOptions, function(err) {
-    if (err) {
-      req.flash('errors', { msg: err.message });
-      return res.redirect('/contact');
-    }
-    req.flash('success', { msg: 'Email has been sent successfully!' });
-    res.redirect('/contact');
-  });
+  //You can see an example of sending emails in emailService.js
+  //This is just hack to avoid having tons of spam ;)
+  req.flash('success', { msg: 'Thank you for your interest. ' });
+  res.redirect('/contact');
 };
