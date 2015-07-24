@@ -7,8 +7,9 @@
   },
   "scripts": {
     "start": "node app.js",
-    "test": "mocha",
-    "test-debug": "node_modules/.bin/mocha --debug --debug-brk"
+    "test": "NODE_ENV=test mocha",
+    "test-ci": "NODE_ENV=test-travis mocha --reporter spec",
+    "test-debug": "NODE_ENV=test node_modules/.bin/mocha --debug --debug-brk"
   },
   "dependencies": {
     "bcrypt-nodejs": "^0.0.3",

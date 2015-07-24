@@ -24,26 +24,17 @@ module.exports = {
 
   sessionSecret: process.env.SESSION_SECRET || 'Your Session Secret goes here',
 
-  mysql: {
-    host: '127.0.0.1',
-    user: 'root',
-    password: '',
-    database: 'test_db',
-    dialect: 'mysql',
-    sessionTable: 'session'
-  },
+  //mysql: {
+  //  host: '127.0.0.1',
+  //  user: 'root',
+  //  password: '',
+  //  database: 'test_db',
+  //  dialect: 'mysql',
+  //  sessionTable: 'session'
+  //},
 
-  postgres: {
-    host: '127.0.0.1',
-    user: 'yhnavein',
-    password: '123',
-    database: 'test',
-    dialect: 'postgres',
-    sessionTable: 'session',
-    connectionString: function() {
-      return "postgres://" + this.user + ":" + this.password + "@" + this.host + "/" + this.database;
-    }
-  },
+  //will be generated. Take a look at the bottom of this file
+  postgres: {},
 
   mailgun: {
     user: process.env.MAILGUN_USER || 'postmaster@sandbox697fcddc09814c6b83718b9fd5d4e5dc.mailgun.org',
@@ -163,4 +154,40 @@ module.exports = {
   bitgo: {
     accessToken: process.env.BITGO_ACCESS_TOKEN || '4fca3ed3c2839be45b03bbd330e5ab1f9b3989ddd949bf6b8765518bc6a0e709'
   }
+};
+
+if(process.env.NODE_ENV === 'test-travis') {
+  module.exports.postgres = {
+    host: '127.0.0.1',
+    user: 'postgres',
+    password: null,
+    database: 'test_travis_ci',
+    dialect: 'postgres',
+    sessionTable: 'session'
+  };
+} else if(process.env.NODE_ENV === 'test') {
+  module.exports.postgres = {
+    host: '127.0.0.1',
+    user: 'yhnavein',
+    password: '123',
+    database: 'test',
+    dialect: 'postgres',
+    sessionTable: 'session'
+  };
+} else {
+  module.exports.postgres = {
+    host: '127.0.0.1',
+    user: 'yhnavein',
+    password: '123',
+    database: 'prod',
+    dialect: 'postgres',
+    sessionTable: 'session'
+  };
+}
+
+module.exports.postgres.connectionString = function() {
+  if(this.password)
+    return "postgres://" + this.user + ":" + this.password + "@" + this.host + "/" + this.database;
+
+  return "postgres://" + this.user + "@" + this.host + "/" + this.database;
 };
