@@ -166,6 +166,7 @@ repo.createAccFromGithub = function(req, accessToken, tokenSecret, profile, done
         req.flash('errors', { msg: 'There is already an account using this email address. Sign in to that account and link it with GitHub manually from Account Settings.' });
         done('UserExists');
       } else {
+        console.log(profile);
         var user = db.User.build({ githubId: profile.id.toString() });
         user.email = profile._json.email;
         user.tokens = { github: accessToken };
@@ -249,8 +250,8 @@ repo.linkGoogleProfile = function(req, accessToken, tokenSecret, profile, done) 
         if(!user.profile) user.profile = {};
         user.tokens.google = accessToken;
         user.profile.name = user.profile.name || profile.displayName;
-        user.profile.gender = user.profile.gender || profile._json.gender;
-        user.profile.picture = user.profile.picture || profile._json.picture;
+        user.profile.gender = user.profile.gender || profile.gender;
+        user.profile.picture = user.profile.picture || (profile._json.image ? profile._json.image.url : '');
         user.set('tokens', user.tokens);
         user.set('profile', user.profile);
 
@@ -273,13 +274,14 @@ repo.createAccFromGoogle = function(req, accessToken, tokenSecret, profile, done
         req.flash('errors', { msg: 'There is already an account using this email address. Sign in to that account and link it with Google manually from Account Settings.' });
         done('UserExists');
       } else {
+        console.log('Google', profile);
         var user = db.User.build({ googleId: profile.id.toString() });
         user.email = profile.emails[0].value;
         user.tokens = { google: accessToken };
         user.profile = {
           name: profile.displayName,
-          gender: profile._json.gender,
-          picture: profile._json.picture
+          gender: profile.gender,
+          picture: (profile._json.image ? profile._json.image.url : '')
         };
         user.save()
           .then(function(savedUser) { done(null, savedUser); })
