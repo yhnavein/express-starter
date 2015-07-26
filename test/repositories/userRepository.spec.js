@@ -158,7 +158,7 @@ describe('User Repository', function() {
 
     it('should create properly a new user from github', function (done) {
       var $u = createUser();
-      $u.profile._json = {email: $u.email};
+      $u.profile.emails = [ {value: $u.email} ];
 
       userRepo.createAccFromGithub(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
         expect(err).to.be(null);
@@ -175,7 +175,8 @@ describe('User Repository', function() {
 
     it('should create properly a new user from github with location', function (done) {
       var $u = createUser();
-      $u.profile._json = {email: $u.email, location: 'Warsaw'};
+      $u.profile.emails = [ {value: $u.email} ];
+      $u.profile._json = {location: 'Warsaw'};
 
       userRepo.createAccFromGithub(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
         expect(err).to.be(null);
@@ -185,7 +186,20 @@ describe('User Repository', function() {
         done();
       });
     });
-/*
+
+    it('should create properly a new user where there is no email returned from GitHub', function (done) {
+      var $u = createUser();
+      $u.profile.emails = [ {value: ''} ];
+
+      userRepo.createAccFromGithub(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
+        expect(err).to.be(null);
+        expect(user).to.be.a('object');
+        expect(user.profile).to.be.a('object');
+        expect(user.email).to.be($u.uniqueness + '@github.com');
+        done();
+      });
+    });
+
     it('should create properly a github full profile', function (done) {
       var $u = createUser();
 
@@ -241,7 +255,7 @@ describe('User Repository', function() {
       });
     });
 
-*/
+
     it('should properly link github account to the existing local account', function (done) {
       var uniqueness = Date.now();
       var sampleUser = {

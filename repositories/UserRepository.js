@@ -35,7 +35,7 @@ repo.assignResetPswToken = function(email, token, done) {
   .then(function(savedUser) {
       return done(null, savedUser);
     })
-  .catch(function(err) {
+  .catch(function() {
     return done('User was not found!', null);
   });
 };
@@ -159,16 +159,25 @@ repo.linkGithubProfile = function(req, accessToken, tokenSecret, profile, done) 
 };
 
 repo.createAccFromGithub = function(req, accessToken, tokenSecret, profile, done) {
+  var email;
+  if(profile.emails && profile.emails.length > 0 && profile.emails[0].value)
+    email = profile.emails[0].value;
+  else
+    email = profile.id + '@github.com';
+
+  if(!profile._json)
+    profile._json = {};
+
   db.User.findOne({ where: { githubId: profile.id.toString() } }).then(function(existingUser) {
     if (existingUser) return done(null, existingUser);
-    db.User.findOne({ where: { email: profile._json.email } }).then(function(existingEmailUser) {
+    db.User.findOne({ where: { email: email } }).then(function(existingEmailUser) {
       if (existingEmailUser) {
         req.flash('errors', { msg: 'There is already an account using this email address. Sign in to that account and link it with GitHub manually from Account Settings.' });
         done('UserExists');
       } else {
         console.log(profile);
         var user = db.User.build({ githubId: profile.id.toString() });
-        user.email = profile._json.email;
+        user.email = email;
         user.tokens = { github: accessToken };
         user.profile = {
           name: profile.displayName,
