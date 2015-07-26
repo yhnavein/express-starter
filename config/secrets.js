@@ -18,26 +18,37 @@
 
  * IMPORTANT  IMPORTANT  IMPORTANT  IMPORTANT  IMPORTANT  IMPORTANT  IMPORTANT
  */
+'use strict';
 
 module.exports = {
 
-  db: process.env.MONGODB || 'mongodb://localhost:27017/test',
-
   sessionSecret: process.env.SESSION_SECRET || 'Your Session Secret goes here',
+
+  //mysql: {
+  //  host: '127.0.0.1',
+  //  user: 'root',
+  //  password: '',
+  //  database: 'test_db',
+  //  dialect: 'mysql',
+  //  sessionTable: 'session'
+  //},
+
+  //will be generated. Take a look at the bottom of this file
+  postgres: {},
 
   mailgun: {
     user: process.env.MAILGUN_USER || 'postmaster@sandbox697fcddc09814c6b83718b9fd5d4e5dc.mailgun.org',
     password: process.env.MAILGUN_PASSWORD || '29eldds1uri6'
   },
-  
+
   mandrill: {
     user: process.env.MANDRILL_USER || 'hackathonstarterdemo',
     password: process.env.MANDRILL_PASSWORD || 'E1K950_ydLR4mHw12a0ldA'
   },
 
   sendgrid: {
-    user: process.env.SENDGRID_USER || 'hslogin',
-    password: process.env.SENDGRID_PASSWORD || 'hspassword00'
+    //api_user: process.env.SENDGRID_APIUSER || 'expressstarter',
+    api_key: process.env.SENDGRID_APIKEY || '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'
   },
 
   nyt: {
@@ -56,12 +67,12 @@ module.exports = {
     passReqToCallback: true
   },
 
-  instagram: {
-    clientID: process.env.INSTAGRAM_ID || '9f5c39ab236a48e0aec354acb77eee9b',
-    clientSecret: process.env.INSTAGRAM_SECRET || '5920619aafe842128673e793a1c40028',
-    callbackURL: '/auth/instagram/callback',
-    passReqToCallback: true
-  },
+  // instagram: {
+  //   clientID: process.env.INSTAGRAM_ID || '9f5c39ab236a48e0aec354acb77eee9b',
+  //   clientSecret: process.env.INSTAGRAM_SECRET || '5920619aafe842128673e793a1c40028',
+  //   callbackURL: '/auth/instagram/callback',
+  //   passReqToCallback: true
+  // },
 
   github: {
     clientID: process.env.GITHUB_ID || 'cb448b1d4f0c743a1e36',
@@ -72,7 +83,7 @@ module.exports = {
 
   twitter: {
     consumerKey: process.env.TWITTER_KEY || '6NNBDyJ2TavL407A3lWxPFKBI',
-    consumerSecret: process.env.TWITTER_SECRET  || 'ZHaYyK3DQCqv49Z9ofsYdqiUgeoICyh6uoBgFfu7OeYC7wTQKa',
+    consumerSecret: process.env.TWITTER_SECRET || 'ZHaYyK3DQCqv49Z9ofsYdqiUgeoICyh6uoBgFfu7OeYC7wTQKa',
     callbackURL: '/auth/twitter/callback',
     passReqToCallback: true
   },
@@ -88,7 +99,7 @@ module.exports = {
     clientID: process.env.LINKEDIN_ID || '77chexmowru601',
     clientSecret: process.env.LINKEDIN_SECRET || 'szdC8lN2s2SuMSy8',
     callbackURL: process.env.LINKEDIN_CALLBACK_URL || 'http://localhost:3000/auth/linkedin/callback',
-    scope: ['r_fullprofile', 'r_emailaddress', 'r_network'],
+    scope: ['r_basicprofile', 'r_emailaddress'],
     passReqToCallback: true
   },
 
@@ -128,11 +139,6 @@ module.exports = {
     redirectUrl: process.env.VENMO_REDIRECT_URL || 'http://localhost:3000/auth/venmo/callback'
   },
 
-  ordrin: {
-    publicKey: process.env.ORDRIN_PUBLIC || 'G35-rSt76CXpUEOlqXYNMC84ZbdFUKN_plHVHVYhdeU',
-    secretKey: process.env.ORDRIN_SECRET || 'bcoOR_2z6gQDZuEOcw1yTt6THFPK9KmvywG7UJD7pqQ'
-  },
-
   paypal: {
     host: 'api.sandbox.paypal.com',
     client_id: process.env.PAYPAL_ID || 'AdGE8hDyixVoHmbhASqAThfbBcrbcgiJPBwlAM7u7Kfq3YU-iPGc6BXaTppt',
@@ -143,5 +149,45 @@ module.exports = {
 
   lob: {
     apiKey: process.env.LOB_KEY || 'test_814e892b199d65ef6dbb3e4ad24689559ca'
+  },
+
+  bitgo: {
+    accessToken: process.env.BITGO_ACCESS_TOKEN || '4fca3ed3c2839be45b03bbd330e5ab1f9b3989ddd949bf6b8765518bc6a0e709'
   }
+};
+
+if(process.env.NODE_ENV === 'test-travis') {
+  module.exports.postgres = {
+    host: '127.0.0.1',
+    user: 'postgres',
+    password: null,
+    database: 'test_travis_ci',
+    dialect: 'postgres',
+    sessionTable: 'session'
+  };
+} else if(process.env.NODE_ENV === 'test') {
+  module.exports.postgres = {
+    host: '127.0.0.1',
+    user: 'yhnavein',
+    password: '123',
+    database: 'test',
+    dialect: 'postgres',
+    sessionTable: 'session'
+  };
+} else {
+  module.exports.postgres = {
+    host: '127.0.0.1',
+    user: 'yhnavein',
+    password: '123',
+    database: 'prod',
+    dialect: 'postgres',
+    sessionTable: 'session'
+  };
+}
+
+module.exports.postgres.connectionString = function() {
+  if(this.password)
+    return "postgres://" + this.user + ":" + this.password + "@" + this.host + "/" + this.database;
+
+  return "postgres://" + this.user + "@" + this.host + "/" + this.database;
 };

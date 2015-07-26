@@ -1,12 +1,13 @@
-![Alt](https://lh4.googleusercontent.com/-PVw-ZUM9vV8/UuWeH51os0I/AAAAAAAAD6M/0Ikg7viJftQ/w1286-h566-no/hackathon-starter-logo.jpg)
-Hackathon Starter [![Dependency Status](https://david-dm.org/sahat/hackathon-starter/status.svg?style=flat)](https://david-dm.org/sahat/hackathon-starter) [![Build Status](http://img.shields.io/travis/sahat/hackathon-starter.svg?style=flat)](https://travis-ci.org/sahat/hackathon-starter) [![Analytics](https://ga-beacon.appspot.com/UA-47447818-2/hackathon-starter?pixel)](https://github.com/igrigorik/ga-beacon)
+![Alt](http://i480.photobucket.com/albums/rr168/Mania_Stacia/express-starter.png)
+Express Starter 
+[![Dependency Status](https://david-dm.org/yhnavein/express-starter/status.svg?style=flat)](https://david-dm.org/yhnavein/express-starter)
+[![Build Status](https://travis-ci.org/yhnavein/express-starter.svg)](https://travis-ci.org/yhnavein/express-starter)
+[![GitHub license](https://img.shields.io/github/license/yhnavein/express-starter.svg)](https://github.com/yhnavein/express-starter)
 =======================
-
-[![Join the chat at https://gitter.im/sahat/hackathon-starter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sahat/hackathon-starter?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 **Live Demo**: http://hackathonstarter.herokuapp.com
 
-Jump to [What's new in 3.0.2?](#changelog)
+Jump to [What's new in 3.0.3?](#changelog)
 
 A boilerplate for **Node.js** web applications.
 
@@ -21,9 +22,6 @@ I also tried to make it as **generic** and **reusable** as possible to cover mos
 without being too specific. In the worst case you can use this as a learning guide for your projects,
 if for example you are only interested in **Sign in with Google** authentication and nothing else.
 
-Chances are you do not need all authentication methods or API examples. As of **Hackathon Starter 2.1**
-it is possible to selectively check which authentication methods you need by running `node setup.js`.
-
 <h4 align="center">Modern Theme</h4>
 
 ![](https://lh6.googleusercontent.com/-KQTmCFNK6MM/U7OZpznjDuI/AAAAAAAAERc/h3jR27Uy1lE/w1366-h1006-no/Screenshot+2014-07-02+01.32.22.png)
@@ -35,10 +33,6 @@ it is possible to selectively check which authentication methods you need by run
 <h4 align="center">API Examples</h4>
 
 ![](https://lh5.googleusercontent.com/-BJD2wK8CvC8/VLodBsyL-NI/AAAAAAAAEx0/SafE6o_qq_I/w1818-h1186-no/Screenshot%2B2015-01-17%2B00.25.49.png)
-
-<h4 align="center">Hackathon Starter Generator</h4>
-
-![](https://lh4.googleusercontent.com/-ncBLUzq6czE/U3KkYE0UXsI/AAAAAAAAEEM/YsZeIqOlZg8/w1288-h874-no/Screenshot+2014-05-13+19.01.15.png)
 
 Table of Contents
 -----------------
@@ -57,7 +51,6 @@ Table of Contents
 - [Pro Tips](#pro-tips)
 - [FAQ](#faq)
 - [How It Works](#how-it-works-mini-guides)
-- [Mongoose Cheatsheet](#mongoose-cheatsheet)
 - [Deployment](#deployment)
 - [Changelog](#changelog)
 - [Contributing](#contributing)
@@ -68,7 +61,7 @@ Features
 
 - **Local Authentication** using Email and Password
 - **OAuth 1.0a Authentication** via Twitter
-- **OAuth 2.0 Authentication** via Facebook, Google, GitHub, LinkedIn, Instagram
+- **OAuth 2.0 Authentication** via Facebook, Google, GitHub, LinkedIn
 - Flash notifications
 - MVC Project Structure
 - Node.js clusters support
@@ -90,13 +83,13 @@ Features
 Prerequisites
 -------------
 
-- [MongoDB](http://www.mongodb.org/downloads)
+- [PostgreSQL](http://www.postgresql.org/download/) or [MySQL](http://www.mysql.com/downloads/)
 - [Node.js](http://nodejs.org)
 - Command Line Tools
  - <img src="http://deluge-torrent.org/images/apple-logo.gif" height="17">&nbsp;**Mac OS X**: [Xcode](https://itunes.apple.com/us/app/xcode/id497799835?mt=12) (or **OS X 10.9 Mavericks**: `xcode-select --install`)
  - <img src="http://dc942d419843af05523b-ff74ae13537a01be6cfec5927837dcfe.r14.cf1.rackcdn.com/wp-content/uploads/windows-8-50x50.jpg" height="17">&nbsp;**Windows**: [Visual Studio](http://www.visualstudio.com/downloads/download-visual-studio-vs#d-express-windows-8)
  - <img src="https://lh5.googleusercontent.com/-2YS1ceHWyys/AAAAAAAAAAI/AAAAAAAAAAc/0LCb_tsTvmU/s46-c-k/photo.jpg" height="17">&nbsp;**Ubuntu**: `sudo apt-get install build-essential`
- - <img src="http://i1-news.softpedia-static.com/images/extra/LINUX/small/slw218news1.png" height="17">&nbsp;**Fedora**: `sudo yum groupinstall "Development Tools"`
+ - <img src="http://i1-news.softpedia-static.com/images/extra/LINUX/small/slw218news1.png" height="17">&nbsp;**Fedora**: `sudo dnf groupinstall "Development Tools"`
  - <img src="https://en.opensuse.org/images/b/be/Logo-geeko_head.png" height="17">&nbsp;**OpenSUSE**: `sudo zypper install --type pattern devel_basis`
 
 **Note:** If you are new to Node or Express, I recommend to watch
@@ -111,7 +104,7 @@ The easiest way to get started is to clone the repository:
 
 ```bash
 # Get the latest snapshot
-$ git clone --depth=1 https://github.com/sahat/hackathon-starter.git myproject
+$ git clone https://github.com/yhnavein/express-starter.git myproject
 $ cd myproject
 $ git remote rm origin
 
@@ -158,13 +151,19 @@ them with *your credentials* when you are ready to deploy an app.
 
 <img src="http://images.google.com/intl/en_ALL/images/srpr/logo6w.png" width="200">
 - Visit [Google Cloud Console](https://cloud.google.com/console/project)
-- Click **CREATE PROJECT** button
-- Enter *Project Name*, then click **CREATE**
-- Then select *APIs & auth* from the sidebar and click on *Credentials* tab
-- Click **CREATE NEW CLIENT ID** button
+- Click on the **Create Project** button
+- Enter *Project Name*, then click on **Create** button
+- Then click on *APIs & auth* in the sidebar and select *API* tab
+- Click on **Google+ API** under *Social APIs*, then click **Enable API**
+- Next, under *APIs & auth* in the sidebar click on *Credentials* tab
+- Click on **Create new Client ID** button
+- Select *Web Application* and click on **Configure Consent Screen**
+- Fill out the required fields then click on **Save**
+- In the *Create Client ID* modal dialog:
  - **Application Type**: Web Application
  - **Authorized Javascript origins**: http://localhost:3000
  - **Authorized redirect URI**: http://localhost:3000/auth/google/callback
+- Click on **Create Client ID** button
 - Copy and paste *Client ID* and *Client secret* keys into `config/secrets.js`
 
 **Note:** When you ready to deploy to production don't forget to
@@ -193,7 +192,7 @@ The same goes for other providers.
 - Go to [Account Settings](https://github.com/settings/profile)
 - Select **Applications** from the sidebar
 - Then inside **Developer applications** click on **Register new application**
-- Enter *Application Name* and *Homepage URL*.
+- Enter *Application Name* and *Homepage URL*
 - For *Authorization Callback URL*: http://localhost:3000/auth/github/callback
 - Click **Register application**
 - Now copy and paste *Client ID* and *Client Secret* keys into `config/secrets.js`
@@ -222,9 +221,7 @@ The same goes for other providers.
  - **OAuth 2.0 Redirect URLs**: http://localhost:3000/auth/linkedin/callback
  - **JavaScript API Domains**: http://localhost:3000
 - For **Default Scope** make sure *at least* the following is checked:
- - `r_fullprofile`
- - `r_emailaddress`
- - `r_network`
+ - `r_basicprofile`
 - Finish by clicking **Add Application** button
 - Copy and paste *API Key* and *Secret Key* keys into `config/secrets.js`
  - *API Key* is your **clientID**
@@ -273,16 +270,6 @@ The same goes for other providers.
 
 <hr>
 
-<img src="http://img4.wikia.nocookie.net/__cb20130520163346/logopedia/images/8/8d/Tumblr_logo_by_x_1337_x-d5ikwpp.png" width="200">
-- Go to http://www.tumblr.com/oauth/apps
-- Once signed in, click **+Register application**
-- Fill in all the details
-- For **Default Callback URL**: http://localhost:3000/auth/tumblr/callback
-- Click **✔Register**
-- Copy and paste *OAuth consumer key* and *OAuth consumer secret* keys into `config/secrets.js`
-
-<hr>
-
 <img src="http://www.technologytell.com/gaming/files/2012/01/steam_logo.jpg" width="200">
 - Go to http://steamcommunity.com/dev/apikey
 - Sign in with your existing Steam account
@@ -311,33 +298,41 @@ The same goes for other providers.
 - From the dashboard, click on *Get SMTP credentials*
 - Copy and paste the default SMTP *Login* and *Password* into `config/secrets.js`
 
+<hr>
+
+<img src="https://www.bitgo.com/img/new_bitgo/logo_footer.png" width="200">
+- Go to https://test.bitgo.com/
+- Sign up for an account.
+- Once logged into the dashboard, go to the top right selector and click 'account settings'
+- Under the developers tab, create your access token and copy and paste it into `config/secrets.js`
+
 
 Project Structure
 -----------------
 
-| Name                               | Description                                                 |
-| ---------------------------------- |:-----------------------------------------------------------:|
-| **config**/passport.js             | Passport Local and OAuth strategies, plus login middleware. |
-| **config**/secrets.js              | Your API keys, tokens, passwords and database URL.          |
-| **controllers**/api.js             | Controller for /api route and all api examples.             |
-| **controllers**/contact.js         | Controller for contact form.                                |
-| **controllers**/home.js            | Controller for home page (index).                           |
-| **controllers**/user.js            | Controller for user account management.                     |
-| **models**/User.js                 | Mongoose schema and model for User.                         |
-| **public**/                        | Static assets (fonts, css, js, img).                        |
-| **public**/**js**/application.js   | Specify client-side JavaScript dependencies.                |
-| **public**/**js**/main.js          | Place your client-side JavaScript here.                     |
-| **public**/**css**/main.less       | Main stylesheet for your app.                               |
-| **public/css/themes**/default.less | Some Bootstrap overrides to make it look prettier.          |
-| **views/account**/                 | Templates for *login, password reset, signup, profile*.     |
-| **views/api**/                     | Templates for API Examples.                                 |
-| **views/partials**/flash.jade      | Error, info and success flash notifications.                |
-| **views/partials**/header.jade     | Navbar partial template.                                    |
-| **views/partials**/footer.jade     | Footer partial template.                                    |
-| **views**/layout.jade              | Base template.                                              |
-| **views**/home.jade                | Home page template.                                         |
-| app.js                             | Main application file.                                      |
-| setup.js                       | Tool for removing authentication providers and other things.|
+| Name                               | Description                                                  |
+| ---------------------------------- | ------------------------------------------------------------ |
+| **config**/passport.js             | Passport Local and OAuth strategies, plus login middleware.  |
+| **config**/secrets.js              | Your API keys, tokens, passwords and database URL.           |
+| **controllers**/api.js             | Controller for /api route and all api examples.              |
+| **controllers**/contact.js         | Controller for contact form.                                 |
+| **controllers**/home.js            | Controller for home page (index).                            |
+| **controllers**/user.js            | Controller for user account management.                      |
+| **models**/User.js                 | Mongoose schema and model for User.                          |
+| **public**/                        | Static assets (fonts, css, js, img).                         |
+| **public**/**js**/application.js   | Specify client-side JavaScript dependencies.                 |
+| **public**/**js**/main.js          | Place your client-side JavaScript here.                      |
+| **public**/**css**/main.less       | Main stylesheet for your app.                                |
+| **public/css/themes**/default.less | Some Bootstrap overrides to make it look prettier.           |
+| **views/account**/                 | Templates for *login, password reset, signup, profile*.      |
+| **views/api**/                     | Templates for API Examples.                                  |
+| **views/partials**/flash.jade      | Error, info and success flash notifications.                 |
+| **views/partials**/header.jade     | Navbar partial template.                                     |
+| **views/partials**/footer.jade     | Footer partial template.                                     |
+| **views**/layout.jade              | Base template.                                               |
+| **views**/home.jade                | Home page template.                                          |
+| app.js                             | Main application file.                                       |
+| setup.js                           | Tool for removing authentication providers and other things. |
 
 **Note:** There is no preference how you name or structure your views.
 You could place all your templates in a top-level `views` directory without
@@ -348,65 +343,69 @@ Just don't forget to update `extends ../layout`  and corresponding
 List of Packages
 ----------------
 
-| Package                         | Description   |
-| ------------------------------- |:-------------:|
-| async                           | Utility library that provides asynchronous control flow. |
-| bcrypt-nodejs                   | Library for hashing and salting user passwords. |
-| cheerio                         | Scrape web pages using jQuery-style syntax.  |
-| clockwork                       | Clockwork SMS API library. |
-| connect-assets                  | Compiles LESS stylesheets, concatenates & minifies JavaScript. |
-| connect-mongo                   | MongoDB session store for Express. |
-| csso                            | Dependency for connect-assets library to minify CSS. |
-| express                         | Node.js web framework. |
-| body-parser                     | Express 4.0 middleware. |
-| cookie-parser                   | Express 4.0 middleware. |
-| express-session                 | Express 4.0 middleware. |
-| morgan                          | Express 4.0 middleware. |
-| compression                     | Express 4.0 middleware. |
-| errorhandler                    | Express 4.0 middleware. |
-| method-override                 | Express 4.0 middleware. |
-| express-flash                   | Provides flash messages for Express. |
-| express-validator               | Easy form validation for Express. |
-| fbgraph                         | Facebook Graph API library. |
-| github-api                      | GitHub API library. |
-| jade                            | Template engine for Express. |
-| lastfm                          | Last.fm API library. |
-| instagram-node                  | Instagram API library. |
-| less                            | LESS compiler. Used implicitly by connect-assets. |
-| lob                             | Lob API library |
-| lusca                           | CSRF middleware.        |
-| mongoose                        | MongoDB ODM. |
-| node-foursquare                 | Foursquare API library. |
-| node-linkedin                   | LinkedIn API library. |
-| nodemailer                      | Node.js library for sending emails. |
-| passport                        | Simple and elegant authentication library for node.js |
-| passport-facebook               | Sign-in with Facebook plugin. |
-| passport-github                 | Sign-in with GitHub plugin. |
-| passport-google-oauth           | Sign-in with Google plugin. |
-| passport-twitter                | Sign-in with Twitter plugin. |
-| passport-instagram              | Sign-in with Instagram plugin. |
-| passport-local                  | Sign-in with Username and Password plugin. |
-| passport-linkedin-oauth2        | Sign-in with LinkedIn plugin. |
-| passport-oauth                  | Allows you to set up your own OAuth 1.0a and OAuth 2.0 strategies. |
-| request                         | Simplified HTTP request library. |
-| stripe                          | Offical Stripe API library. |
-| tumblr.js                       | Tumblr API library. |
-| twilio                          | Twilio API library. |
-| twit                            | Twitter API library. |
-| lodash                          | Handy JavaScript utlities library. |
-| uglify-js                       | Dependency for connect-assets library to minify JS. |
+| Package                         | Description                                                           |
+| ------------------------------- | --------------------------------------------------------------------- |
+| async                           | Utility library that provides asynchronous control flow.              |
+| bcrypt-nodejs                   | Library for hashing and salting user passwords.                       |
+| bitgo                           | Multi-sig Bitcoin wallet API.  |
+| cheerio                         | Scrape web pages using jQuery-style syntax.                           |
+| clockwork                       | Clockwork SMS API library.                                            |
+| connect-assets                  | Compiles LESS stylesheets, concatenates & minifies JavaScript.        |
+| connect-mongo                   | MongoDB session store for Express.                                    |
+| csso                            | Dependency for connect-assets library to minify CSS.                  |
+| express                         | Node.js web framework.                                                |
+| body-parser                     | Express 4.0 middleware.                                               |
+| cookie-parser                   | Express 4.0 middleware.                                               |
+| express-session                 | Express 4.0 middleware.                                               |
+| morgan                          | Express 4.0 middleware.                                               |
+| multer                          | Express 4.0 middleware.                                               |
+| compression                     | Express 4.0 middleware.                                               |
+| errorhandler                    | Express 4.0 middleware.                                               |
+| method-override                 | Express 4.0 middleware.                                               |
+| serve-favicon                   | Express 4.0 middleware offering favicon serving and caching.          |
+| express-flash                   | Provides flash messages for Express.                                  |
+| express-validator               | Easy form validation for Express.                                     |
+| fbgraph                         | Facebook Graph API library.                                           |
+| github-api                      | GitHub API library.                                                   |
+| jade                            | Template engine for Express.                                          |
+| lastfm                          | Last.fm API library.                                                  |
+| instagram-node                  | Instagram API library.                                                |
+| less                            | LESS compiler. Used implicitly by connect-assets.                     |
+| lob                             | Lob API library                                                       |
+| lusca                           | CSRF middleware.                                                      |
+| mongoose                        | MongoDB ODM.                                                          |
+| node-foursquare                 | Foursquare API library.                                               |
+| node-linkedin                   | LinkedIn API library.                                                 |
+| nodemailer                      | Node.js library for sending emails.                                   |
+| passport                        | Simple and elegant authentication library for node.js                 |
+| passport-facebook               | Sign-in with Facebook plugin.                                         |
+| passport-github                 | Sign-in with GitHub plugin.                                           |
+| passport-google-oauth           | Sign-in with Google plugin.                                           |
+| passport-twitter                | Sign-in with Twitter plugin.                                          |
+| passport-instagram              | Sign-in with Instagram plugin.                                        |
+| passport-local                  | Sign-in with Username and Password plugin.                            |
+| passport-linkedin-oauth2        | Sign-in with LinkedIn plugin.                                         |
+| passport-oauth                  | Allows you to set up your own OAuth 1.0a and OAuth 2.0 strategies.    |
+| paypal-rest-sdk                 | PayPal APIs library.                                                  |
+| request                         | Simplified HTTP request library.                                      |
+| stripe                          | Offical Stripe API library.                                           |
+| tumblr.js                       | Tumblr API library.                                                   |
+| twilio                          | Twilio API library.                                                   |
+| twit                            | Twitter API library.                                                  |
+| lodash                          | Handy JavaScript utlities library.                                    |
+| uglify-js                       | Dependency for connect-assets library to minify JS.                   |
 | validator                       | Used in conjunction with express-validator in **controllers/api.js**. |
-| mocha                           | Test framework. |
-| chai                            | BDD/TDD assertion library. |
-| supertest                       | HTTP assertion library. |
-| multiline                       | Multi-line strings for the generator. |
-| blessed                         | Interactive command line interface for the generator. |
-| yui                             | Used by the Yahoo API example. |
+| mocha                           | Test framework.                                                       |
+| chai                            | BDD/TDD assertion library.                                            |
+| supertest                       | HTTP assertion library.                                               |
+| multiline                       | Multi-line strings for the generator.                                 |
+| blessed                         | Interactive command line interface for the generator.                 |
+| yui                             | Used by the Yahoo API example.                                        |
 
 Useful Tools and Resources
 --------------------------
 - [JSDB.io](http://www.jsdb.io) - The Database of JavaScript Libraries
-- [JS Recipes](http://jsrecipes.org) - JavaScript tutorials for backend and frontend development.
+- [JS Recipes](http://sahatyalkabov.com/jsrecipes) - JavaScript tutorials for backend and frontend development.
 - [Jade Syntax Documentation by Example](http://naltatis.github.io/jade-syntax-docs/#attributes) - Even better than official Jade docs.
 - [HTML to Jade converter](http://html2jade.aaron-powell.com) - Extremely valuable when you need to quickly copy and paste HTML snippets from the web.
 - [JavascriptOO](http://www.javascriptoo.com/) - A directory of JavaScript libraries with examples, CDN links, statistics, and videos.
@@ -465,10 +464,6 @@ added to `package.json` as well. For example, `npm install --save moment`.
 asynchronous tasks, and then render a page, but only when all tasks are completed. For example, you might
 want to scrape 3 different websites for some data and render the results in a template
 after all 3 websites have been scraped.
-- Need to find a specific object inside an Array? Use [_.find](http://lodash.com/docs#find)
-function from Lodash. For example, this is how you would retrieve a
-Twitter token from database: `var token = _.find(req.user.tokens, { kind: 'twitter' });`,
-where 1st parameter is an array, and a 2nd parameter is an object to search for.
 
 FAQ
 ---
@@ -557,25 +552,6 @@ When you deploy your app, it will run in production mode, and so **connect-asset
 will automatically serve a single concatenated & minified `application.js`.
 For more information see [Sprockets-style concatenation](https://github.com/adunkman/connect-assets/#sprockets-style-concatenation)
 section.
-
-### I am getting MongoDB Connection Error, how do I fix it?
-That's a custom error message defined in `app.js` to indicate that there was a
-problem connecting to MongoDB:
-
-```js
-mongoose.connection.on('error', function() {
-  console.error('✗ MongoDB Connection Error. Please make sure MongoDB is running.');
-});
-```
-You need to have a MongoDB server running before launching `app.js`. You can
-download MongoDB [here](mongodb.org/downloads), or install it via a package manager.
-<img src="http://dc942d419843af05523b-ff74ae13537a01be6cfec5927837dcfe.r14.cf1.rackcdn.com/wp-content/uploads/windows-8-50x50.jpg" height="17">
-Windows users, read [Install MongoDB on Windows](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/).
-
-**Tip:** If you are always connected to the internet, you could just use
-[MongoLab](https://mongolab.com/) or [Compose](https://www.compose.io/) instead
-of downloading and installing MongoDB locally. You will only need to update the
-`db` property in `config/secrets.js`.
 
 ### I get an error when I deploy my app, why?
 Chances are you haven't changed the *Database URI* in `secrets.js`. If `db` is
@@ -1041,45 +1017,45 @@ If you want to see a really cool real-time dashboard check out this
 [pull request #23](https://github.com/sahat/hackathon-starter/pull/23/files) to
 see how it is implemented.
 
-Mongoose Cheatsheet
+Sequelize Cheatsheet
 -------------------
 
 #### Find all users:
 ```js
-User.find(function(err, users) {
-  console.log(users);
-});
+db.User.findAll()
+  .then(function(users) {
+    console.log(users);
+  })
+  .catch(function(err) {
+    console.error(err);
+  });
 ```
 
 #### Find a user by email:
 ```js
 var userEmail = 'example@gmail.com';
-User.findOne({ email: userEmail }, function(err, user) {
-  console.log(user);
-});
+db.User.findOne({ where: { email: userEmail }})
+  .then(function(user) {
+    console.log(user);
+  })
+  .catch(function(err) {
+    console.error(err);
+  });
 ```
 
 #### Find 5 most recent user accounts:
 ```js
-User
-  .find()
-  .sort({ _id: -1 })
-  .limit(5)
-  .exec(function(err, users) {
+db.User
+  .findAll({ 
+    limit: 5,
+    order: [ ['id', 'DESC'] ]
+  })
+  .then(function(users) {
     console.log(users);
+  })
+  .catch(function(err) {
+    console.error(err);
   });
-```
-
-#### Get total count of a field from all documents:
-Let's suppose that each user has a `votes` field and you would like to count
-the total number of votes in your database across all users. One very
-inefficient way would be to loop through each document and manually accumulate
-the count. Or you could use [MongoDB Aggregation Framework](http://docs.mongodb.org/manual/core/aggregation-introduction/) instead:
-
-```js
-User.aggregate({ $group: { _id: null, total: { $sum: '$votes' } } }, function(err, votesCount) {
-  console.log(votesCount.total);
-});
 ```
 
 Deployment
@@ -1201,173 +1177,7 @@ Also, be sure to check out the [Jump-start your hackathon efforts with DevOps Se
 
 Changelog
 ---------
-
-### 3.0.2 (March 31, 2015)
-- Renamed `navbar.jade` to `header.jade`.
-- Fixed typos in README. Thanks @josephahn and @rstormsf. 
-- Fix radio button alignment on small screens in Profile page.
-- Increased `bcrypt.genSalt()` from **5** to **10**.
-- Updated package dependencies.
-- Updated Font Awesome `4.3.0`.
-- Updated Bootstrap `3.3.4`.
-- Removed Ionicons.
-- Removed unused `User` variable in *controllers/api.js*.
-- Removed Nodejitsu instructions from README.
-
-### 3.0.1 (February 23, 2015)
-- Reverted Sass to LESS stylesheets. See <a href="https://github.com/sahat/hackathon-starter/issues/233">#233</a>.
-- Convert email to lower case in Passport's LocalStrategy during login.
-- New Lob API.
-- Updated Font Awesome to 4.3.0
-- Updated Bootstrap and Flatly theme to 3.3.2.
-
-### 3.0.0 (January 11, 2015)
-- New Ordr.in API example.
-- Brought back PayPal API example.
-- Added `xframe` and xssProtection` protection via **lusca** module.
-- No more CSRF route whitelisting, either enable or dsiable it globally.
-- Simplified "remember original destination" middleware.
- - Instead of excluding certain routes, you now have to "opt-in" for the routes you wish to remember for a redirect after successful authentication.
-- Converted LESS to Sass.
-- Updated Bootstrap to 3.3.1 and Font Awesome to 4.2.0.
-- Updated jQuery to 2.1.3 and Bootstrap to 3.3.1 JS files.
-- Updated Ionicons to 2.0.
-- Faster travis-ci builds using `sudo: false`.
-- Fixed YUI url on Yahoo API example.
-- Fixed `mongo-connect` deprecation warning.
-- Code cleanup throughout the project.
-- Updated `secrets.js` notice.
-- Simplified the generator (`setup.js`), no longer removes auth providers.
-- Added `git remote rm origin` to Getting Started instructions in README.
-
-### 2.4.0 (November 8, 2014)
-- Bootstrap 3.3.0.
-- Flatly 3.3.0 theme.
-- User model cleanup.
-- Removed `helperContext` from connect-assets middleware.
-
-### 2.3.4 (October 27, 2014)
-- Font Awesome 4.2.0 [01e7bd5c09926911ca856fe4990e6067d9148694](https://github.com/sahat/hackathon-starter/commit/01e7bd5c09926911ca856fe4990e6067d9148694)
-- Code cleanup in `app.js` and `controllers/api.js`. [8ce48f767c0146062296685cc101acf3d5d224d9](https://github.com/sahat/hackathon-starter/commit/8ce48f767c0146062296685cc101acf3d5d224d9) [cdbb9d1888a96bbba92d4d14deec99a8acba2618](https://github.com/sahat/hackathon-starter/commit/cdbb9d1888a96bbba92d4d14deec99a8acba2618)
-- Updated Stripe API example. [afef373cd57b6a44bf856eb093e8f2801fc2dbe2](https://github.com/sahat/hackathon-starter/commit/afef373cd57b6a44bf856eb093e8f2801fc2dbe2)
-- Added 1-step deployment process with Heroku and MongoLab add-on. [c5def7b7b3b98462e9a2e7896dc11aaec1a48b3f](https://github.com/sahat/hackathon-starter/commit/c5def7b7b3b98462e9a2e7896dc11aaec1a48b3f)
-- Updated Twitter apps dashboard url. [e378fbbc24e269de69494d326bc20fcb641c0697](https://github.com/sahat/hackathon-starter/commit/e378fbbc24e269de69494d326bc20fcb641c0697)
-- Fixed dead links in the README. [78fac5489c596e8bcef0ab11a96e654335573bb4](https://github.com/sahat/hackathon-starter/commit/78fac5489c596e8bcef0ab11a96e654335573bb4)
-
-### 2.3.3 (September 1, 2014)
-- Use *https* (instead of http) profile image URL with Twitter authentication
-
-### 2.3.2 (July 28, 2014)
-- Fixed an issue with connect-assets when running `app.js` from an outside folder
-- Temporarily disabled `setup.js` on Windows platform until [blessed](https://github.com/chjj/blessed) fixes its problems
-
-### 2.3.1 (July 15, 2014)
-- Migrated to Nodemailer 1.0
-
-### 2.3 (July 2, 2014)
-- Bootstrap 3.2
-- New default theme
-- Ionicons fonts
-- Fixed bodyParser deprecation warning
-- Minor visual updates
-- CSS cleanup via RECESS
-- Replaced `navbar-brand` image with a font icon
-
-### 2.2.1 (June 17, 2014)
-- Added IBM Codename: BlueMix deployment instructions
-
-### 2.2 (June 6, 2014)
-- Use Lodash instead of Underscore.js
-- Replaced all occurrences of `_.findWhere` with `_.find`
-- Added a flash message when user deletes an account
-- Updated and clarified some comments
-- Updated the Remove Auth message in `setup.js`
-- Cleaned up `styles.less`
-- Redesigned API Examples page
-- Updated Last.fm API example
-- Updated Steam API example
-- Updated Instagram API example
-- Updated Facebook API example
-- Updated jQuery to 2.1.1
-- Fixed a bug that didn't remove Instagram Auth properly
-- Fixed Foursquare secret token
-
-### 2.1.4 (June 5, 2014)
-- Fixed a bug related to `returnTo` url (#155)
-
-### 2.1.3 (June 3, 2014)
-- Font Awesome 4.1
-- Updated icons on some API examples
-- Use LESS files for *bootstrap-social* and *font-awesome*
-
-### 2.1.2 (June 2, 2014)
-- Improved Twilio API example
-- Updated dependencies
-
-### 2.1.1 (May 29, 2014)
-- Added **Compose new Tweet** to Twitter API example
-- Fixed email service indentation
-- Fixed Mailgun and Mandrill secret.js properties
-- Renamed `navigation.jade` to `navbar.jade`
-
-### 2.1 (May 13, 2014)
-- New and improved generator - **setup.js**
-- Added Yahoo API
-- CSS and templates cleanup
-- Minor improvement to the default theme
-- `cluster_app.js` has been moved into **setup.js**
-
-### 2.0.4 (April 26, 2014)
-- Added Mandrill e-mail service (via generator)
-
-### 2.0.3 (April 25, 2014)
-- LinkedIn API: Fixed an error if a user did not specify education on LinkedIn
-- Removed email constraint when linking OAuth accounts in order to be able to merge accounts that use the same email address
-- Check if email address is already taken when creating a new local account
- - Previously relied on Validation Error 11000, which doesn't always work
-- When creating a local account, checks if e-mail address is already taken
-- Flash notifications can now be dismissed by clicking on ×
-
-### 2.0.2 (April 22, 2014)
-- Added Instagram Authentication
-- Added Instagram API example
-- Updated Instagram Strategy to use a "fake" email address similar to Twitter Startegy
-
-### 2.0.1 (April 18, 2014)
-- Conditional CSRF support using [lusca](https://github.com/krakenjs/lusca)
-- Fixed EOL problem in `generator.js` for Windows users
-- Fixed outdated csrf token string on profile.jade
-- Code cleanup
-
-### 2.0.0 (April 15, 2014)
-There are have been over **500+** commits since the initial announcement in
-January 2014 and over a **120** issues and pull requests from **28** contributors.
-
-- Documentation grew **8x** in size since the announcement on Hacker News
-- Upgraded to Express 4.0
-- Generator for adding/removing authentication providers
-- New Instagram authentication that can be added via generator
-- Forgot password and password reset for Local authentication
-- Added LinkedIn authentication and API example
-- Added Stripe API example
-- Added Venmo API example
-- Added Clockwork SMS example
-- Nicer Facebook API example
-- Pre-populated secrets.js with API keys (not linked to my personal accounts)
-- Grid layout with company logos on API Examples page
-- Added tests (Mocha, Chai, Supertest)
-- Gravatar pictures in Navbar and Profile page
-- Tracks last visited URL before signing in to redirect back to original destination
-- CSRF protection
-- Gzip compression and static assets caching
-- Client-side JavaScript is automatically minified+concatenated in production
-- Navbar, flash messages, footer refactored into partial templates
-- Support for Node.js clusters
-- Support for Mailgun email service
-- Support for environment variables in secrets.js
-- Switched from less-middleware to connect-assets
-- Bug fixes related to multi-authentication login and account linking
-- Other small fixes and changes that are too many to list
+TODO
 
 Contributing
 ------------

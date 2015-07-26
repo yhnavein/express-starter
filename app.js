@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Module dependencies.
  */
@@ -6,18 +7,17 @@ var cookieParser = require('cookie-parser');
 var compress = require('compression');
 var favicon = require('serve-favicon');
 var session = require('express-session');
+var pgSession = require('connect-pg-simple')(session);
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 var errorHandler = require('errorhandler');
 var lusca = require('lusca');
 var methodOverride = require('method-override');
-var multer  = require('multer');
+var multer = require('multer');
 
-var _ = require('lodash');
-var MongoStore = require('connect-mongo')(session);
+//var MySQLStore = require('connect-mysql')({ session: session });
 var flash = require('express-flash');
 var path = require('path');
-var mongoose = require('mongoose');
 var passport = require('passport');
 var expressValidator = require('express-validator');
 var connectAssets = require('connect-assets');
@@ -42,14 +42,6 @@ var passportConf = require('./config/passport');
 var app = express();
 
 /**
- * Connect to MongoDB.
- */
-mongoose.connect(secrets.db);
-mongoose.connection.on('error', function() {
-  console.error('MongoDB Connection Error. Please make sure that MongoDB is running.');
-});
-
-/**
  * Express configuration.
  */
 app.set('port', process.env.PORT || 3000);
@@ -63,15 +55,35 @@ app.use(logger('dev'));
 app.use(favicon(path.join(__dirname, 'public/favicon.png')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(multer({ dest: path.join(__dirname, 'uploads') }));
+app.use(multer({ dest: path.join(__dirname, 'uploads') }).single());
 app.use(expressValidator());
 app.use(methodOverride());
 app.use(cookieParser());
+
+var db = require('./models/sequelize');
+
+//MySQL Store
+/*
 app.use(session({
   resave: true,
   saveUninitialized: true,
   secret: secrets.sessionSecret,
-  store: new MongoStore({ url: secrets.db, autoReconnect: true })
+  store: new MySQLStore({
+    config: secrets.mysql,
+    table: secrets.mysql.sessionTable
+  })
+}));
+*/
+//PostgreSQL Store
+app.use(session({
+  store: new pgSession({
+    conString: secrets.postgres.connectionString(),
+    tableName: secrets.postgres.sessionTable
+  }),
+  secret: secrets.sessionSecret,
+  saveUninitialized: true,
+  resave: true,
+  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -90,6 +102,7 @@ app.use(function(req, res, next) {
   next();
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
+
 
 /**
  * Primary app routes.
@@ -127,7 +140,6 @@ app.get('/api/twilio', apiController.getTwilio);
 app.post('/api/twilio', apiController.postTwilio);
 app.get('/api/clockwork', apiController.getClockwork);
 app.post('/api/clockwork', apiController.postClockwork);
-app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFoursquare);
 app.get('/api/tumblr', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getTumblr);
 app.get('/api/facebook', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFacebook);
 app.get('/api/github', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getGithub);
@@ -136,57 +148,51 @@ app.post('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized
 app.get('/api/venmo', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getVenmo);
 app.post('/api/venmo', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.postVenmo);
 app.get('/api/linkedin', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getLinkedin);
-app.get('/api/instagram', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getInstagram);
 app.get('/api/yahoo', apiController.getYahoo);
-app.get('/api/ordrin', apiController.getOrdrin);
 app.get('/api/paypal', apiController.getPayPal);
 app.get('/api/paypal/success', apiController.getPayPalSuccess);
 app.get('/api/paypal/cancel', apiController.getPayPalCancel);
 app.get('/api/lob', apiController.getLob);
+app.get('/api/bitgo', apiController.getBitGo);
+app.post('/api/bitgo', apiController.postBitGo);
+
+function safeRedirectToReturnTo(req, res) {
+  var returnTo = req.session.returnTo || '/';
+  delete req.session.returnTo;
+  res.redirect(returnTo);
+}
 
 /**
  * OAuth authentication routes. (Sign in)
  */
-app.get('/auth/instagram', passport.authenticate('instagram'));
-app.get('/auth/instagram/callback', passport.authenticate('instagram', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
+// app.get('/auth/instagram', passport.authenticate('instagram'));
+// app.get('/auth/instagram/callback', passport.authenticate('instagram', { failureRedirect: '/login' }), safeRedirectToReturnTo);
 app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email', 'user_location'] }));
-app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
+app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), safeRedirectToReturnTo);
 app.get('/auth/github', passport.authenticate('github'));
-app.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
+app.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: '/login' }), safeRedirectToReturnTo);
 app.get('/auth/google', passport.authenticate('google', { scope: 'profile email' }));
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), safeRedirectToReturnTo);
 app.get('/auth/twitter', passport.authenticate('twitter'));
-app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
+app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/login' }), safeRedirectToReturnTo);
 app.get('/auth/linkedin', passport.authenticate('linkedin', { state: 'SOME STATE' }));
-app.get('/auth/linkedin/callback', passport.authenticate('linkedin', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
+app.get('/auth/linkedin/callback', passport.authenticate('linkedin', { failureRedirect: '/login' }), safeRedirectToReturnTo);
 
 /**
  * OAuth authorization routes. (API examples)
  */
-app.get('/auth/foursquare', passport.authorize('foursquare'));
-app.get('/auth/foursquare/callback', passport.authorize('foursquare', { failureRedirect: '/api' }), function(req, res) {
-  res.redirect('/api/foursquare');
-});
-app.get('/auth/tumblr', passport.authorize('tumblr'));
-app.get('/auth/tumblr/callback', passport.authorize('tumblr', { failureRedirect: '/api' }), function(req, res) {
-  res.redirect('/api/tumblr');
-});
-app.get('/auth/venmo', passport.authorize('venmo', { scope: 'make_payments access_profile access_balance access_email access_phone' }));
-app.get('/auth/venmo/callback', passport.authorize('venmo', { failureRedirect: '/api' }), function(req, res) {
-  res.redirect('/api/venmo');
-});
+// app.get('/auth/foursquare', passport.authorize('foursquare'));
+// app.get('/auth/foursquare/callback', passport.authorize('foursquare', { failureRedirect: '/api' }), function(req, res) {
+//   res.redirect('/api/foursquare');
+// });
+// app.get('/auth/tumblr', passport.authorize('tumblr'));
+// app.get('/auth/tumblr/callback', passport.authorize('tumblr', { failureRedirect: '/api' }), function(req, res) {
+//   res.redirect('/api/tumblr');
+// });
+// app.get('/auth/venmo', passport.authorize('venmo', { scope: 'make_payments access_profile access_balance access_email access_phone' }));
+// app.get('/auth/venmo/callback', passport.authorize('venmo', { failureRedirect: '/api' }), function(req, res) {
+//   res.redirect('/api/venmo');
+// });
 
 /**
  * Error Handler.
@@ -196,8 +202,14 @@ app.use(errorHandler());
 /**
  * Start Express server.
  */
-app.listen(app.get('port'), function() {
-  console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
-});
+
+db
+  .sequelize
+  .sync({ force: false })
+  .then(function() {
+      app.listen(app.get('port'), function() {
+        console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
+      });
+  });
 
 module.exports = app;

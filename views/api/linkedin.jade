@@ -62,11 +62,12 @@ block content
           small.text-muted= profile.publicProfileUrl
 
   h3.text-primary LinkedIn Connections
-  table.table.table-hover.table-striped.table-bordered
-    tbody
-    for connection in profile.connections.values
-      if connection.id != 'private'
-        tr
-          td
-            strong #{connection.firstName} #{connection.lastName}
-            .text-muted #{connection.headline}
+  if profile.connections != null
+    table.table.table-hover.table-striped.table-bordered
+      tbody
+      for connection in profile.connections.values
+        if connection.id != 'private'
+          tr
+            td
+              strong #{connection.firstName} #{connection.lastName}
+              .text-muted #{connection.headline}

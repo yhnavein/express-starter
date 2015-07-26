@@ -1,10 +1,12 @@
-var _ = require('lodash');
-var async = require('async');
+'use strict';
+
+var async = require('neo-async');
 var crypto = require('crypto');
-var nodemailer = require('nodemailer');
 var passport = require('passport');
-var User = require('../models/User');
-var secrets = require('../config/secrets');
+var db = require('../models/sequelize');
+var UserRepo = require('../repositories/UserRepository.js');
+
+var emailService = require('../services/emailService.js');
 
 /**
  * GET /login
@@ -35,13 +37,15 @@ exports.postLogin = function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
     if (err) return next(err);
     if (!user) {
-      req.flash('errors', { msg: info.message });
+      req.flash('errors', { msg: info ? info.message : '' });
       return res.redirect('/login');
     }
-    req.logIn(user, function(err) {
-      if (err) return next(err);
+    req.logIn(user, function(loginErr) {
+      if (loginErr) return next(loginErr);
       req.flash('success', { msg: 'Success! You are logged in.' });
-      res.redirect(req.session.returnTo || '/');
+      var redirectTo = req.session.returnTo || '/';
+      delete req.session.returnTo;
+      res.redirect(redirectTo);
     });
   })(req, res, next);
 };
@@ -82,22 +86,25 @@ exports.postSignup = function(req, res, next) {
     return res.redirect('/signup');
   }
 
-  var user = new User({
-    email: req.body.email,
-    password: req.body.password
-  });
-
-  User.findOne({ email: req.body.email }, function(err, existingUser) {
+  db.User.findOne({ where: { email: req.body.email } }).then(function(existingUser) {
     if (existingUser) {
       req.flash('errors', { msg: 'Account with that email address already exists.' });
-      return res.redirect('/signup');
+      return res.redirect('/login');
     }
-    user.save(function(err) {
-      if (err) return next(err);
+
+    db.User.create({
+      email: req.body.email,
+      password: req.body.password,
+      profile: {},
+      tokens: {}
+    }).then(function(user) {
       req.logIn(user, function(err) {
         if (err) return next(err);
         res.redirect('/');
       });
+    })
+    .catch(function(err) {
+      return next(err);
     });
   });
 };
@@ -117,19 +124,25 @@ exports.getAccount = function(req, res) {
  * Update profile information.
  */
 exports.postUpdateProfile = function(req, res, next) {
-  User.findById(req.user.id, function(err, user) {
-    if (err) return next(err);
+  db.User.findById(req.user.id).then(function(user) {
     user.email = req.body.email || '';
     user.profile.name = req.body.name || '';
     user.profile.gender = req.body.gender || '';
     user.profile.location = req.body.location || '';
     user.profile.website = req.body.website || '';
+    user.set('profile', user.profile);
 
-    user.save(function(err) {
-      if (err) return next(err);
+    console.log('changed', user.changed('profile'));
+    user.save().then(function() {
       req.flash('success', { msg: 'Profile information updated.' });
       res.redirect('/account');
+    })
+    .catch(function(err) {
+      return next(err);
     });
+  })
+  .catch(function(err) {
+    return next(err);
   });
 };
 
@@ -148,17 +161,16 @@ exports.postUpdatePassword = function(req, res, next) {
     return res.redirect('/account');
   }
 
-  User.findById(req.user.id, function(err, user) {
-    if (err) return next(err);
+  db.User.findById(req.user.id)
+    .then(function(user) {
+      user.password = req.body.password;
 
-    user.password = req.body.password;
-
-    user.save(function(err) {
-      if (err) return next(err);
-      req.flash('success', { msg: 'Password has been changed.' });
-      res.redirect('/account');
-    });
-  });
+      user.save().then(function() {
+        req.flash('success', { msg: 'Password has been changed.' });
+        res.redirect('/account');
+      });
+    })
+    .catch(function(err) { return next(err); });
 };
 
 /**
@@ -166,12 +178,12 @@ exports.postUpdatePassword = function(req, res, next) {
  * Delete user account.
  */
 exports.postDeleteAccount = function(req, res, next) {
-  User.remove({ _id: req.user.id }, function(err) {
-    if (err) return next(err);
-    req.logout();
-    req.flash('info', { msg: 'Your account has been deleted.' });
-    res.redirect('/');
-  });
+  db.User.destroy({ where: { id: req.user.id } })
+    .then(function() {
+      req.logout();
+      req.flash('info', { msg: 'Your account has been deleted.' });
+      res.redirect('/');
+    });
 };
 
 /**
@@ -180,16 +192,16 @@ exports.postDeleteAccount = function(req, res, next) {
  */
 exports.getOauthUnlink = function(req, res, next) {
   var provider = req.params.provider;
-  User.findById(req.user.id, function(err, user) {
-    if (err) return next(err);
 
-    user[provider] = undefined;
-    user.tokens = _.reject(user.tokens, function(token) { return token.kind === provider; });
+  db.User.findById(req.user.id).then(function(user) {
+    var attrInfo = {};
+    attrInfo[provider + 'Id'] = null;
 
-    user.save(function(err) {
-      if (err) return next(err);
+    user.updateAttributes(attrInfo).then(function() {
       req.flash('info', { msg: provider + ' account has been unlinked.' });
       res.redirect('/account');
+    }).catch(function(err) {
+      return next(err);
     });
   });
 };
@@ -202,17 +214,16 @@ exports.getReset = function(req, res) {
   if (req.isAuthenticated()) {
     return res.redirect('/');
   }
-  User
-    .findOne({ resetPasswordToken: req.params.token })
-    .where('resetPasswordExpires').gt(Date.now())
-    .exec(function(err, user) {
-      if (!user) {
-        req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
-        return res.redirect('/forgot');
-      }
+  db.User
+    .findOne({ where: { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: new Date() } } })
+    .then(function(user) {
       res.render('account/reset', {
         title: 'Password Reset'
       });
+    })
+    .catch(function(err) {
+      req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
+      return res.redirect('/forgot');
     });
 };
 
@@ -233,45 +244,16 @@ exports.postReset = function(req, res, next) {
 
   async.waterfall([
     function(done) {
-      User
-        .findOne({ resetPasswordToken: req.params.token })
-        .where('resetPasswordExpires').gt(Date.now())
-        .exec(function(err, user) {
-          if (!user) {
-            req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
-            return res.redirect('back');
-          }
-
-          user.password = req.body.password;
-          user.resetPasswordToken = undefined;
-          user.resetPasswordExpires = undefined;
-
-          user.save(function(err) {
-            if (err) return next(err);
-            req.logIn(user, function(err) {
-              done(err, user);
-            });
-          });
+      UserRepo.changeUserPswAndResetToken(req.params.token, req.body.password, function(err, user){
+        req.logIn(user, function(err2) {
+          done(err2, user);
         });
+      });
     },
     function(user, done) {
-      var transporter = nodemailer.createTransport({
-        service: 'SendGrid',
-        auth: {
-          user: secrets.sendgrid.user,
-          pass: secrets.sendgrid.password
-        }
-      });
-      var mailOptions = {
-        to: user.email,
-        from: 'hackathon@starter.com',
-        subject: 'Your Hackathon Starter password has been changed',
-        text: 'Hello,\n\n' +
-          'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
-      };
-      transporter.sendMail(mailOptions, function(err) {
-        req.flash('success', { msg: 'Success! Your password has been changed.' });
-        done(err);
+      emailService.sendPasswordChangeNotificationEmail(user.email, function(err) {
+        req.flash('info', { msg: 'Password has been successfully changed. Notification e-mail has been sent to ' + user.email + ' to inform about this fact.' });
+        done(err, 'done');
       });
     }
   ], function(err) {
@@ -309,44 +291,19 @@ exports.postForgot = function(req, res, next) {
 
   async.waterfall([
     function(done) {
-      crypto.randomBytes(16, function(err, buf) {
+      crypto.randomBytes(24, function(err, buf) {
         var token = buf.toString('hex');
         done(err, token);
       });
     },
     function(token, done) {
-      User.findOne({ email: req.body.email.toLowerCase() }, function(err, user) {
-        if (!user) {
-          req.flash('errors', { msg: 'No account with that email address exists.' });
-          return res.redirect('/forgot');
-        }
-
-        user.resetPasswordToken = token;
-        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-
-        user.save(function(err) {
-          done(err, token, user);
-        });
+      var email = req.body.email.toLowerCase();
+      UserRepo.assignResetPswToken(email, token, function(err, user){
+        done(err, token, user);
       });
     },
     function(token, user, done) {
-      var transporter = nodemailer.createTransport({
-        service: 'SendGrid',
-        auth: {
-          user: secrets.sendgrid.user,
-          pass: secrets.sendgrid.password
-        }
-      });
-      var mailOptions = {
-        to: user.email,
-        from: 'hackathon@starter.com',
-        subject: 'Reset your password on Hackathon Starter',
-        text: 'You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n' +
-          'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-          'http://' + req.headers.host + '/reset/' + token + '\n\n' +
-          'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-      };
-      transporter.sendMail(mailOptions, function(err) {
+      emailService.sendRequestPasswordEmail(user.email, req.headers.host, token, function(err) {
         req.flash('info', { msg: 'An e-mail has been sent to ' + user.email + ' with further instructions.' });
         done(err, 'done');
       });
