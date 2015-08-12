@@ -1,9 +1,10 @@
 ![Alt](http://i480.photobucket.com/albums/rr168/Mania_Stacia/express-starter.png)
 Express Starter 
-[![Dependency Status](https://david-dm.org/yhnavein/express-starter/status.svg?style=flat)](https://david-dm.org/yhnavein/express-starter)
-[![Build Status](https://travis-ci.org/yhnavein/express-starter.svg)](https://travis-ci.org/yhnavein/express-starter)
-[![GitHub license](https://img.shields.io/github/license/yhnavein/express-starter.svg)](https://github.com/yhnavein/express-starter)
 =======================
+
+[![Build Status](http://img.shields.io/travis/yhnavein/express-starter.svg)](https://travis-ci.org/yhnavein/express-starter)
+[![Code Climate](http://img.shields.io/codeclimate/github/yhnavein/express-starter.svg)](https://codeclimate.com/github/yhnavein/express-starter)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://yhnavein.mit-license.org)
 
 **Live Demo**: http://hackathonstarter.herokuapp.com
 
