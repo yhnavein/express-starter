@@ -77,8 +77,8 @@ app.use(session({
 //PostgreSQL Store
 app.use(session({
   store: new pgSession({
-    conString: secrets.postgres.connectionString(),
-    tableName: secrets.postgres.sessionTable
+    conString: secrets.postgres,
+    tableName: secrets.sessionTable
   }),
   secret: secrets.sessionSecret,
   saveUninitialized: true,

@@ -35,6 +35,7 @@ module.exports = {
 
   //will be generated. Take a look at the bottom of this file
   postgres: {},
+  sessionTable: 'session',
 
   mailgun: {
     user: process.env.MAILGUN_USER || 'postmaster@sandbox697fcddc09814c6b83718b9fd5d4e5dc.mailgun.org',
@@ -156,38 +157,13 @@ module.exports = {
   }
 };
 
+//constructing Postgres connection string
 if(process.env.NODE_ENV === 'test-travis') {
-  module.exports.postgres = {
-    host: '127.0.0.1',
-    user: 'postgres',
-    password: null,
-    database: 'test_travis_ci',
-    dialect: 'postgres',
-    sessionTable: 'session'
-  };
+  module.exports.postgres = 'postgres://postgres@127.0.0.1/test_travis_ci';
 } else if(process.env.NODE_ENV === 'test') {
-  module.exports.postgres = {
-    host: '127.0.0.1',
-    user: 'yhnavein',
-    password: '123',
-    database: 'test',
-    dialect: 'postgres',
-    sessionTable: 'session'
-  };
+  module.exports.postgres = 'postgres://yhnavein:123@127.0.0.1/test';
+} else if(process.env.DATABASE_URL) {
+  module.exports.postgres = process.env.DATABASE_URL;
 } else {
-  module.exports.postgres = {
-    host: '127.0.0.1',
-    user: 'yhnavein',
-    password: '123',
-    database: 'prod',
-    dialect: 'postgres',
-    sessionTable: 'session'
-  };
+  module.exports.postgres = 'postgres://yhnavein:123@127.0.0.1/prod';
 }
-
-module.exports.postgres.connectionString = function() {
-  if(this.password)
-    return "postgres://" + this.user + ":" + this.password + "@" + this.host + "/" + this.database;
-
-  return "postgres://" + this.user + "@" + this.host + "/" + this.database;
-};

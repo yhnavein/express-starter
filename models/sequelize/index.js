@@ -5,14 +5,7 @@ var fs = require('fs')
   , config = require('../../config/secrets')
   , db = {};
 
-var dbConfig = config.postgres;
-
-var sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {
-  host: dbConfig.host,
-  port: dbConfig.port,
-  dialect: dbConfig.dialect,
-  maxConcurrentQueries: 100
-});
+var sequelize = new Sequelize(config.postgres, { maxConcurrentQueries: 100 });
 
 fs
   .readdirSync(__dirname)
