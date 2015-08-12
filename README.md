@@ -7,7 +7,7 @@ Express Starter
 [![Code Climate](http://img.shields.io/codeclimate/github/yhnavein/express-starter.svg)](https://codeclimate.com/github/yhnavein/express-starter)
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://yhnavein.mit-license.org)
 
-**Live Demo**: http://hackathonstarter.herokuapp.com
+**Live Demo**: https://express-starter.herokuapp.com/
 
 Jump to [What's new in 3.0.3?](#changelog)
 
@@ -94,11 +94,6 @@ Prerequisites
  - <img src="http://i1-news.softpedia-static.com/images/extra/LINUX/small/slw218news1.png" height="17">&nbsp;**Fedora**: `sudo dnf groupinstall "Development Tools"`
  - <img src="https://en.opensuse.org/images/b/be/Logo-geeko_head.png" height="17">&nbsp;**OpenSUSE**: `sudo zypper install --type pattern devel_basis`
 
-**Note:** If you are new to Node or Express, I recommend to watch
-[Node.js and Express 101](http://www.youtube.com/watch?v=BN0JlMZCtNU)
-screencast by Alex Ford that teaches Node and Express from scratch. Alternatively,
-here is another great tutorial for complete beginners - [Getting Started With Node.js, Express, MongoDB](http://cwbuecheler.com/web/tutorials/2013/node-express-mongo/).
-
 Getting Started
 ---------------
 
@@ -123,22 +118,6 @@ save you a lot of time in the long run, because you won't need to manually
 restart the server each time you make a small change in code. To install, run
 `sudo npm install -g nodemon`.
 
-Generator
----------
-
-Hackathon Starter Generator is tighly coupled to the project code. As soon as you
-start changing and moving things around, it will probably no longer work as
-expected. That is why it's best to use when you first download the project.
-
-Currently it supports switching between SendGrid, Mailgun and Mandrill email
-services and adding a Node.js cluster support.
-
-To get started, run: `node setup.js`.
-
-**Note:** Generator has a "destructive" behavior, it will physically
-modify your code. *There is no undo action.* To be on a safe side, always commit
-your code to Git, so you could go back and revert the changes.
-
 Obtaining API Keys
 ------------------
 
@@ -147,7 +126,7 @@ to obtain appropriate credentials: Client ID, Client Secret, API Key, or
 Username & Password. You will need to go through each provider to generate new
 credentials.
 
-**Hackathon Starter 2.0 Update:** I have included dummy keys and passwords for
+**Express Starter 2.0 Update:** I have included dummy keys and passwords for
 all API examples to get you up and running even faster. But don't forget to update
 them with *your credentials* when you are ready to deploy an app.
 
@@ -320,7 +299,7 @@ Project Structure
 | **controllers**/contact.js         | Controller for contact form.                                 |
 | **controllers**/home.js            | Controller for home page (index).                            |
 | **controllers**/user.js            | Controller for user account management.                      |
-| **models**/User.js                 | Mongoose schema and model for User.                          |
+| **models**/User.js                 | Sequelize schema and model for User.                          |
 | **public**/                        | Static assets (fonts, css, js, img).                         |
 | **public**/**js**/application.js   | Specify client-side JavaScript dependencies.                 |
 | **public**/**js**/main.js          | Place your client-side JavaScript here.                      |
@@ -334,7 +313,6 @@ Project Structure
 | **views**/layout.jade              | Base template.                                               |
 | **views**/home.jade                | Home page template.                                          |
 | app.js                             | Main application file.                                       |
-| setup.js                           | Tool for removing authentication providers and other things. |
 
 **Note:** There is no preference how you name or structure your views.
 You could place all your templates in a top-level `views` directory without
@@ -353,7 +331,6 @@ List of Packages
 | cheerio                         | Scrape web pages using jQuery-style syntax.                           |
 | clockwork                       | Clockwork SMS API library.                                            |
 | connect-assets                  | Compiles LESS stylesheets, concatenates & minifies JavaScript.        |
-| connect-mongo                   | MongoDB session store for Express.                                    |
 | csso                            | Dependency for connect-assets library to minify CSS.                  |
 | express                         | Node.js web framework.                                                |
 | body-parser                     | Express 4.0 middleware.                                               |
@@ -371,11 +348,9 @@ List of Packages
 | github-api                      | GitHub API library.                                                   |
 | jade                            | Template engine for Express.                                          |
 | lastfm                          | Last.fm API library.                                                  |
-| instagram-node                  | Instagram API library.                                                |
 | less                            | LESS compiler. Used implicitly by connect-assets.                     |
 | lob                             | Lob API library                                                       |
 | lusca                           | CSRF middleware.                                                      |
-| mongoose                        | MongoDB ODM.                                                          |
 | node-foursquare                 | Foursquare API library.                                               |
 | node-linkedin                   | LinkedIn API library.                                                 |
 | nodemailer                      | Node.js library for sending emails.                                   |
@@ -391,17 +366,15 @@ List of Packages
 | paypal-rest-sdk                 | PayPal APIs library.                                                  |
 | request                         | Simplified HTTP request library.                                      |
 | stripe                          | Offical Stripe API library.                                           |
-| tumblr.js                       | Tumblr API library.                                                   |
 | twilio                          | Twilio API library.                                                   |
 | twit                            | Twitter API library.                                                  |
 | lodash                          | Handy JavaScript utlities library.                                    |
 | uglify-js                       | Dependency for connect-assets library to minify JS.                   |
 | validator                       | Used in conjunction with express-validator in **controllers/api.js**. |
 | mocha                           | Test framework.                                                       |
-| chai                            | BDD/TDD assertion library.                                            |
+| expect.js                       | BDD/TDD assertion library.                                            |
 | supertest                       | HTTP assertion library.                                               |
 | multiline                       | Multi-line strings for the generator.                                 |
-| blessed                         | Interactive command line interface for the generator.                 |
 | yui                             | Used by the Yahoo API example.                                        |
 
 Useful Tools and Resources
@@ -420,7 +393,7 @@ Recommended Design Resources
 - [UIBox](http://www.uibox.in) - Curated HTML, CSS, JS, UI components.
 - [Bootstrap Zero](http://bootstrapzero.com/) - Free Bootstrap templates themes.
 - [Google Bootstrap](http://todc.github.io/todc-bootstrap/) - Google-styled theme for Bootstrap.
-- [Font Awesome Icons](http://fortawesome.github.io/Font-Awesome/icons/) - It's already part of the Hackathon Starter, so use this page as a reference.
+- [Font Awesome Icons](http://fortawesome.github.io/Font-Awesome/icons/) - It's already part of the Express Starter, so use this page as a reference.
 - [Colors](http://clrs.cc) - A nicer color palette for the web.
 - [Creative Button Styles](http://tympanus.net/Development/CreativeButtons/) - awesome button styles.
 - [Creative Link Effects](http://tympanus.net/Development/CreativeLinkEffects/) - Beautiful link effects in CSS.
@@ -485,24 +458,6 @@ specify a list of routes that should bypass CSRF verification check.
 **Note 2:** To whitelist dynamic URLs use regular expression tests inside the
 CSRF middleware to see if `req.originalUrl` matches your desired pattern.
 
-### What is cluster_app.js?
-
-**Note**: It is now part of the generator as of **v2.1**.
-
-From the [Node.js Documentation](http://nodejs.org/api/cluster.html#cluster_how_it_works):
-> A single instance of Node runs in a single thread. To take advantage of multi-core systems
-> the user will sometimes want to launch a cluster of Node processes to handle the load.
-> The cluster module allows you to easily create child processes that all share server ports.
-
-Running `cluster_app.js` allows you to take advantage of this feature by forking
-a process of `app.js` for each detected CPU. For the majority of applications
-serving HTTP requests, this is a nice benefit. However, the cluster module is
-still in experimental stage, therefore it should only be used after understanding
-its purpose and behavior. To use it, simply run `node cluster_app.js`.
-**Its use is entirely optional and `app.js` is not tied in any way to it**.
-As a reminder, if you plan to use `cluster_app.js` instead of `app.js`,
-be sure to indicate that in `package.json` when you are ready to deploy your app.
-
 ### What is this Rails 3.1-style asset pipeline that you mentioned under Features?
 This is how you typically define static files inside HTML, Jade or any template
 for that matter:
@@ -557,12 +512,8 @@ section.
 
 ### I get an error when I deploy my app, why?
 Chances are you haven't changed the *Database URI* in `secrets.js`. If `db` is
-set to `localhost`, it will only work on your machine as long as MongoDB is
-running. When you deploy to Heroku, OpenShift or some other provider, you will not have MongoDB
-running on `localhost`. You need to create an account with [MongoLab](http://mongolab.com)
-or [Compose](https://www.compose.io/), then create a free tier database.
-See [Deployment](#deployment) for more information on how to setup an account
-and a new database step-by-step with MongoLab.
+set to `localhost`, it will only work on your machine as long as PostgreSQL is
+running. When you deploy to Heroku, OpenShift or some other provider, you will not have PostgreSQL running on `localhost`. If provider use `DATABASE_URL` node variable it should be configured out of the box (Heroku), but either way, please take a look on deploying documentation.
 
 ### Why Jade instead of Handlebars?
 When I first started this project I didn't have any experience with Handlebars. Since then I have worked on Ember.js apps and got myself familiar with the Handlebars syntax. While it is true Handlebars is easier, because it looks like good old HTML, I have no regrets picking Jade over Handlebars. First off, it's the default template engine in Express, so someone who has built Express apps in the past already knows it. Secondly, I find `extends` and `block` to be indispensable, which as far as I know, Handlebars does not have out of the box. And lastly, subjectively speaking, Jade looks much cleaner and shorter than Handlebars, or any non-HAML style for that matter.
@@ -593,11 +544,6 @@ If you would like to use **Persona** authentication strategy, use the
 [pull request #64](https://github.com/sahat/hackathon-starter/pull/64) as a
 reference guide. I have explained my reasons why it could not be merged in
 [issue #63](https://github.com/sahat/hackathon-starter/issues/63#issuecomment-34898290).
-
-### How do I switch SendGrid for another email delivery service?
-Run `node setup.js` bundled with Hackathon Starter, then select
-**Email Service** option. It will automatically replace appropriate strings in
-your code. Currently there are three options: SendGrid, Mandrill, and Mailgun.
 
 ### Can I use Sass instead of LESS stylesheets?
 Yes you can! Although you will have to manually convert all existing stylesheets
@@ -633,7 +579,7 @@ I hope it provides some guidance to you.
 [HTML5 UP](http://html5up.net/) has many beautiful templates that you can download for free.
 
 When you download the ZIP file, it will come with *index.html*, *images*, *css* and *js* folders. So, how do you
-integrate it with Hackathon Starter? Hackathon Starter uses Bootstrap CSS framework, but these templates do not.
+integrate it with Express Starter? Express Starter uses Bootstrap CSS framework, but these templates do not.
 Trying to use both CSS files at the same time will likely result in undesired effects.
 
 **Note:** Using the custom templates approach, you should understand that you cannot reuse any of the views I have created: layout, home page, api browser, login, signup, account management, contact. Those views were built using Bootstrap grid and styles. You will have to manually update the grid using a different syntax provided in the template. **Having said that, you can mix and match if you want to do so: Use Bootstrap for main app interface, and a custom template for a landing page.**
@@ -671,9 +617,9 @@ Then, each page that changes, be it `index.jade`, `about.jade`, `contact.jade`
 will be embedded in your new `layout.jade` via `block content`. Use existing templates as a reference.
 
 This is a rather lengthy process, and templates you get from elsewhere,
-might have yet another grid system. That's why I chose *Bootstrap* for the Hackathon Starter.
+might have yet another grid system. That's why I chose *Bootstrap* for the Express Starter.
  Many people are already familiar with *Bootstrap*, plus it's easy to get started with it if you have never used *Bootstrap*.
- You can also buy many beautifully designed *Bootstrap* themes at [Themeforest](http://themeforest.net/), and use them as a drop-in replacement for Hackathon Starter. However, if you would like to go with a completely custom HTML/CSS design, this should help you to get started!
+ You can also buy many beautifully designed *Bootstrap* themes at [Themeforest](http://themeforest.net/), and use them as a drop-in replacement for Express Starter. However, if you would like to go with a completely custom HTML/CSS design, this should help you to get started!
 
 <hr>
 
@@ -826,14 +772,27 @@ Use whichever style that makes sense to you. Either one is acceptable. I really 
 `app.route` is very clean and elegant approach, but on the other hand I can no longer see all my routes at a glance
 when you have one route per line.
 
-**Step 2.** Create a new schema and a model `Book.js` inside the *models* directory.
+**Step 2.** Create a new schema and a model `Book.js` inside the *models/sequelize* directory.
 ```js
-var bookSchema = new mongoose.Schema({
-  name: String
-});
 
-var Book = mongoose.model('Book', bookSchema);
-module.exports = Book;
+module.exports = function(db, DataTypes) {
+  var Book = db.define('Book', {
+    id: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
+  }, {
+    tableName: 'books',
+    timestamps: false
+  });
+
+  return Book;
+};
 ```
 
 **Step 3.** Create a new controller file called `book.js` inside the *controllers* directory.
@@ -842,10 +801,10 @@ module.exports = Book;
  * GET /books
  * List all books.
  */
-var Book = require('../models/Book.js');
+var db = require('../models/sequelize');
 
 exports.getBooks = function(req, res) {
-  Book.find(function(err, docs) {
+  db.Book.findAll().then(function(docs) {
     res.render('books', { books: docs });
   });
 };
@@ -873,7 +832,7 @@ That's it! I will say that you could have combined Step 1, 2, 3 as following:
 
 ```js
 app.get('/books', function(req, res) {
-  Book.find(function(err, docs) {
+  db.Book.findAll().then(function(docs) {
     res.render('books', { books: docs });
   });
 });
@@ -888,16 +847,16 @@ difficult to maintain everything in a single file.
 
 That's all there is to it. Express.js is super simple to use.
 Most of the time you will be dealing with other APIs to do the real work:
-[Mongoose](http://mongoosejs.com/docs/guide.html) for querying database, socket.io for sending and receiving messages over websockets,
+[Sequelize](http://sequelize.readthedocs.org/en/latest/docs/querying/) for querying database, socket.io for sending and receiving messages over websockets,
 sending emails via [Nodemailer](http://www.nodemailer.com/), form validation using [express-validator](https://github.com/ctavan/express-validator) library,
 parsing websites using [Cheerio](https://github.com/MatthewMueller/cheerio), and etc.
 
 <hr>
 
-### How do I use Socket.io with Hackathon Starter?
+### How do I use Socket.io with Express Starter?
 [Dan Stroot](https://github.com/dstroot) submitted an excellent [pull request](https://github.com/dstroot/hackathon-starter/commit/0a632def1ce8da446709d92812423d337c977d75) that adds a real-time dashboard with socket.io.
 And as  much as I'd like to add it to the project, I think it violates one of the main
-principles of the Hackathon Starter:
+principles of the Express Starter:
 > When I started this project, my primary focus was on simplicity and ease of use.
 > I also tried to make it as generic and reusable as possible to cover most use cases of
 > hackathon web apps, **without being too specific**.
@@ -922,7 +881,7 @@ I wouldn't even know I had to use port 8000.
 
 I am really glad that Heroku and OpenShift at least
 have a websockets support, because many other PaaS providers still do not support it.
-Due to the aforementioned issues with websockets, I cannot include socket.io as part of the Hackathon Starter. *For now...*
+Due to the aforementioned issues with websockets, I cannot include socket.io as part of the Express Starter. *For now...*
 If you need to use socket.io in your app, please continue reading.
 
 First you need to install socket.io:
@@ -1078,32 +1037,10 @@ listed below.
 - Download and install [Heroku Toolbelt](https://toolbelt.heroku.com/)
 - In terminal, run `heroku login` and enter your Heroku credentials
 - From *your app* directory run `heroku create`
-- Run `heroku addons:add mongolab` to set up Mongo and configure your environment variables
+- Run `heroku addons:create heroku-postgresql:hobby-dev` to set up PostgreSQL and configure your environment variables
 - Lastly, do `git push heroku master`.  Done!
 
 **Note:** To install Heroku add-ons your account must be verified.
-
----
-
-<img src="http://i.imgur.com/7KnCa5a.png" width="200">
-- Open [mongolab.com](https://mongolab.com) website
-- Click the yellow **Sign up** button
-- Fill in your user information then hit **Create account**
-- From the dashboard, click on **:zap:Create new** button
-- Select **any** cloud provider (I usually go with AWS)
-- Under *Plan* click on **Single-node (development)** tab and select **Sandbox** (it's free)
- - *Leave MongoDB version as is - `2.4.x`*
-- Enter *Database name** for your web app
-- Then click on **:zap:Create new MongoDB deployment** button
-- Now, to access your database you need to create a DB user
-- Click to the recently created database
-- You should see the following message:
- - *A database user is required to connect to this database.* **Click here** *to create a new one.*
-- Click the link and fill in **DB Username** and **DB Password** fields
-- Finally, in `secrets.js` instead of `db: 'localhost'`, use the following URI with your credentials:
- - `db: 'mongodb://USERNAME:PASSWORD@ds027479.mongolab.com:27479/DATABASE_NAME'`
-
-**Note:** As an alternative to MongoLab, there is also [Compose](https://www.compose.io/).
 
 
 <img src="http://www.opencloudconf.com/images/openshift_logo.png" width="200">
@@ -1138,7 +1075,7 @@ Add this to `package.json`, after *name* and *version*. This is necessary becaus
 ```
 
 - Finally, now you can push your code to OpenShift by running `git push -f openshift master`
- - **Note:** The first time you run this command, you have to pass `-f` (force) flag because OpenShift creates a dummy server with the welcome page when you create a new Node.js app. Passing `-f` flag will override everything with your *Hackathon Starter* project repository. Please **do not** do `git pull` as it will create unnecessary merge conflicts.
+ - **Note:** The first time you run this command, you have to pass `-f` (force) flag because OpenShift creates a dummy server with the welcome page when you create a new Node.js app. Passing `-f` flag will override everything with your *Express Starter* project repository. Please **do not** do `git pull` as it will create unnecessary merge conflicts.
 - And you are done!
 
 <img src="http://upload.wikimedia.org/wikipedia/commons/f/ff/Windows_Azure_logo.png" width="200">
@@ -1153,7 +1090,7 @@ Add this to `package.json`, after *name* and *version*. This is necessary becaus
 - Select **Local Git repository** from the list, and then click the arrow
 - To enable Git publishing, Azure will ask you to create a user name and password
 - Once the Git repository is ready, you will be presented with a **GIT URL**
-- Inside your *Hackathon Starter* directory, run `git remote add azure [Azure Git URL]`
+- Inside your *Express Starter* directory, run `git remote add azure [Azure Git URL]`
 - To push your changes simply run `git push azure master`
  - **Note:** *You will be prompted for the password you created earlier*
 - On **Deployments** tab of your Windows Azure Web Site, you will see the deployment history
