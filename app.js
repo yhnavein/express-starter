@@ -14,6 +14,7 @@ var errorHandler = require('errorhandler');
 var lusca = require('lusca');
 var methodOverride = require('method-override');
 var multer = require('multer');
+var ejsEngine = require('ejs-mate');
 
 //var MySQLStore = require('connect-mysql')({ session: session });
 var flash = require('express-flash');
@@ -45,8 +46,9 @@ var app = express();
  * Express configuration.
  */
 app.set('port', process.env.PORT || 3000);
+app.engine('ejs', ejsEngine);
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'ejs');
 app.use(compress());
 app.use(connectAssets({
   paths: [path.join(__dirname, 'public/css'), path.join(__dirname, 'public/js')]
