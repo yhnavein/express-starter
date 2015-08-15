@@ -353,7 +353,7 @@ List of Packages
 | lusca                           | CSRF middleware.                                                      |
 | node-foursquare                 | Foursquare API library.                                               |
 | node-linkedin                   | LinkedIn API library.                                                 |
-| nodemailer                      | Node.js library for sending emails.                                   |
+| SendGrid                        | Library for sending emails through SendGrid platform.                                   |
 | passport                        | Simple and elegant authentication library for node.js                 |
 | passport-facebook               | Sign-in with Facebook plugin.                                         |
 | passport-github                 | Sign-in with GitHub plugin.                                           |
@@ -848,7 +848,7 @@ difficult to maintain everything in a single file.
 That's all there is to it. Express.js is super simple to use.
 Most of the time you will be dealing with other APIs to do the real work:
 [Sequelize](http://sequelize.readthedocs.org/en/latest/docs/querying/) for querying database, socket.io for sending and receiving messages over websockets,
-sending emails via [Nodemailer](http://www.nodemailer.com/), form validation using [express-validator](https://github.com/ctavan/express-validator) library,
+sending emails, form validation using [express-validator](https://github.com/ctavan/express-validator) library,
 parsing websites using [Cheerio](https://github.com/MatthewMueller/cheerio), and etc.
 
 <hr>
