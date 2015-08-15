@@ -15,3 +15,12 @@ before_script:
 
 script:
   - npm run test-ci
+
+branches:
+  only:
+    - master
+    - dev
+    - /^feature-.*$/
+    - /^issue-*$/
+    - /^hotfix-*$/
+    - /^fix-*$/
