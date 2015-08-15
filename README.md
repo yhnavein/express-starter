@@ -9,20 +9,13 @@ Express Starter
 
 **Live Demo**: https://express-starter.herokuapp.com/
 
-Jump to [What's new in 3.0.3?](#changelog)
+A boilerplate for **Node.js** web applications, which use RDBS (relational database system) with prefered PostgreSQL instead of overhyped MongoDB.
 
-A boilerplate for **Node.js** web applications.
+Project based on and inspired by [Hackathon Starter](https://github.com/sahat/hackathon-starter).
 
-If you have attended any hackathons in the past, then you know how much time it takes to
-get a project started: decide on what to build, pick a programming language, pick a web framework,
-pick a CSS framework. A while later, you might have an initial project up on GitHub and only then
-can other team members start contributing. Or how about doing something as simple as *Sign in with Facebook*
-authentication? You can spend hours on it if you are not familiar with how OAuth 2.0 works.
+With this boilerplate you can start a brand new application using **node.js** with multiple base features working out-of-a-box. So you can focus on the important stuff you want to create.
 
-When I started this project, my primary focus was on **simplicity** and **ease of use**.
-I also tried to make it as **generic** and **reusable** as possible to cover most use cases of hackathon web apps,
-without being too specific. In the worst case you can use this as a learning guide for your projects,
-if for example you are only interested in **Sign in with Google** authentication and nothing else.
+Take a look on the [Features](#features) section to see what's already done for you!
 
 <h4 align="center">Modern Theme</h4>
 
@@ -39,6 +32,7 @@ if for example you are only interested in **Sign in with Google** authentication
 Table of Contents
 -----------------
 
+- [Why not MEAN?](#why-not-mean)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
@@ -58,19 +52,33 @@ Table of Contents
 - [Contributing](#contributing)
 - [License](#license)
 
+Why not MEAN?
+-------------
+
+There are tons of *MEAN* boilerplates and even more **node.js** stacks that include **MongoDB** by default. But there is a shortage of good and easy-to-use starters for people who want to use relational databases.
+
+Why should you use RDBS? That's a very good question. But the better would be to ask: Why should you use **NoSQL** database in the first place?
+
+There are some situations when NoSQLs are very wise choice, but in the most cases in your applications you will need to store relational data and you want to store it safely and process stored info very quickly. And to that you don't need a MongoDB.
+
+For some time there was a very big advantage in using **MongoDB** with the **node.js** applications. That is, it was a really easy and straightforward to save and retrieve any json object using just a one-liner, which at that point was not that easy with relational databases.
+
+Problem was partially solved by **PostgreSQL 9.3** which introduced a new `JSON` field type, which allows not only to store any JSON object, but also query it as well. And you still have a proper and *ACID*-compliant relational database!
+
+So, if you care about **security** of your data *AND* **performance** *AND* **reliability** *AND* you want to use **node.js** stack, then you should avoid *MEAN* and at least try **Express Starter**.
+
 Features
 --------
 
-- **Local Authentication** using Email and Password
+- really secure **Local Authentication** using Email and Password (**bcrypt** is used)
 - **OAuth 1.0a Authentication** via Twitter
 - **OAuth 2.0 Authentication** via Facebook, Google, GitHub, LinkedIn
 - Flash notifications
 - MVC Project Structure
-- Node.js clusters support
 - Rails 3.1-style asset pipeline by connect-assets (See FAQ)
 - LESS stylesheets (auto-compiled without any Gulp/Grunt hassle)
 - Bootstrap 3 + Flat UI + iOS7
-- Contact Form (powered by Mailgun, Sendgrid or Mandrill)
+- Contact Form (powered by Sendgrid by default, but Mailgun and Mandrill can be used as well)
 - **Account Management**
  - Gravatar
  - Profile Details
@@ -78,9 +86,11 @@ Features
  - Forgot Password
  - Reset Password
  - Link multiple OAuth strategies to one account
+ - Unlink OAuth accounts
  - Delete Account
 - CSRF protection
-- **API Examples**: Facebook, Foursquare, Last.fm, Tumblr, Twitter, Stripe, LinkedIn and more.
+- **API Examples**: Facebook, Foursquare, Last.fm, Twitter, Stripe, LinkedIn and more.
+- Unit and Integrational Tests
 
 Prerequisites
 -------------
@@ -89,7 +99,6 @@ Prerequisites
 - [Node.js](http://nodejs.org)
 - Command Line Tools
  - <img src="http://deluge-torrent.org/images/apple-logo.gif" height="17">&nbsp;**Mac OS X**: [Xcode](https://itunes.apple.com/us/app/xcode/id497799835?mt=12) (or **OS X 10.9 Mavericks**: `xcode-select --install`)
- - <img src="http://dc942d419843af05523b-ff74ae13537a01be6cfec5927837dcfe.r14.cf1.rackcdn.com/wp-content/uploads/windows-8-50x50.jpg" height="17">&nbsp;**Windows**: [Visual Studio](http://www.visualstudio.com/downloads/download-visual-studio-vs#d-express-windows-8)
  - <img src="https://lh5.googleusercontent.com/-2YS1ceHWyys/AAAAAAAAAAI/AAAAAAAAAAc/0LCb_tsTvmU/s46-c-k/photo.jpg" height="17">&nbsp;**Ubuntu**: `sudo apt-get install build-essential`
  - <img src="http://i1-news.softpedia-static.com/images/extra/LINUX/small/slw218news1.png" height="17">&nbsp;**Fedora**: `sudo dnf groupinstall "Development Tools"`
  - <img src="https://en.opensuse.org/images/b/be/Logo-geeko_head.png" height="17">&nbsp;**OpenSUSE**: `sudo zypper install --type pattern devel_basis`
