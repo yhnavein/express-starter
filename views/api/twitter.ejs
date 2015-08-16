@@ -1,0 +1,52 @@
+<% layout('layout') -%>
+
+<div class="page-header">
+  <h2><i style="color: #4099ff" class="fa fa-twitter"></i>Twitter API</h2>
+</div>
+<div class="btn-group btn-group-justified">
+  <a href="https://github.com/ttezel/twit" target="_blank" class="btn btn-success">
+    <i class="fa fa-file-text-o"></i>Twit Library Docs
+  </a>
+  <a href="https://dev.twitter.com/docs" target="_blank" class="btn btn-success">
+    <i class="fa fa-check-square-o"></i>Overview
+  </a>
+  <a href="https://dev.twitter.com/docs/api/1.1" target="_blank" class="btn btn-success">
+    <i class="fa fa-code-fork"></i>API Endpoints
+  </a>
+</div>
+
+<br/>
+
+<div class="well">
+  <h4>Compose new Tweet</h4>
+  <form role="form" method="POST">
+    <input type="hidden" name="_csrf" value="<%= _csrf %>"/>
+    <div class="form-group">
+      <input type="text" name="tweet" autofocus="autofocus" class="form-control" />
+      <p class="help-block">This new Tweet will be posted on your Twitter profile.</p>
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <i class="fa fa-twitter"></i> Tweet
+    </button>
+  </form>
+</div>
+<br/>
+<div class="lead">
+  Latest <strong><%= tweets.length %></strong> Tweets containing the term<strong> nodejs</strong> in NYC within <strong> 5</strong> miles radius
+</div>
+
+<ul class="media-list">
+  <% for(var i = 0; i < tweets.length; i++) {
+var image = tweets[i].user.profile_image_url.replace('_normal', ''); %>
+    <li class="media">
+      <a href='#' class="pull-left">
+        <img class="media-object" src="<%= image %>" style='width: 64px; height: 64px;'>
+      </a>
+      <div class="media-body">
+        <strong class="media-heading"> <%= tweets[i].user.name %> </strong>
+        <span class="text-muted"> <%= tweets[i].user.screen_name %> </span>
+        <p> <%= tweets[i].text %> </p>
+      </div>
+    </li>
+  <% } %>
+</ul>

@@ -1,0 +1,57 @@
+<% layout('layout') -%>
+
+<div class="page-header">
+  <h2>
+    <i class="fa fa-steam-square"></i>Steam Web API
+  </h2>
+</div>
+<div class="btn-group btn-group-justified">
+  <a href="https://developer.valvesoftware.com/wiki/Steam_Web_API" target="_blank" class="btn btn-primary">
+    <i class="fa fa-check-square-o"></i>API Overview
+  </a>
+</div>
+
+<br/>
+
+<div class="alert alert-info">
+  <h4>Steam ID</h4>
+  <p>Displaying public information for Steam ID: <%= playerSummary.steamid %>.</p>
+</div>
+<h3>Profile Information</h3>
+
+<div class="row">
+  <div class="col-sm-2">
+    <img src="<%= playerSummary.avatarfull %>" alt="Player's Avatar" width='92' height='92'>
+  </div>
+  <div class="col-sm-10">
+    <span class="lead"> <%= playerSummary.personaname %> </span>
+
+    <div>Account since: <%= new Date(playerSummary.timecreated * 1000) %> </div>
+    <div>Last Online: <%= new Date(playerSummary.lastlogoff * 1000) %> </div>
+    <div>
+      Online Status:
+      <% if(playerSummary.personastate) { %>
+        <strong class="text-success">Online</strong>
+      <% } else { %>
+        <strong class="text-danger">Offline</strong>
+      <% } %>
+  </div>
+</div>
+
+<h3>
+  <%= playerAchievemments.gameName %> Achievements
+</h3>
+
+<ul class="lead list-unstyled">
+  <% for(var i = 0; playerAchievemments.achievements && i < playerAchievemments.achievements.length; i++) {
+    if(playerAchievemments.achievements[i].achieved) { %>
+      <li class="text-success"> <%= playerAchievemments.achievements[i].name %> </li>
+  <% } } %>
+</ul>
+
+<h3>Owned Games</h3>
+<% for(var i = 0; ownedGames && i < ownedGames.length; i++) { %>
+  <a href="http://store.steampowered.com/app/<%= ownedGames[i].appid %>/">
+    <img src="http://media.steampowered.com/steamcommunity/public/images/apps/<%= ownedGames[i].appid %>/<%= ownedGames[i].img_logo_url %>.jpg" width="92">
+  </a>
+<% } %>

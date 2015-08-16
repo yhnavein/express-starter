@@ -1,0 +1,28 @@
+<% if(messages.errors) { %>
+  <div class="alert alert-danger fade in">
+    <button type="button" data-dismiss="alert" class="close">
+      <span class="ion-close-circled"></span>
+    </button>
+    <% for(msg in messages.errors) { %>
+      <div> <%= msg.msg %> </div>
+    <% } %>
+  </div>
+<% } else if (messages.info) { %>
+  <div class="alert alert-info fade in">
+    <button type="button" data-dismiss="alert" class="close">
+      <span class="fa fa-times-circle-o"></span>
+    </button>
+    <% for(msg in messages.info) { %>
+      <div> <%= msg.msg %> </div>
+    <% } %>
+  </div>
+<% } else if (messages.success) { %>
+  <div class="alert alert-success fade in">
+    <button type="button" data-dismiss="alert" class="close">
+      <span class="fa fa-times-circle-o"></span>
+    </button>
+    <% for(msg in messages.success) { %>
+      <div> <%= msg.msg %> </div>
+    <% } %>
+  </div>
+<% } %>

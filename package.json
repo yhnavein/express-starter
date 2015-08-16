@@ -59,7 +59,6 @@
     "sequelize": "^3.5.1",
     "serve-favicon": "^2.3.0",
     "stripe": "^3.7.0",
-    "tumblr.js": "^0.0.5",
     "twilio": "^2.2.1",
     "twit": "^2.1.0",
     "uglify-js": "^2.4.24",
