@@ -180,7 +180,7 @@ exports.getLastfm = function(req, res, next) {
     }
   },
   function(err, results) {
-    if (err) return next(err.message);
+    if (err) return next(err.error.message);
     var artist = {
       name: results.artistInfo.artist.name,
       image: results.artistInfo.artist.image.slice(-1)[0]['#text'],

@@ -1,0 +1,53 @@
+<% layout('layout') -%>
+
+<div class="page-header">
+  <h2><i style="color: #db1302" class="fa fa-play-circle-o"></i>Last.fm API</h2>
+</div>
+
+<div class="btn-group btn-group-justified">
+  <a href="https://github.com/jammus/lastfm-node#lastfm-node" target="_blank" class="btn btn-primary">
+    <i class="fa fa-check-square-o"></i>Last.fm Node Docs
+  </a>
+  <a href="http://www.last.fm/api/account/create" target="_blank" class="btn btn-primary">
+    <i class="fa fa-laptop"></i>Create API Account
+  </a>
+  <a href="http://www.last.fm/api" target="_blank" class="btn btn-primary">
+    <i class="fa fa-code-fork"></i>API Endpoints
+  </a>
+</div>
+
+<h3> <%= artist.name %> </h3>
+<img src="<%= artist.image %>" class="thumbnail">
+
+<h3>Tags</h3>
+<% for(var i = 0; artist.tags && i < artist.tags.length; i++) { %>
+  <div class="span label label-primary">
+    <i class="fa fa-tag"></i> <%= artist.tags[i].name %>
+  </div>
+<% } %>
+
+<h3>Biography</h3>
+<p> <%= artist.bio %> </p>
+
+<h3>Top Albums</h3>
+<% for(var i = 0; artist.topAlbums && i < artist.topAlbums.length; i++) { %>
+  <img src="<%= artist.topAlbums[i] %>" width="150" height="150">
+<% } %>
+
+<h3>Top Tracks</h3>
+<ol>
+  <% for(var i = 0; artist.topTracks && i < artist.topTracks.length; i++) { %>
+    <li>
+      <a href="<%= artist.topTracks[i].url %>"><%= artist.topTracks[i].name %></a>
+    </li>
+  <% } %>
+</ol>
+
+<h3>Similar Artists</h3>
+<ul class="list-unstyled list-inline">
+  <% for(var i = 0; artist.similar && i < artist.similar.length; i++) { %>
+    <li>
+      <a href="<%= artist.similar[i].url %>"> <%= artist.similar[i].name %> </a>
+    </li>
+  <% } %>
+</ul>
