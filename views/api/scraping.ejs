@@ -1,0 +1,32 @@
+<% layout('layout') -%>
+
+<div class="page-header">
+  <h2><i style="color: #ff6600" class="fa fa-hacker-news"></i>Web Scraping</h2>
+</div>
+<div class="btn-group btn-group-justified">
+  <a href="http://matthewmueller.github.io/cheerio/" target="_blank" class="btn btn-primary">
+    <i class="fa fa-info"></i>Cheerio Docs
+  </a>
+  <a href="http://vimeo.com/31950192" target="_blank" class="btn btn-primary">
+    <i class="fa fa-film"></i>Cheerio Screencast
+  </a>
+</div>
+
+<h3>Hacker News Frontpage</h3>
+
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <th>№</th>
+      <th>Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% links.forEach(function(index, link) { %>
+      <tr>
+        <td> <%= index + 1 %> </td>
+        <td> <%= link %> </td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>
