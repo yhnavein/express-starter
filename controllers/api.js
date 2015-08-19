@@ -262,7 +262,7 @@ exports.postTwitter = function(req, res, next) {
     access_token: accessToken,
     access_token_secret: secretToken
   });
-  T.post('statuses/update', { status: req.body.tweet }, function(err, data, response) {
+  T.post('statuses/update', { status: req.body.tweet }, function(err) {
     if (err) return next(err);
     req.flash('success', { msg: 'Tweet has been posted.'});
     res.redirect('/api/twitter');
@@ -337,7 +337,7 @@ exports.postStripe = function(req, res, next) {
     currency: 'usd',
     card: stripeToken,
     description: stripeEmail
-  }, function(err, charge) {
+  }, function(err) {
     if (err && err.type === 'StripeCardError') {
       req.flash('errors', { msg: 'Your card has been declined.' });
       res.redirect('/api/stripe');
