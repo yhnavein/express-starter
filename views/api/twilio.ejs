@@ -1,0 +1,35 @@
+<% layout('layout') -%>
+
+<div class="page-header">
+  <h2><i style="color: #f00" class="fa fa-phone"></i>Twilio API</h2>
+</div>
+<div class="btn-group btn-group-justified">
+  <a href="http://twilio.github.io/twilio-node/" target="_blank" class="btn btn-primary">
+    <i class="fa fa-check-square-o"></i>Twilio Node
+  </a>
+  <a href="https://apigee.com/console/twilio" target="_blank" class="btn btn-primary">
+    <i class="fa fa-laptop"></i>API Console
+  </a>
+  <a href="https://www.twilio.com/docs/api/rest" target="_blank" class="btn btn-primary">
+    <i class="fa fa-code-fork"></i>REST API
+  </a>
+</div>
+
+<br/>
+
+<div class="row">
+  <div class="col-sm-6">
+    <form role="form" method="POST">
+      <input type="hidden" name="_csrf" value="<%= _csrf %>"/>
+      <div class="form-group">
+        <label class="control-label">Number to text</label>
+        <input type="text" name="number" autofocus="autofocus" class="form-control"/>
+      </div>
+      <div class="form-group">
+        <label class="control-label">Message</label>
+        <input type="text" name="message" class="form-control"/>
+      </div>
+      <button type="submit" class="btn btn-default"><i class="fa fa-location-arrow"></i>Send</button>
+    </form>
+  </div>
+</div>
