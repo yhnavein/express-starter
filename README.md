@@ -2,9 +2,9 @@
 Express Starter 
 =======================
 
-[![Build Status](http://img.shields.io/travis/yhnavein/express-starter.svg)](https://travis-ci.org/yhnavein/express-starter)
+[![Build Status](https://travis-ci.org/yhnavein/express-starter.svg?branch=master)](https://travis-ci.org/yhnavein/express-starter)
 [![Dependency Status](https://david-dm.org/yhnavein/express-starter/status.svg?style=flat)](https://david-dm.org/yhnavein/express-starter)
-[![Code Climate](http://img.shields.io/codeclimate/github/yhnavein/express-starter.svg)](https://codeclimate.com/github/yhnavein/express-starter)
+[![Code Climate](https://codeclimate.com/github/yhnavein/express-starter/badges/gpa.svg)](https://codeclimate.com/github/yhnavein/express-starter)
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://yhnavein.mit-license.org)
 
 **Live Demo**: https://express-starter.herokuapp.com/
