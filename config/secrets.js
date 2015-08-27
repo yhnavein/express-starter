@@ -48,7 +48,6 @@ module.exports = {
   },
 
   sendgrid: {
-    //api_user: process.env.SENDGRID_APIUSER || 'expressstarter',
     api_key: process.env.SENDGRID_APIKEY || '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'
   },
 
@@ -67,13 +66,6 @@ module.exports = {
     callbackURL: '/auth/facebook/callback',
     passReqToCallback: true
   },
-
-  // instagram: {
-  //   clientID: process.env.INSTAGRAM_ID || '9f5c39ab236a48e0aec354acb77eee9b',
-  //   clientSecret: process.env.INSTAGRAM_SECRET || '5920619aafe842128673e793a1c40028',
-  //   callbackURL: '/auth/instagram/callback',
-  //   passReqToCallback: true
-  // },
 
   github: {
     clientID: process.env.GITHUB_ID || 'cb448b1d4f0c743a1e36',
@@ -122,24 +114,6 @@ module.exports = {
     publishableKey: process.env.STRIPE_PKEY || 'pk_test_6pRNASCoBOKtIshFeQd4XMUh'
   },
 
-  tumblr: {
-    consumerKey: process.env.TUMBLR_KEY || 'FaXbGf5gkhswzDqSMYI42QCPYoHsu5MIDciAhTyYjehotQpJvM',
-    consumerSecret: process.env.TUMBLR_SECRET || 'QpCTs5IMMCsCImwdvFiqyGtIZwowF5o3UXonjPoNp4HVtJAL4o',
-    callbackURL: '/auth/tumblr/callback'
-  },
-
-  foursquare: {
-    clientId: process.env.FOURSQUARE_ID || '2STROLSFBMZLAHG3IBA141EM2HGRF0IRIBB4KXMOGA2EH3JG',
-    clientSecret: process.env.FOURSQUARE_SECRET || 'UAABFAWTIHIUFBL0PDC3TDMSXJF2GTGWLD3BES1QHXKAIYQB',
-    redirectUrl: process.env.FOURSQUARE_REDIRECT_URL || 'http://localhost:3000/auth/foursquare/callback'
-  },
-
-  venmo: {
-    clientId: process.env.VENMO_ID || '1688',
-    clientSecret: process.env.VENMO_SECRET || 'uQXtNBa6KVphDLAEx8suEush3scX8grs',
-    redirectUrl: process.env.VENMO_REDIRECT_URL || 'http://localhost:3000/auth/venmo/callback'
-  },
-
   paypal: {
     host: 'api.sandbox.paypal.com',
     client_id: process.env.PAYPAL_ID || 'AdGE8hDyixVoHmbhASqAThfbBcrbcgiJPBwlAM7u7Kfq3YU-iPGc6BXaTppt',
@@ -162,8 +136,6 @@ if(process.env.NODE_ENV === 'test-travis') {
   module.exports.postgres = 'postgres://postgres@127.0.0.1/test_travis_ci';
 } else if(process.env.NODE_ENV === 'test') {
   module.exports.postgres = 'postgres://yhnavein:123@127.0.0.1/test';
-} else if(process.env.DATABASE_URL) {
-  module.exports.postgres = process.env.DATABASE_URL;
 } else {
-  module.exports.postgres = 'postgres://yhnavein:123@127.0.0.1/prod';
+  module.exports.postgres = process.env.DATABASE_URL || 'postgres://yhnavein:123@127.0.0.1/prod';
 }
