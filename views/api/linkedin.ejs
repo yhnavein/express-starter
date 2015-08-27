@@ -1,0 +1,98 @@
+<% layout('layout') -%>
+
+<div class="page-header">
+  <h2>
+    <i class="fa fa-linkedin-square"></i>LinkedIn API
+  </h2>
+</div>
+
+<div class="btn-group btn-group-justified">
+  <a href="https://github.com/Kuew/node-linkedin" target="_blank" class="btn btn-primary">
+    <i class="fa fa-book"></i>Node LinkedIn Docs
+  </a>
+  <a href="http://developer.linkedin.com/documents/authentication" target="_blank" class="btn btn-primary">
+    <i class="fa fa-check-square-o"></i>Getting Started
+  </a>
+  <a href="http://developer.linkedin.com/apis" target="_blank" class="btn btn-primary">
+    <i class="fa fa-code-fork"></i>API Endpoints
+  </a>
+</div>
+
+<h3 class="text-primary">My LinkedIn Profile</h3>
+
+<div class="well well-sm">
+  <div class="row">
+    <div class="col-sm-2">
+      <img class="thumbnail" src="<%= profile.pictureUrl %>">
+    </div>
+    <div class="col-sm-10">
+      <h3><%= profile.formattedName %></h3>
+      <h4><%= profile.headline %></h4>
+      <span class="text-muted">
+        <%= profile.location.name %> |
+        <%= profile.industry %>
+      </span>
+    </div>
+
+    <br/>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <dl class="dl-horizontal">
+          <dt class="text-muted">Current</dt>
+          <% profile.positions.values.forEach(function(position) {
+            if (position.isCurrent) { %>
+            <dd>
+              <strong><%= position.title %></strong> at <strong><%= position.company.name %></strong>
+            </dd>
+          <% } }); %>
+
+          <dt class="text-muted">Previous</dt>
+          <dd>
+          <% profile.positions.values.forEach(function(position) {
+            if (!position.isCurrent) { %>
+              <strong><%= position.title %></strong> at <strong><%= position.company.name %></strong>
+          <% } }); %>
+          </dd>
+        <% if(profile.educations) { %>
+          <dt class="text-muted">Education</dt>
+          <% profile.educations.values.forEach(function(education) { %>
+            <dd><%= education.schoolName %></dd>
+          <% }); %>
+        <% } %>
+
+          <dt class="text-muted">Recommendations</dt>
+          <dd>
+            <strong><%= profile.numRecommenders || 0 %></strong> recommendation(s) received
+          </dd>
+
+          <dt class="text-muted">Connections</dt>
+          <dd>
+            <strong><%= profile.numConnections || 0 %></strong> connections
+          </dd>
+        </dl>
+
+        <div class="text-center">
+          <small class="text-muted"><%= profile.publicProfileUrl %></small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 class="text-primary">LinkedIn Connections</h3>
+<% if (profile.connections != null) { %>
+  <table class="table table-hover table-striped table-bordered">
+    <tbody>
+    <% profile.connections.values.forEach(function(connection) {
+      if (connection.id != 'private') { %>
+      <tr>
+        <td>
+          <strong><%= connection.firstName %> <%= connection.lastName %></strong>
+          <div class="text-muted"><%= connection.headline %></div>
+        </td>
+      </tr>
+    <% } }); %>
+    </tbody>
+  </table>
+<% } %>

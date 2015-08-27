@@ -584,6 +584,7 @@ exports.getLob = function(req, res, next) {
 exports.getBitGo = function(req, res, next) {
   var bitgo = new BitGo.BitGo({ env: 'test', accessToken: secrets.bitgo.accessToken });
   var walletId = req.session.walletId; // we use the session to store the walletid, but you should store it elsewhere
+  var walletParameters = ['id', 'label', 'permissions', 'balance', 'confirmedBalance', 'unconfirmedSends', 'unconfirmedReceives'];
 
   var renderWalletInfo = function(wId) {
     bitgo.wallets().get({id: wId}, function(err, walletRes) {
@@ -592,6 +593,7 @@ exports.getBitGo = function(req, res, next) {
           res.render('api/bitgo', {
             title: 'BitGo API',
             wallet: walletRes.wallet,
+            walletParameters: walletParameters,
             address: addressRes.address,
             transactions: transactionsRes.transactions
           });
