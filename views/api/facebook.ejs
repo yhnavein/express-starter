@@ -1,0 +1,45 @@
+<% layout('layout') -%>
+
+<div class="page-header">
+  <h2><i style="color: #335397" class="fa fa-facebook-square"></i>Facebook API</h2>
+</div>
+<div class="btn-group btn-group-justified">
+  <a href="https://developers.facebook.com/docs/graph-api/quickstart/" target="_blank" class="btn btn-primary">
+    <i class="fa fa-check-square-o"></i>Quickstart
+  </a>
+  <a href="https://developers.facebook.com/tools/explorer" target="_blank" class="btn btn-primary">
+    <i class="fa fa-facebook"></i>Graph API Explorer
+  </a>
+  <a href="https://developers.facebook.com/docs/graph-api/reference/" target="_blank" class="btn btn-primary">
+    <i class="fa fa-code-fork"></i>API Reference
+  </a>
+</div>
+<h3>
+  <i class="fa fa-user"></i> My Profile
+</h3>
+
+<img src="https://graph.facebook.com/<%= me.id %>/picture?type=large" width='90' height='90'>
+<h4><%= me.name %></h4>
+
+  <h6>First Name: <%= me.first_name %></h6>
+  <h6>Last Name: <%= me.last_name %></h6>
+  <h6>Gender: <%= me.gender %></h6>
+  <h6>Username: <%= me.username %></h6>
+  <h6>Link: <%= me.link %></h6>
+  <h6>Email: <%= me.email %></h6>
+  <h6>Locale: <%= me.locale %></h6>
+  <h6>Timezone: <%= me.timezone %></h6>
+
+<h3>
+  <i class="fa fa-group"></i> My Friends
+</h3>
+
+<div class="row">
+  <% for(var i = 0; i < friends.length; i++) { %>
+    <div class="col-xs-3 col-md-2">
+      <a href="http://facebook.com/<%= friends[i].id %>" class="thumbnail">
+        <img src="https://graph.facebook.com/<%= friends[i].id %>/picture?width=150&height=150" alt="Friend's Avatar">
+      </a>
+    </div>
+  <% } %>
+</div>

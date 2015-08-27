@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var secrets = require('../config/secrets');
 var querystring = require('querystring');
@@ -8,7 +8,6 @@ var cheerio = require('cheerio');
 var request = require('request');
 var graph = require('fbgraph');
 var LastFmNode = require('lastfm').LastFmNode;
-var tumblr = require('tumblr.js');
 var Github = require('github-api');
 var Twit = require('twit');
 var stripe = require('stripe')(secrets.stripe.secretKey);
@@ -32,42 +31,20 @@ exports.getApi = function(req, res) {
 };
 
 /**
- * GET /api/tumblr
- * Tumblr API example.
- */
-exports.getTumblr = function(req, res, next) {
-  var token = req.user.tokens.tumblr;
-  var client = tumblr.createClient({
-    consumer_key: secrets.tumblr.consumerKey,
-    consumer_secret: secrets.tumblr.consumerSecret,
-    token: token.accessToken,
-    token_secret: token.tokenSecret
-  });
-  client.posts('withinthisnightmare.tumblr.com', { type: 'photo' }, function(err, data) {
-    if (err) return next(err);
-    res.render('api/tumblr', {
-      title: 'Tumblr API',
-      blog: data.blog,
-      photoset: data.posts[0].photos
-    });
-  });
-};
-
-/**
  * GET /api/facebook
  * Facebook API example.
  */
 exports.getFacebook = function(req, res, next) {
   var token = req.user.tokens.facebook;
-  graph.setAccessToken(token.accessToken);
+  graph.setAccessToken(token);
   async.parallel({
     getMe: function(done) {
-      graph.get(req.user.facebook, function(err, me) {
+      graph.get(req.user.facebookId, function(err, me) {
         done(err, me);
       });
     },
     getMyFriends: function(done) {
-      graph.get(req.user.facebook + '/friends', function(err, friends) {
+      graph.get(req.user.facebookId + '/friends', function(err, friends) {
         done(err, friends.data);
       });
     }
@@ -203,7 +180,7 @@ exports.getLastfm = function(req, res, next) {
     }
   },
   function(err, results) {
-    if (err) return next(err.message);
+    if (err) return next(err.error.message);
     var artist = {
       name: results.artistInfo.artist.name,
       image: results.artistInfo.artist.image.slice(-1)[0]['#text'],
@@ -274,7 +251,7 @@ exports.postTwitter = function(req, res, next) {
  * Steam API example.
  */
 exports.getSteam = function(req, res, next) {
-  var steamId = '76561197982488301';
+  var steamId = '76561198040657099';
   var query = { l: 'english', steamid: steamId, key: secrets.steam.apiKey };
   async.parallel({
     playerAchievements: function(done) {
@@ -607,6 +584,7 @@ exports.getLob = function(req, res, next) {
 exports.getBitGo = function(req, res, next) {
   var bitgo = new BitGo.BitGo({ env: 'test', accessToken: secrets.bitgo.accessToken });
   var walletId = req.session.walletId; // we use the session to store the walletid, but you should store it elsewhere
+  var walletParameters = ['id', 'label', 'permissions', 'balance', 'confirmedBalance', 'unconfirmedSends', 'unconfirmedReceives'];
 
   var renderWalletInfo = function(wId) {
     bitgo.wallets().get({id: wId}, function(err, walletRes) {
@@ -615,6 +593,7 @@ exports.getBitGo = function(req, res, next) {
           res.render('api/bitgo', {
             title: 'BitGo API',
             wallet: walletRes.wallet,
+            walletParameters: walletParameters,
             address: addressRes.address,
             transactions: transactionsRes.transactions
           });

@@ -1,0 +1,30 @@
+<% layout('layout') -%>
+
+<div class="page-header">
+  <h2><i class="fa fa-phone"></i>Clockwork SMS API</h2>
+</div>
+<div class="btn-group btn-group-justified">
+  <a href="http://github.com/mediaburst/node-clockwork" target="_blank" class="btn btn-primary">
+    <i class="fa fa-check-square-o"></i>Clockwork Node
+  </a>
+  <a href="http://www.clockworksms.com/doc/clever-stuff/xml-interface/send-sms/" target="_blank" class="btn btn-primary">
+    <i class="fa fa-code-fork"></i>XML API
+  </a>
+</div>
+
+<h4>Send a text message</h4>
+<div class="row">
+  <div class="col-sm-6">
+    <form role="form" method="POST">
+      <input type="hidden" name="_csrf" value="<%= _csrf %>"/>
+      <div class="form-group">
+        <div class="input-group">
+          <input type="text" name="telephone" placeholder="Phone Number (international format)" class="form-control"/>
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-success">Send</button>
+          </span>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
