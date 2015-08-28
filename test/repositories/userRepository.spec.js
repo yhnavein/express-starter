@@ -53,6 +53,20 @@ describe('User Repository', function() {
       });
     });
 
+    it('should handle properly situation when email returned from facebook is empty', function (done) {
+      var $u = createUser();
+      $u.profile._json = { email: null };
+
+      userRepo.createAccFromFacebook(reqMock, $u.accessToken, $u.refreshToken, $u.profile, function (err, user) {
+        expect(err).to.be(null);
+        expect(user).to.be.a('object');
+        expect(user.facebookId).to.be($u.uniqueness.toString());
+        expect(user.password).to.be(null);
+        expect(user.email).to.be(user.facebookId + '@facebook.com');
+        done();
+      });
+    });
+
     it('should respond with error when empty json property is passed from facebook', function (done) {
       var $u = createUser();
 

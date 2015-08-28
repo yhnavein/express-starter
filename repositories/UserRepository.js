@@ -110,7 +110,7 @@ repo.createAccFromFacebook = function(req, accessToken, refreshToken, profile, d
       } else {
         console.log('Facebook Profile', profile);
         var user = db.User.build({ facebookId: profile.id.toString() });
-        user.email = profile._json.email;
+        user.email = profile._json.email || ( profile.id.toString() + '@facebook.com' );
         user.tokens = { facebook: accessToken };
         user.profile = {
           name: profile.displayName,
