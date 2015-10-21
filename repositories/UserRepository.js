@@ -33,8 +33,8 @@ repo.assignResetPswToken = function(email, token, done) {
     return user.save();
   })
   .then(function(savedUser) {
-      return done(null, savedUser);
-    })
+    return done(null, savedUser);
+  })
   .catch(function() {
     return done('User was not found!', null);
   });

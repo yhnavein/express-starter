@@ -44,7 +44,7 @@ describe('GET /contact', function() {
 describe('GET /random-url', function() {
   it('should return 404', function(done) {
     request(app)
-      .get('/reset')
+      .get('/random-url')
       .expect(404, done);
   });
 });
