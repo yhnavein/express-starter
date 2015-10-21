@@ -1,7 +1,7 @@
 'use strict';
 
+var crypto;
 var async = require('neo-async');
-var crypto = require('crypto');
 var passport = require('passport');
 var db = require('../models/sequelize');
 var UserRepo = require('../repositories/UserRepository.js');
@@ -280,8 +280,9 @@ exports.getForgot = function(req, res) {
  * Create a random token, then the send user an email with a reset link.
  */
 exports.postForgot = function(req, res, next) {
-  req.assert('email', 'Please enter a valid email address.').isEmail();
+  crypto = require('crypto');
 
+  req.assert('email', 'Please enter a valid email address.').isEmail();
   var errors = req.validationErrors();
 
   if (errors) {

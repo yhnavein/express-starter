@@ -1,6 +1,5 @@
 'use strict';
 
-var db = require('../models/sequelize');
 var secrets = require('../config/secrets');
 
 var applicationName = 'Express Starter';

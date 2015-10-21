@@ -1,24 +1,27 @@
 "use strict";
 
+//global requires
 var secrets = require('../config/secrets');
 var querystring = require('querystring');
 var validator = require('validator');
 var async = require('neo-async');
-var cheerio = require('cheerio');
 var request = require('request');
-var graph = require('fbgraph');
-var LastFmNode = require('lastfm').LastFmNode;
-var Github = require('github-api');
-var Twit = require('twit');
-var stripe = require('stripe')(secrets.stripe.secretKey);
-var twilio = require('twilio')(secrets.twilio.sid, secrets.twilio.token);
-var Linkedin = require('node-linkedin')(secrets.linkedin.clientID, secrets.linkedin.clientSecret, secrets.linkedin.callbackURL);
-var BitGo = require('bitgo');
-var clockwork = require('clockwork')({ key: secrets.clockwork.apiKey });
-var paypal = require('paypal-rest-sdk');
-var lob = require('lob')(secrets.lob.apiKey);
-var Y = require('yui/yql');
 var _ = require('lodash');
+
+//specific requires
+var cheerio;
+var graph;
+var LastFmNode;
+var Github;
+var Twit;
+var stripe;
+var twilio;
+var Linkedin;
+var BitGo;
+var clockwork;
+var paypal;
+var lob;
+var Y;
 
 /**
  * GET /api
@@ -35,6 +38,8 @@ exports.getApi = function(req, res) {
  * Facebook API example.
  */
 exports.getFacebook = function(req, res, next) {
+  graph = require('fbgraph');
+
   var token = req.user.tokens.facebook;
   graph.setAccessToken(token);
   async.parallel({
@@ -64,6 +69,8 @@ exports.getFacebook = function(req, res, next) {
  * Web scraping example using Cheerio library.
  */
 exports.getScraping = function(req, res, next) {
+  cheerio = require('cheerio');
+
   request.get('https://news.ycombinator.com/', function(err, reqInner, body) {
     if (err) return next(err);
     var $ = cheerio.load(body);
@@ -83,6 +90,8 @@ exports.getScraping = function(req, res, next) {
  * GitHub API Example.
  */
 exports.getGithub = function(req, res, next) {
+  Github = require('github-api');
+
   var token = req.user.tokens.github;
   var github = new Github({ token: token });
   var repo = github.getRepo('sahat', 'requirejs-library');
@@ -129,6 +138,8 @@ exports.getNewYorkTimes = function(req, res, next) {
  * Last.fm API example.
  */
 exports.getLastfm = function(req, res, next) {
+  LastFmNode = require('lastfm').LastFmNode;
+
   var lastfm = new LastFmNode(secrets.lastfm);
   async.parallel({
     artistInfo: function(done) {
@@ -203,6 +214,8 @@ exports.getLastfm = function(req, res, next) {
  * Twiter API example.
  */
 exports.getTwitter = function(req, res, next) {
+  Twit = require('twit');
+
   var accessToken = req.user.tokens.twitter;
   var secretToken = req.user.tokens.twitterSecret;
   var T = new Twit({
@@ -225,6 +238,8 @@ exports.getTwitter = function(req, res, next) {
  * Post a tweet.
  */
 exports.postTwitter = function(req, res, next) {
+  Twit = require('twit');
+
   req.assert('tweet', 'Tweet cannot be empty.').notEmpty();
   var errors = req.validationErrors();
   if (errors) {
@@ -296,6 +311,8 @@ exports.getSteam = function(req, res, next) {
  * Stripe API example.
  */
 exports.getStripe = function(req, res) {
+  stripe = require('stripe')(secrets.stripe.secretKey);
+
   res.render('api/stripe', {
     title: 'Stripe API',
     publishableKey: secrets.stripe.publishableKey
@@ -307,12 +324,14 @@ exports.getStripe = function(req, res) {
  * Make a payment.
  */
 exports.postStripe = function(req, res, next) {
+  stripe = require('stripe')(secrets.stripe.secretKey);
+
   var stripeToken = req.body.stripeToken;
   var stripeEmail = req.body.stripeEmail;
   stripe.charges.create({
     amount: 395,
     currency: 'usd',
-    card: stripeToken,
+    source: stripeToken,
     description: stripeEmail
   }, function(err) {
     if (err && err.type === 'StripeCardError') {
@@ -339,6 +358,8 @@ exports.getTwilio = function(req, res) {
  * Send a text message using Twilio.
  */
 exports.postTwilio = function(req, res, next) {
+  twilio = require('twilio')(secrets.twilio.sid, secrets.twilio.token);
+
   req.assert('number', 'Phone number is required.').notEmpty();
   req.assert('message', 'Message cannot be blank.').notEmpty();
   var errors = req.validationErrors();
@@ -373,6 +394,8 @@ exports.getClockwork = function(req, res) {
  * Send a text message using Clockwork SMS
  */
 exports.postClockwork = function(req, res, next) {
+  clockwork = require('clockwork')({ key: secrets.clockwork.apiKey });
+
   var message = {
     To: req.body.telephone,
     From: 'Hackathon',
@@ -457,6 +480,8 @@ exports.postVenmo = function(req, res, next) {
  * LinkedIn API example.
  */
 exports.getLinkedin = function(req, res, next) {
+  Linkedin = require('node-linkedin')(secrets.linkedin.clientID, secrets.linkedin.clientSecret, secrets.linkedin.callbackURL);
+
   var token = req.user.tokens.linkedin;
   var linkedin = Linkedin.init(token);
   linkedin.people.me(function(err, $in) {
@@ -473,6 +498,8 @@ exports.getLinkedin = function(req, res, next) {
  * Yahoo API example.
  */
 exports.getYahoo = function(req, res) {
+  Y = require('yui/yql');
+
   Y.YQL('SELECT * FROM weather.forecast WHERE (location = 10007)', function(response) {
     var location = response.query.results.channel.location;
     var condition = response.query.results.channel.item.condition;
@@ -489,6 +516,8 @@ exports.getYahoo = function(req, res) {
  * PayPal SDK example.
  */
 exports.getPayPal = function(req, res, next) {
+  paypal = require('paypal-rest-sdk');
+
   paypal.configure({
     mode: 'sandbox',
     client_id: secrets.paypal.client_id,
@@ -566,6 +595,8 @@ exports.getPayPalCancel = function(req, res) {
  * Lob API example.
  */
 exports.getLob = function(req, res, next) {
+  lob = require('lob')(secrets.lob.apiKey);
+
   lob.routes.list({
     zip_codes: ['10007']
   }, function(err, routes) {
@@ -582,6 +613,8 @@ exports.getLob = function(req, res, next) {
  * BitGo wallet example
  */
 exports.getBitGo = function(req, res, next) {
+  BitGo = require('bitgo');
+
   var bitgo = new BitGo.BitGo({ env: 'test', accessToken: secrets.bitgo.accessToken });
   var walletId = req.session.walletId; // we use the session to store the walletid, but you should store it elsewhere
   var walletParameters = ['id', 'label', 'permissions', 'balance', 'confirmedBalance', 'unconfirmedSends', 'unconfirmedReceives'];
@@ -625,6 +658,8 @@ exports.getBitGo = function(req, res, next) {
  * BitGo send coins example
  */
 exports.postBitGo = function(req, res, next) {
+  BitGo = require('bitgo');
+
   var bitgo = new BitGo.BitGo({ env: 'test', accessToken: secrets.bitgo.accessToken });
   var walletId = req.session.walletId; // we use the session to store the walletid, but you should store it elsewhere
   var amount = parseInt(req.body.amount);
@@ -632,7 +667,7 @@ exports.postBitGo = function(req, res, next) {
   try {
     bitgo.wallets().get({id: walletId}, function (err, wallet) {
       wallet.sendCoins(
-      { address: req.body.address, amount: parseInt(req.body.amount), walletPassphrase: req.sessionID },
+      { address: req.body.address, amount: amount, walletPassphrase: req.sessionID },
       function (e, result) {
         if (e) {
           console.dir(e);

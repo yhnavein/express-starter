@@ -1,4 +1,4 @@
-var secrets = require('../config/secrets');
+"use strict";
 
 /**
  * GET /contact
