@@ -86,18 +86,21 @@ exports.postSignup = function(req, res, next) {
     return res.redirect('/signup');
   }
 
-  db.User.findOne({ where: { email: req.body.email } }).then(function(existingUser) {
-    if (existingUser) {
-      req.flash('errors', { msg: 'Account with that email address already exists.' });
-      return res.redirect('/login');
-    }
+  db.User.findOne({ where: { email: req.body.email } })
+    .then(function(existingUser) {
+      if (existingUser) {
+        req.flash('errors', { msg: 'Account with that email address already exists.' });
+        return res.redirect('/login');
+      }
 
-    db.User.create({
-      email: req.body.email,
-      password: req.body.password,
-      profile: {},
-      tokens: {}
-    }).then(function(user) {
+      return db.User.create({
+        email: req.body.email,
+        password: req.body.password,
+        profile: {},
+        tokens: {}
+      });
+    })
+    .then(function(user) {
       req.logIn(user, function(err) {
         if (err) return next(err);
         res.redirect('/');
@@ -106,7 +109,6 @@ exports.postSignup = function(req, res, next) {
     .catch(function(err) {
       return next(err);
     });
-  });
 };
 
 /**
@@ -124,26 +126,25 @@ exports.getAccount = function(req, res) {
  * Update profile information.
  */
 exports.postUpdateProfile = function(req, res, next) {
-  db.User.findById(req.user.id).then(function(user) {
-    user.email = req.body.email || '';
-    user.profile.name = req.body.name || '';
-    user.profile.gender = req.body.gender || '';
-    user.profile.location = req.body.location || '';
-    user.profile.website = req.body.website || '';
-    user.set('profile', user.profile);
+  db.User.findById(req.user.id)
+    .then(function(user) {
+      user.email = req.body.email || '';
+      user.profile.name = req.body.name || '';
+      user.profile.gender = req.body.gender || '';
+      user.profile.location = req.body.location || '';
+      user.profile.website = req.body.website || '';
+      user.set('profile', user.profile);
 
-    console.log('changed', user.changed('profile'));
-    user.save().then(function() {
+      console.log('changed', user.changed('profile'));
+      return user.save();
+    })
+    .then(function() {
       req.flash('success', { msg: 'Profile information updated.' });
       res.redirect('/account');
     })
     .catch(function(err) {
       return next(err);
     });
-  })
-  .catch(function(err) {
-    return next(err);
-  });
 };
 
 /**
@@ -165,10 +166,11 @@ exports.postUpdatePassword = function(req, res, next) {
     .then(function(user) {
       user.password = req.body.password;
 
-      user.save().then(function() {
-        req.flash('success', { msg: 'Password has been changed.' });
-        res.redirect('/account');
-      });
+      return user.save();
+    })
+    .then(function() {
+      req.flash('success', { msg: 'Password has been changed.' });
+      res.redirect('/account');
     })
     .catch(function(err) { return next(err); });
 };
@@ -178,7 +180,8 @@ exports.postUpdatePassword = function(req, res, next) {
  * Delete user account.
  */
 exports.postDeleteAccount = function(req, res, next) {
-  db.User.destroy({ where: { id: req.user.id } })
+  db.User
+    .destroy({ where: { id: req.user.id } })
     .then(function() {
       req.logout();
       req.flash('info', { msg: 'Your account has been deleted.' });
@@ -193,17 +196,14 @@ exports.postDeleteAccount = function(req, res, next) {
 exports.getOauthUnlink = function(req, res, next) {
   var provider = req.params.provider;
 
-  db.User.findById(req.user.id).then(function(user) {
-    var attrInfo = {};
-    attrInfo[provider + 'Id'] = null;
-
-    user.updateAttributes(attrInfo).then(function() {
+  UserRepo.unlinkProviderFromAccount(provider, req.user.id)
+    .then(function() {
       req.flash('info', { msg: provider + ' account has been unlinked.' });
       res.redirect('/account');
-    }).catch(function(err) {
+    })
+    .catch(function(err) {
       return next(err);
     });
-  });
 };
 
 /**

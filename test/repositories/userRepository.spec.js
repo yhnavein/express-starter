@@ -154,6 +154,41 @@ describe('User Repository', function() {
         });
       });
     });
+
+    it('should properly unlink linked facebook account', function (done) {
+      var uniqueness = Date.now();
+      var sampleUser = {
+        email: 'test-local-' + uniqueness + '@puredev.eu',
+        password: 'admin1' //:D
+      };
+      userRepo.createUser(sampleUser, function (err, user) {
+        var localReqMock = {
+          flash: function () { }, user: user
+        };
+
+        var $u = createUser();
+        $u.profile._json = {email: $u.email};
+
+        userRepo.linkFacebookProfile(localReqMock, $u.accessToken, $u.refreshToken, $u.profile, function (fbErr, fbUser) {
+          expect(fbErr).to.be(null);
+          expect(fbUser).to.be.a('object');
+          expect(fbUser.facebookId).to.not.be(null);
+          expect(fbUser.tokens).to.be.a('object');
+          expect(fbUser.tokens.facebook).to.be($u.accessToken);
+
+          userRepo.unlinkProviderFromAccount('facebook', $u.id)
+            .then(function(savedUser) {
+              expect(savedUser.tokens.facebook).to.be(null);
+              expect(savedUser.facebookId).to.be(null);
+
+              done();
+            })
+            .catch(function() {
+              done();
+            });
+        });
+      });
+    });
   });
 
 
@@ -480,8 +515,7 @@ describe('User Repository', function() {
       };
       userRepo.createUser(sampleUser, function (err, user) {
         var localReqMock = {
-          flash: function () {
-          }, user: user
+          flash: function () { }, user: user
         };
         var $u = createUser();
 
@@ -495,6 +529,42 @@ describe('User Repository', function() {
           expect(twUser.tokens.twitter).to.be($u.accessToken);
           expect(twUser.tokens.twitterSecret).to.be($u.tokenSecret);
           done();
+        });
+      });
+    });
+
+    it('should properly unlink linked twitter account', function (done) {
+      var uniqueness = Date.now();
+      var sampleUser = {
+        email: 'test-local2-' + uniqueness + '@puredev.eu',
+        password: 'admin1' //:D
+      };
+      userRepo.createUser(sampleUser, function (err, user) {
+        var localReqMock = {
+          flash: function () { }, user: user
+        };
+
+        var $u = createUser();
+
+        userRepo.linkTwitterProfile(localReqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (twErr, twUser) {
+          expect(twErr).to.be(null);
+          expect(twUser).to.be.a('object');
+          expect(twUser.twitterId).to.not.be(null);
+          expect(twUser.tokens).to.be.a('object');
+          expect(twUser.tokens.twitter).to.be($u.accessToken);
+          expect(twUser.tokens.twitterSecret).to.be($u.tokenSecret);
+
+          userRepo.unlinkProviderFromAccount('twitter', $u.id)
+            .then(function(savedUser) {
+              expect(savedUser.tokens.twitter).to.be(null);
+              expect(savedUser.tokens.twitterSecret).to.be(null);
+              expect(savedUser.twitterId).to.be(null);
+
+              done();
+            })
+            .catch(function() {
+              done();
+            });
         });
       });
     });

@@ -33,15 +33,15 @@ repo.assignResetPswToken = function(email, token, done) {
     return user.save();
   })
   .then(function(savedUser) {
-    return done(null, savedUser);
+    done(null, savedUser);
   })
   .catch(function() {
-    return done('User was not found!', null);
+    done('User was not found!', null);
   });
 };
 
 repo.changeUserPswAndResetToken = function(token, newPassword, done) {
-  if(token == null || token.length < 1)
+  if(!token || token.length < 1)
     return done('Token cannot be empty!', null);
 
   db.User.findOne({
@@ -57,13 +57,25 @@ repo.changeUserPswAndResetToken = function(token, newPassword, done) {
 
     return user.save();
   })
-  .then(function(savedUser) { return done(null, savedUser); })
+  .then(function(savedUser) { done(null, savedUser); })
   .catch(function() {
-    return done('User was not found!', null);
+    done('User was not found!', null);
   });
 };
 
+repo.unlinkProviderFromAccount = function(provider, userId) {
+  return db.User.findById(userId)
+    .then(function(user) {
+      var attrInfo = {};
+      attrInfo[provider + 'Id'] = null;
+      attrInfo.tokens = user.tokens || {};
+      attrInfo.tokens[provider.toLowerCase()] = null;
+      if(provider === 'twitter')
+        attrInfo.tokens.twitterSecret = null;
 
+      return user.updateAttributes(attrInfo);
+    });
+};
 
 
 /**
@@ -75,24 +87,25 @@ repo.linkFacebookProfile = function(req, accessToken, refreshToken, profile, don
       req.flash('errors', { msg: 'There is already a Facebook account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
       done('Facebook already linked');
     } else {
-      db.User.findById(req.user.id).then(function(user) {
-        user.facebookId = profile.id.toString();
-        if(!user.tokens) user.tokens = {};
-        if(!user.profile) user.profile = {};
-        user.tokens.facebook = accessToken;
-        user.profile.name = user.profile.name || profile.displayName;
-        user.profile.gender = user.profile.gender || profile._json.gender;
-        user.profile.picture = user.profile.picture || 'https://graph.facebook.com/' + profile.id.toString() + '/picture?type=large';
-        user.set('tokens', user.tokens);
-        user.set('profile', user.profile);
+      db.User.findById(req.user.id)
+        .then(function(user) {
+          user.facebookId = profile.id.toString();
+          if(!user.tokens) user.tokens = {};
+          if(!user.profile) user.profile = {};
+          user.tokens.facebook = accessToken;
+          user.profile.name = user.profile.name || profile.displayName;
+          user.profile.gender = user.profile.gender || profile._json.gender;
+          user.profile.picture = user.profile.picture || 'https://graph.facebook.com/' + profile.id.toString() + '/picture?type=large';
+          user.set('tokens', user.tokens);
+          user.set('profile', user.profile);
 
-        user.save()
-          .then(function(savedUser) {
-            req.flash('info', { msg: 'Facebook account has been linked.' });
-            done(null, savedUser);
-          })
-          .catch(function(error) { done(error); });
-      });
+          return user.save();
+        })
+        .then(function(savedUser) {
+          req.flash('info', { msg: 'Facebook account has been linked.' });
+          done(null, savedUser);
+        })
+        .catch(function(error) { done(error); });
     }
   });
 };
@@ -135,25 +148,26 @@ repo.linkGithubProfile = function(req, accessToken, tokenSecret, profile, done) 
       req.flash('errors', { msg: 'There is already a GitHub account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
       done('UserExists');
     } else {
-      db.User.findById(req.user.id).then(function(user) {
-        user.githubId = profile.id.toString();
-        if(!user.tokens) user.tokens = {};
-        if(!user.profile) user.profile = {};
-        user.tokens.github = accessToken;
-        user.profile.name = user.profile.name || profile.displayName;
-        user.profile.picture = user.profile.picture || profile._json.avatar_url;
-        user.profile.location = user.profile.location || profile._json.location;
-        user.profile.website = user.profile.website || profile._json.blog;
-        user.set('tokens', user.tokens);
-        user.set('profile', user.profile);
+      db.User.findById(req.user.id)
+        .then(function(user) {
+          user.githubId = profile.id.toString();
+          if(!user.tokens) user.tokens = {};
+          if(!user.profile) user.profile = {};
+          user.tokens.github = accessToken;
+          user.profile.name = user.profile.name || profile.displayName;
+          user.profile.picture = user.profile.picture || profile._json.avatar_url;
+          user.profile.location = user.profile.location || profile._json.location;
+          user.profile.website = user.profile.website || profile._json.blog;
+          user.set('tokens', user.tokens);
+          user.set('profile', user.profile);
 
-        user.save()
-          .then(function(savedUser) {
-            req.flash('info', { msg: 'GitHub account has been linked.' });
-            done(null, savedUser);
-          })
-          .catch(function(error) { done(error); });
-      });
+          return user.save();
+        })
+        .then(function(savedUser) {
+          req.flash('info', { msg: 'GitHub account has been linked.' });
+          done(null, savedUser);
+        })
+        .catch(function(error) { done(error); });
     }
   });
 };
@@ -203,25 +217,26 @@ repo.linkTwitterProfile = function(req, accessToken, tokenSecret, profile, done)
       req.flash('errors', { msg: 'There is already a Twitter account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
       done('UserExists');
     } else {
-      db.User.findById(req.user.id).then(function(user) {
-        user.twitterId = profile.id.toString();
-        if(!user.tokens) user.tokens = {};
-        if(!user.profile) user.profile = {};
-        user.tokens.twitter = accessToken;
-        user.tokens.twitterSecret = tokenSecret;
-        user.profile.name = user.profile.name || profile.displayName;
-        user.profile.location = user.profile.location || profile._json.location;
-        user.profile.picture = user.profile.picture || profile._json.profile_image_url_https;
-        user.set('tokens', user.tokens);
-        user.set('profile', user.profile);
+      db.User.findById(req.user.id)
+        .then(function(user) {
+          user.twitterId = profile.id.toString();
+          if(!user.tokens) user.tokens = {};
+          if(!user.profile) user.profile = {};
+          user.tokens.twitter = accessToken;
+          user.tokens.twitterSecret = tokenSecret;
+          user.profile.name = user.profile.name || profile.displayName;
+          user.profile.location = user.profile.location || profile._json.location;
+          user.profile.picture = user.profile.picture || profile._json.profile_image_url_https;
+          user.set('tokens', user.tokens);
+          user.set('profile', user.profile);
 
-        user.save()
-          .then(function(savedUser) {
-            req.flash('info', { msg: 'Twitter account has been linked.' });
-            done(null, savedUser);
-          })
-          .catch(function(error) { done(error); });
-      });
+          return user.save();
+        })
+        .then(function(savedUser) {
+          req.flash('info', { msg: 'Twitter account has been linked.' });
+          done(null, savedUser);
+        })
+        .catch(function(error) { done(error); });
     }
   });
 };
@@ -253,24 +268,25 @@ repo.linkGoogleProfile = function(req, accessToken, tokenSecret, profile, done) 
       req.flash('errors', { msg: 'There is already a Google account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
       done('UserExists');
     } else {
-      db.User.findById(req.user.id).then(function(user) {
-        user.googleId = profile.id.toString();
-        if(!user.tokens) user.tokens = {};
-        if(!user.profile) user.profile = {};
-        user.tokens.google = accessToken;
-        user.profile.name = user.profile.name || profile.displayName;
-        user.profile.gender = user.profile.gender || profile.gender;
-        user.profile.picture = user.profile.picture || (profile._json.image ? profile._json.image.url : '');
-        user.set('tokens', user.tokens);
-        user.set('profile', user.profile);
+      db.User.findById(req.user.id)
+        .then(function(user) {
+          user.googleId = profile.id.toString();
+          if(!user.tokens) user.tokens = {};
+          if(!user.profile) user.profile = {};
+          user.tokens.google = accessToken;
+          user.profile.name = user.profile.name || profile.displayName;
+          user.profile.gender = user.profile.gender || profile.gender;
+          user.profile.picture = user.profile.picture || (profile._json.image ? profile._json.image.url : '');
+          user.set('tokens', user.tokens);
+          user.set('profile', user.profile);
 
-        user.save()
-          .then(function(savedUser) {
-            req.flash('info', { msg: 'Google account has been linked.' });
-            done(null, savedUser);
-          })
-          .catch(function(error) { done(error); });
-      });
+          return user.save();
+        })
+        .then(function(savedUser) {
+          req.flash('info', { msg: 'Google account has been linked.' });
+          done(null, savedUser);
+        })
+        .catch(function(error) { done(error); });
     }
   });
 };
@@ -310,25 +326,26 @@ repo.linkLinkedInProfile = function(req, accessToken, tokenSecret, profile, done
       req.flash('errors', { msg: 'There is already a LinkedIn account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
       done('UserExists');
     } else {
-      db.User.findById(req.user.id).then(function(user) {
-        user.linkedInId = profile.id.toString();
-        if(!user.tokens) user.tokens = {};
-        if(!user.profile) user.profile = {};
-        user.tokens.linkedin = accessToken;
-        user.profile.name = user.profile.name || profile.displayName;
-        user.profile.location = user.profile.location || (profile._json.location) ? profile._json.location.name : '';
-        user.profile.picture = user.profile.picture || profile._json.pictureUrl;
-        user.profile.website = user.profile.website || profile._json.publicProfileUrl;
-        user.set('tokens', user.tokens);
-        user.set('profile', user.profile);
+      db.User.findById(req.user.id)
+        .then(function(user) {
+          user.linkedInId = profile.id.toString();
+          if(!user.tokens) user.tokens = {};
+          if(!user.profile) user.profile = {};
+          user.tokens.linkedin = accessToken;
+          user.profile.name = user.profile.name || profile.displayName;
+          user.profile.location = user.profile.location || (profile._json.location) ? profile._json.location.name : '';
+          user.profile.picture = user.profile.picture || profile._json.pictureUrl;
+          user.profile.website = user.profile.website || profile._json.publicProfileUrl;
+          user.set('tokens', user.tokens);
+          user.set('profile', user.profile);
 
-        user.save()
-          .then(function(savedUser) {
-            req.flash('info', { msg: 'Google account has been linked.' });
-            done(null, savedUser);
-          })
-          .catch(function(error) { done(error); });
-      });
+          return user.save();
+        })
+        .then(function(savedUser) {
+          req.flash('info', { msg: 'Google account has been linked.' });
+          done(null, savedUser);
+        })
+        .catch(function(error) { done(error); });
     }
   });
 };
