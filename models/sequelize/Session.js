@@ -1,5 +1,7 @@
 'use strict';
 
+var config = require('../../config/secrets');
+
 module.exports = function(db, DataTypes) {
     var Session = db.define('Session', {
         sid: {
@@ -16,7 +18,7 @@ module.exports = function(db, DataTypes) {
             allowNull: false
         }
     }, {
-        tableName: 'session',
+        tableName: config.sessionTable,
         timestamps: false
     });
 
