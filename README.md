@@ -1,5 +1,5 @@
 ![Alt](http://i480.photobucket.com/albums/rr168/Mania_Stacia/express-starter.png)
-Express Starter 
+Express Starter
 =======================
 
 [![Build Status](https://travis-ci.org/yhnavein/express-starter.svg?branch=master)](https://travis-ci.org/yhnavein/express-starter)
@@ -20,14 +20,6 @@ Take a look on the [Features](#features) section to see what's already done for 
 <h4 align="center">Modern Theme</h4>
 
 ![](https://lh6.googleusercontent.com/-KQTmCFNK6MM/U7OZpznjDuI/AAAAAAAAERc/h3jR27Uy1lE/w1366-h1006-no/Screenshot+2014-07-02+01.32.22.png)
-
-<h4 align="center">Flatly Bootstrap Theme</h4>
-
-![](https://lh5.googleusercontent.com/-oJ-7bSYisRY/U1a-WhK_LoI/AAAAAAAAECM/a04fVYgefzw/w1474-h1098-no/Screen+Shot+2014-04-22+at+3.08.33+PM.png)
-
-<h4 align="center">API Examples</h4>
-
-![](https://lh5.googleusercontent.com/-BJD2wK8CvC8/VLodBsyL-NI/AAAAAAAAEx0/SafE6o_qq_I/w1818-h1186-no/Screenshot%2B2015-01-17%2B00.25.49.png)
 
 Table of Contents
 -----------------
@@ -135,7 +127,7 @@ to obtain appropriate credentials: Client ID, Client Secret, API Key, or
 Username & Password. You will need to go through each provider to generate new
 credentials.
 
-**Express Starter 2.0 Update:** I have included dummy keys and passwords for
+**Important Notice:** I have included dummy keys and passwords for
 all API examples to get you up and running even faster. But don't forget to update
 them with *your credentials* when you are ready to deploy an app.
 
@@ -308,7 +300,9 @@ Project Structure
 | **controllers**/contact.js         | Controller for contact form.                                 |
 | **controllers**/home.js            | Controller for home page (index).                            |
 | **controllers**/user.js            | Controller for user account management.                      |
-| **models**/User.js                 | Sequelize schema and model for User.                          |
+| **models**/**sequelize**/User.js   | Sequelize schema and model for User.                         |
+| **models**/**sequelize**/Session.js| Schema for Session table (used for convenience)              |
+| **models**/**sequelize**/index.js  | Tool for easy managing all of the table schemas              |
 | **public**/                        | Static assets (fonts, css, js, img).                         |
 | **public**/**js**/application.js   | Specify client-side JavaScript dependencies.                 |
 | **public**/**js**/main.js          | Place your client-side JavaScript here.                      |
@@ -316,11 +310,11 @@ Project Structure
 | **public/css/themes**/default.less | Some Bootstrap overrides to make it look prettier.           |
 | **views/account**/                 | Templates for *login, password reset, signup, profile*.      |
 | **views/api**/                     | Templates for API Examples.                                  |
-| **views/partials**/flash.jade      | Error, info and success flash notifications.                 |
-| **views/partials**/header.jade     | Navbar partial template.                                     |
-| **views/partials**/footer.jade     | Footer partial template.                                     |
-| **views**/layout.jade              | Base template.                                               |
-| **views**/home.jade                | Home page template.                                          |
+| **views/partials**/flash.ejs       | Error, info and success flash notifications.                 |
+| **views/partials**/header.ejs      | Navbar partial template.                                     |
+| **views/partials**/footer.ejs      | Footer partial template.                                     |
+| **views**/layout.ejs               | Base template.                                               |
+| **views**/home.ejs                 | Home page template.                                          |
 | app.js                             | Main application file.                                       |
 
 **Note:** There is no preference how you name or structure your views.
@@ -334,17 +328,17 @@ List of Packages
 
 | Package                         | Description                                                           |
 | ------------------------------- | --------------------------------------------------------------------- |
-| async                           | Utility library that provides asynchronous control flow.              |
 | bcrypt-nodejs                   | Library for hashing and salting user passwords.                       |
-| bitgo                           | Multi-sig Bitcoin wallet API.  |
+| bitgo                           | Multi-sig Bitcoin wallet API.  																				|
 | cheerio                         | Scrape web pages using jQuery-style syntax.                           |
 | clockwork                       | Clockwork SMS API library.                                            |
 | connect-assets                  | Compiles LESS stylesheets, concatenates & minifies JavaScript.        |
 | csso                            | Dependency for connect-assets library to minify CSS.                  |
+| ejs                             | Template engine for Express.                                          |
+| ejs-mate                        | Layouts and partials support for the EJS                              |
 | express                         | Node.js web framework.                                                |
 | body-parser                     | Express 4.0 middleware.                                               |
 | cookie-parser                   | Express 4.0 middleware.                                               |
-| express-session                 | Express 4.0 middleware.                                               |
 | morgan                          | Express 4.0 middleware.                                               |
 | multer                          | Express 4.0 middleware.                                               |
 | compression                     | Express 4.0 middleware.                                               |
@@ -352,28 +346,31 @@ List of Packages
 | method-override                 | Express 4.0 middleware.                                               |
 | serve-favicon                   | Express 4.0 middleware offering favicon serving and caching.          |
 | express-flash                   | Provides flash messages for Express.                                  |
+| express-session                 | Express 4.0 middleware.                                               |
 | express-validator               | Easy form validation for Express.                                     |
 | fbgraph                         | Facebook Graph API library.                                           |
 | github-api                      | GitHub API library.                                                   |
-| jade                            | Template engine for Express.                                          |
+| knex                            | SQL query builder (useful but not mandatory)                          |
 | lastfm                          | Last.fm API library.                                                  |
 | less                            | LESS compiler. Used implicitly by connect-assets.                     |
 | lob                             | Lob API library                                                       |
 | lusca                           | CSRF middleware.                                                      |
-| node-foursquare                 | Foursquare API library.                                               |
 | node-linkedin                   | LinkedIn API library.                                                 |
-| SendGrid                        | Library for sending emails through SendGrid platform.                                   |
+| neo-async                       | Utility library that provides asynchronous control flow.              |
 | passport                        | Simple and elegant authentication library for node.js                 |
 | passport-facebook               | Sign-in with Facebook plugin.                                         |
 | passport-github                 | Sign-in with GitHub plugin.                                           |
 | passport-google-oauth           | Sign-in with Google plugin.                                           |
 | passport-twitter                | Sign-in with Twitter plugin.                                          |
-| passport-instagram              | Sign-in with Instagram plugin.                                        |
 | passport-local                  | Sign-in with Username and Password plugin.                            |
 | passport-linkedin-oauth2        | Sign-in with LinkedIn plugin.                                         |
 | passport-oauth                  | Allows you to set up your own OAuth 1.0a and OAuth 2.0 strategies.    |
 | paypal-rest-sdk                 | PayPal APIs library.                                                  |
+| pg                              | PostgreSQL client                                                     |
+| pg-hstore                       | Module for handling JSON data in Postgres (required if you use JSON)  |
 | request                         | Simplified HTTP request library.                                      |
+| sequelize                       | Multi-dialect ORM for node.js                                         |
+| SendGrid                        | Library for sending emails through SendGrid platform.                 |
 | stripe                          | Offical Stripe API library.                                           |
 | twilio                          | Twilio API library.                                                   |
 | twit                            | Twitter API library.                                                  |
@@ -383,15 +380,13 @@ List of Packages
 | mocha                           | Test framework.                                                       |
 | expect.js                       | BDD/TDD assertion library.                                            |
 | supertest                       | HTTP assertion library.                                               |
-| multiline                       | Multi-line strings for the generator.                                 |
 | yui                             | Used by the Yahoo API example.                                        |
 
 Useful Tools and Resources
 --------------------------
 - [JSDB.io](http://www.jsdb.io) - The Database of JavaScript Libraries
 - [JS Recipes](http://sahatyalkabov.com/jsrecipes) - JavaScript tutorials for backend and frontend development.
-- [Jade Syntax Documentation by Example](http://naltatis.github.io/jade-syntax-docs/#attributes) - Even better than official Jade docs.
-- [HTML to Jade converter](http://html2jade.aaron-powell.com) - Extremely valuable when you need to quickly copy and paste HTML snippets from the web.
+- [EJS Documentation](http://ejs.co/) - learn about EJS templating
 - [JavascriptOO](http://www.javascriptoo.com/) - A directory of JavaScript libraries with examples, CDN links, statistics, and videos.
 - [Favicon Generator](http://realfavicongenerator.net/) - Generate favicons for PC, Android, iOS, Windows 8.
 
@@ -457,8 +452,8 @@ You need to add the following hidden input element to your form. This has been
 added in the [pull request #40](https://github.com/sahat/hackathon-starter/pull/40)
 as part of the CSRF protection.
 
-```
-input(type='hidden', name='_csrf', value=_csrf)
+```HTML
+<input type="hidden" name="_csrf" value="<%= _csrf %>"/>
 ```
 
 **Note:** It is now possible to whitelist certain URLs. In other words you can
@@ -471,11 +466,11 @@ CSRF middleware to see if `req.originalUrl` matches your desired pattern.
 This is how you typically define static files inside HTML, Jade or any template
 for that matter:
 
-```jade
-link(href='/css/styles.css', rel='stylesheet')
-script(src='/js/lib/jquery-2.1.0.min.js')
-script(src='/js/lib/bootstrap.min.js')
-script(src='/js/main.js')
+```HTML
+<link href="/css/styles.css" rel="stylesheet"/>
+<script src="/js/lib/jquery-2.1.0.min.js"></script>
+<script src="/js/lib/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
 ```
 
 Simple enough right? But wouldn't it be nice to have it just like that in
@@ -483,9 +478,9 @@ development mode, but when you deploy your app to production, have it minified
 and concatenated into a single file automatically without any extra effort on
 your part?
 
-```jade
-link(href='/css/styles.css', rel='stylesheet')
-script(src='/js/application.js')
+```HTML
+<link href="/css/styles.css" rel="stylesheet"/>
+<script src="/js/application.js"></script>
 ```
 
 As soon as you start bringing in more JavaScript libraries, the benefits of
@@ -493,8 +488,8 @@ concatenating and minifying JavaScript files will be even greater. Using
 **connect-assets** library, it is  as as simple as declaring these two lines:
 
 ```
-!= css('styles')      // expects public/css/styles.less
-!= js('application')  // expects public/js/application.js
+<%- css('main') %>      // expects public/css/styles.less
+<%- js('application') %>  // expects public/js/application.js
 ```
 
 **Tip:** We can use `css` and `js` functions in Jade templates because in
@@ -524,9 +519,6 @@ Chances are you haven't changed the *Database URI* in `secrets.js`. If `db` is
 set to `localhost`, it will only work on your machine as long as PostgreSQL is
 running. When you deploy to Heroku, OpenShift or some other provider, you will not have PostgreSQL running on `localhost`. If provider use `DATABASE_URL` node variable it should be configured out of the box (Heroku), but either way, please take a look on deploying documentation.
 
-### Why Jade instead of Handlebars?
-When I first started this project I didn't have any experience with Handlebars. Since then I have worked on Ember.js apps and got myself familiar with the Handlebars syntax. While it is true Handlebars is easier, because it looks like good old HTML, I have no regrets picking Jade over Handlebars. First off, it's the default template engine in Express, so someone who has built Express apps in the past already knows it. Secondly, I find `extends` and `block` to be indispensable, which as far as I know, Handlebars does not have out of the box. And lastly, subjectively speaking, Jade looks much cleaner and shorter than Handlebars, or any non-HAML style for that matter.
-
 ### Why do you have all routes defined in app.js?
 For the sake of simplicity. While there might be a better approach,
 such as passing `app` context to each controller as outlined in this
@@ -543,7 +535,7 @@ REST API server.
 ### I don't need a sticky footer, can I delete it?
 Absolutely. But unlike a regular footer there is a bit more work involved.
 First, delete `#wrap` and `#footer` ID selectors and `html, body { height: 100%; }`
-from **styles.less**. Next, delete `#wrap` and `#footer` lines from **layout.jade**
+from **styles.less**. Next, delete `#wrap` and `#footer` lines from **layout.ejs**
 (By the way, if no element is specified before class or id, Jade assumes it is
 a `div` element). Don't forget to indent everything under `#wrap` to the left
 once, since this project uses two spaces per block indentation.
@@ -561,10 +553,10 @@ Simply rename `styles.less` to `styles.scss` and **connect-assets** will
 automatically use Sass preprocessor.
 
 Your are not limited to just Sass *or* LESS, you could use both if you want to.
-In **layout.jade** simply specify LESS and Sass stylesheets separately:
-```jade
-!= css('styles') # public/css/styles.less
-!= css('my_sass_styles') # public/css/my_sass_styles.scss
+In **layout.ejs** simply specify LESS and Sass stylesheets separately:
+```HTML
+<%- css('styles') %>  # public/css/styles.less
+<%- css('my_sass_styles') %>  # public/css/my_sass_styles.scss
 ```
 
 And as I already mentioned you do not need to specify the file extension,
@@ -583,55 +575,6 @@ how a particular functionality works. Maybe you are just curious about
 how it works, or maybe you are lost and confused while reading the code,
 I hope it provides some guidance to you.
 
-###Custom HTML and CSS Design 101
-
-[HTML5 UP](http://html5up.net/) has many beautiful templates that you can download for free.
-
-When you download the ZIP file, it will come with *index.html*, *images*, *css* and *js* folders. So, how do you
-integrate it with Express Starter? Express Starter uses Bootstrap CSS framework, but these templates do not.
-Trying to use both CSS files at the same time will likely result in undesired effects.
-
-**Note:** Using the custom templates approach, you should understand that you cannot reuse any of the views I have created: layout, home page, api browser, login, signup, account management, contact. Those views were built using Bootstrap grid and styles. You will have to manually update the grid using a different syntax provided in the template. **Having said that, you can mix and match if you want to do so: Use Bootstrap for main app interface, and a custom template for a landing page.**
-
-Let's start from the beginning. For this example I will use [Escape Velocity](http://html5up.net/escape-velocity/) template:
-![Alt](http://html5up.net/uploads/images/escape-velocity.jpg)
-
-**Note:** For the sake of simplicity I will only consider `index.html`, and skip `left-sidebar.html`,
-`no-sidebar.html`, `right-sidebar.html`.
-
-Move all javascript files from `html5up-escape-velocity/js` to `public/js`. Then move all css files from `html5up-escape-velocity/css` to `public/css`. And finally, move all images from `html5up-escape-velocity/images` to `public/images` (You could move it to the existing **img** folder, but then you would have to manually change every `img` reference). Grab the contents of `index.html` and paste it into [HTML To Jade](http://html2jade.aaron-powell.com/).
-
-Create a new file `escape-velocity.jade` and paste the Jade markup in `views` folder.
-Whenever you see the code `res.render('account/login')` - that means it will search for `views/account/login.jade` file.
-
-Let's see how it looks. Create a new controller **escapeVelocity** inside `controllers/home.js`:
-
-```js
-exports.escapeVelocity = function(req, res) {
-  res.render('escape-velocity', {
-    title: 'Landing Page'
-  });
-};
-```
-
-And then create a route in `app.js`. I placed it right after the index controller:
-```js
-app.get('/escape-velocity', homeController.escapeVelocity);
-```
-
-Restart the server (if you are not using **nodemon**), then you should see the new template at [http://localhost:3000/escape-velocity](http://localhost:3000/escape-velocity).
-
-I will stop right here, but if you would like to use this template as more than just a single page, take a look at how these Jade templates work: `layout.jade` - base template, `index.jade` - home page, `partials/header.jade` - Bootstrap navbar, `partials/footer.jade` - sticky footer. You will have to manually break it apart into smaller pieces. Figure out which part of the template you want to keep the same on all pages - that's your new `layout.jade`.
-Then, each page that changes, be it `index.jade`, `about.jade`, `contact.jade`
-will be embedded in your new `layout.jade` via `block content`. Use existing templates as a reference.
-
-This is a rather lengthy process, and templates you get from elsewhere,
-might have yet another grid system. That's why I chose *Bootstrap* for the Express Starter.
- Many people are already familiar with *Bootstrap*, plus it's easy to get started with it if you have never used *Bootstrap*.
- You can also buy many beautifully designed *Bootstrap* themes at [Themeforest](http://themeforest.net/), and use them as a drop-in replacement for Express Starter. However, if you would like to go with a completely custom HTML/CSS design, this should help you to get started!
-
-<hr>
-
 ### How do flash messages work in this project?
 Flash messages allow you to display a message at the end of the request and access
 it on next request and only next request. For instance, on a failed login attempt, you would
@@ -646,11 +589,17 @@ thanks to *express-flash*.
 
 Flash messages have a two-step process. You use `req.flash('errors', { msg: 'Error messages goes here' }`
 to create a flash message in your controllers, and then display them in your views:
-```jade
-if messages.errors
-  .alert.alert-danger.fade.in
-    for error in messages.errors
-      div= error.msg
+```HTML
+<% if(messages.errors) { %>
+  <div class="alert alert-danger fade in">
+    <button type="button" data-dismiss="alert" class="close">
+      <span class="ion-close-circled"></span>
+    </button>
+    <% for(msg in messages.errors) { %>
+      <div> <%= msg.msg %> </div>
+    <% } %>
+  </div>
+<% } %>
 ```
 In the first step, `'errors'` is the name of a flash message, which should match the
 name of the property on `messages` object in your views. You place alert messages
@@ -670,7 +619,7 @@ why an error has occurred. Here is a more general example of what express-valida
 
 To keep consistent with that style, you should pass all flash messages
 as `{ msg: 'My flash message' }` instead of a string. Otherwise you will just see an alert box
-without an error message. That is because, in **partials/flash.jade** template it will try to output
+without an error message. That is because, in **partials/flash.ejs** template it will try to output
 `error.msg` (i.e. `"My flash message".msg`), in other words it will try to call a `msg` method on a *String* object,
 which will return *undefined*. Everything I just mentioned about errors, also applies
 to "info" and "success" flash messages, and you could even create a new one yourself, such as:
@@ -681,20 +630,26 @@ req.flash('warning', { msg: 'You have exceeded 90% of your data usage' });
 ```
 
 **User Account Page (Example)**
-```jade
-if messages.warning
-  .alert.alert-warning.fade.in
-    for warning in messages.warning
-      div= warning.msg
+```HTML
+<% if(messages.warning) { %>
+  <div class="alert alert-warning fade in">
+    <button type="button" data-dismiss="alert" class="close">
+      <span class="ion-close-circled"></span>
+    </button>
+    <% for(msg in messages.warning) { %>
+      <div> <%= msg.msg %> </div>
+    <% } %>
+  </div>
+<% } %>
 ```
 
-`partials/flash.jade` is a partial template that contains how flash messages
+`partials/flash.ejs` is a partial template that contains how flash messages
 are formatted. Previously, flash
 messages were scattered throughout each view that used flash messages
 (contact, login, signup, profile), but now, thankfully it is uses a *DRY* approach.
 
-The flash messages partial template is *included* in the `layout.jade`, along with footer and navigation.
-```jade
+The flash messages partial template is *included* in the `layout.ejs`, along with footer and navigation.
+```HTML
 body
   #wrap
     include partials/navigation
@@ -824,17 +779,17 @@ exports.getBooks = function(req, res) {
 var bookController = require('./controllers/book');
 ```
 
-**Step 5.** Create `books.jade` template.
-```jade
-extends layout
+**Step 5.** Create `books.ejs` template.
+```HTML
+<% layout('layout') -%>
 
-block content
-  .page-header
-    h3 All Books
+<h1>All books</h1>
 
-  ul
-    for book in books
-      li= book.name
+<ul>
+	<% books.forEach(function(book) { %>
+    <li> <%= book.name %> </li>
+  <% }); %>
+</ul>
 ```
 
 That's it! I will say that you could have combined Step 1, 2, 3 as following:
@@ -947,17 +902,18 @@ want to [*"get shit done"*](http://www.startupvitamins.com/media/products/13/aar
 Well, either way, use whichever approach makes more sense to you. At the end of the day,
 it's **what** you build that matters, not **how** you build it.
 
-If you want to stick all your JavaScript inside templates, then in `layout.jade` -
+If you want to stick all your JavaScript inside templates, then in `layout.ejs` -
 your main template file, add this to `head` block.
 
-```jade
-script(src='/socket.io/socket.io.js')
-script.
-    var socket = io.connect(window.location.href);
-    socket.on('greet', function (data) {
-      console.log(data);
-      socket.emit('respond', { message: 'Hey there, server!' });
-    });
+```HTML
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect(window.location.href);
+  socket.on('greet', function (data) {
+    console.log(data);
+    socket.emit('respond', { message: 'Hey there, server!' });
+  });
+</script>
 ```
 
 **Note:** Notice the path of the `socket.io.js`, you don't actually
@@ -1016,7 +972,7 @@ db.User.findOne({ where: { email: userEmail }})
 #### Find 5 most recent user accounts:
 ```js
 db.User
-  .findAll({ 
+  .findAll({
     limit: 5,
     order: [ ['id', 'DESC'] ]
   })
