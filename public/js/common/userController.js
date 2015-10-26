@@ -1,0 +1,1 @@
+console.log('Tr0ub4dour&3', zxcvbn('Tr0ub4dour&3').score);

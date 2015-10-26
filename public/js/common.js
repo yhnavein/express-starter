@@ -13,6 +13,13 @@
  * below via "//= require [filename]".
  */
 
-//= require lib/jquery-2.1.3.min
-//= require lib/bootstrap.min
-//= require main
+/* LIST OF 3rd PARTY LIBS */
+
+
+//= require lib/angular.min
+//= require lib/zxcvbn
+
+
+/* LIST OF CUSTOM JS CODE FILES */
+//= require common/app
+//= require common/userController
