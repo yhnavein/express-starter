@@ -1,31 +1,46 @@
 <% layout('layout') -%>
 
-<div class="page-header">
-  <h3>Sign up</h3>
+<div class="custom-container" ng-controller="UserSignUpCtrl">
+  <div class="page-header">
+    <h3>Sign up</h3>
+  </div>
+  <form name="signupForm" method="POST" class="form-horizontal" action="/signup" novalidate>
+    <input type="hidden" name="_csrf" value="<%= _csrf %>"/>
+    <div class="form-group">
+      <label for="email" class="col-sm-3 control-label">Email</label>
+      <div class="col-sm-7">
+        <input type="email" name="email" id="email" placeholder="Email" autofocus class="form-control" ng-model="email" required/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="password" class="col-sm-3 control-label">Password</label>
+      <div class="col-sm-7">
+        <input type="password" name="password" id="password" placeholder="Password" class="form-control" ng-model="psw" required/>
+        <div class="psw-strength psw-rank-{{pswRank}}">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="confirmPassword" class="col-sm-3 control-label">Confirm Password</label>
+      <div class="col-sm-7">
+        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" class="form-control" ng-model="psw1" required/>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-3 col-sm-7">
+        <button type="submit" class="btn btn-success" ng-disabled="signupForm.$invalid || psw != psw1">
+          <i class="fa fa-user-plus"></i>Signup
+        </button>
+
+        <div class="alert-container" ng-show="psw != psw1 && psw1">
+          <hr>
+          <div class="alert alert-danger">Passwords do not match!</div>
+        </div>
+      </div>
+    </div>
+  </form>
 </div>
-<form id="signup-form" method="POST" class="form-horizontal">
-  <input type="hidden" name="_csrf" value="<%= _csrf %>"/>
-  <div class="form-group">
-    <label for="email" class="col-sm-3 control-label">Email</label>
-    <div class="col-sm-7">
-      <input type="email" name="email" id="email" placeholder="Email" autofocus="autofocus" class="form-control"/>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="password" class="col-sm-3 control-label">Password</label>
-    <div class="col-sm-7">
-      <input type="password" name="password" id="password" placeholder="Password" class="form-control"/>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="confirmPassword" class="col-sm-3 control-label">Confirm Password</label>
-    <div class="col-sm-7">
-      <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" class="form-control"/>
-    </div>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-offset-3 col-sm-7">
-      <button type="submit" class="btn btn-success"><i class="fa fa-user-plus"></i>Signup</button>
-    </div>
-  </div>
-</form>

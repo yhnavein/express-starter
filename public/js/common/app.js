@@ -1,3 +1,3 @@
 'use strict';
-angular.module('express-starter', []);
+var app = angular.module('express-starter', ['ngRoute']);
 

@@ -2,6 +2,7 @@
 /**
  * Module dependencies.
  */
+var toobusy = require('toobusy-js');
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var compress = require('compression');
@@ -41,6 +42,15 @@ var passportConf = require('./config/passport');
  * Create Express server.
  */
 var app = express();
+
+/* Avoid not responsing when server load is huge */
+// app.use(function(req, res, next) {
+//   if (toobusy()) {
+//     res.status(503).send("I'm busy right now, sorry. Please try again later.");
+//   } else {
+//     next();
+//   }
+// });
 
 /**
  * Express configuration.

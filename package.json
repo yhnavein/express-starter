@@ -57,6 +57,7 @@
     "sequelize": "^3.12.2",
     "serve-favicon": "^2.3.0",
     "stripe": "^4.0.0",
+    "toobusy-js": "^0.4.2",
     "twilio": "^2.2.1",
     "twit": "^2.1.0",
     "uglify-js": "^2.4.24",

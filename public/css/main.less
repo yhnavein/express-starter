@@ -29,6 +29,37 @@ footer {
   }
 }
 
+/* Validation Styling */
+
+input.ng-invalid.ng-touched {
+  border-color: @brand-danger;
+}
+
+/* Signup Page */
+
+.psw-strength {
+  height: 6px;
+  margin: 2px 0;
+
+  span {
+    display: inline-block;
+    width: 24%;
+    height: 100%;
+    float: left;
+    background: #efefef;
+    border-radius: 2px;
+    margin-right: 1.333333%;
+
+    &:last-child { margin-right: 0; }
+  }
+
+  &.psw-rank-0 span:nth-child(-n+1) { background: @brand-danger; }
+  &.psw-rank-1 span:nth-child(-n+1) { background: @brand-danger; }
+  &.psw-rank-2 span:nth-child(-n+2) { background: @brand-warning; }
+  &.psw-rank-3 span:nth-child(-n+3) { background: @brand-success; }
+  &.psw-rank-4 span:nth-child(-n+4) { background: darken(@brand-success, 5%); }
+}
+
 // Navbar
 // -------------------------
 
