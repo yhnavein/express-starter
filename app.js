@@ -59,6 +59,7 @@ app.set('port', process.env.PORT || 3000);
 app.engine('ejs', ejsEngine);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.enable("trust proxy");
 app.use(compress());
 app.use(connectAssets({
   paths: [path.join(__dirname, 'public/css'), path.join(__dirname, 'public/js')]
