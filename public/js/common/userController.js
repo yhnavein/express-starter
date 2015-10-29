@@ -11,6 +11,12 @@ app.controller('UserSignUpCtrl', ['$rootScope', '$scope', '$routeParams', '$loca
 
 }]);
 
+app.controller('UserProfileCtrl', ['$rootScope', '$scope', '$routeParams', '$location',
+	function($rootScope, $scope, $routeParams, $location) {
+		$scope.pswChange = {};
+
+}]);
+
 app.factory('passwordStrengthService', [function () {
 	return {
 		calculate: function(password) {
