@@ -1,24 +1,33 @@
 <% layout('layout') -%>
 
 <div class="custom-container" ng-controller="UserResetPswCtrl">
-	<div class="page-header">
-		<h3>Reset Password</h3>
-	</div>
-  <form novalidate method="POST" action="" name="resetForm">
+  <div class="page-header">
+    <h3>Reset Password</h3>
+  </div>
+  <form novalidate method="POST" action="" name="resetForm" class="form-horizontal">
     <input type="hidden" name="_csrf" value="<%= _csrf %>"/>
+
+    <blockquote><strong>Almost done!</strong> You need to set up your new password now.</blockquote>
+
     <div class="form-group">
-      <label for="password">New Password</label>
-      <input type="password" name="password" placeholder="New password" autofocus="autofocus" class="form-control" ng-model="psw" required/>
-	    <div password-strength value="psw"></div>
+      <label for="password" class="col-sm-4 control-label">New Password</label>
+      <div class="col-sm-4">
+        <input type="password" name="password" placeholder="New password" autofocus="autofocus" class="form-control" ng-model="psw" required/>
+        <div password-strength value="psw"></div>
+      </div>
     </div>
     <div class="form-group">
-      <label for="confirm">Confirm Password</label>
-      <input type="password" name="confirm" placeholder="Confirm password" class="form-control" ng-model="psw1" required/>
+      <label for="confirm" class="col-sm-4 control-label">Confirm Password</label>
+      <div class="col-sm-4">
+        <input type="password" name="confirm" placeholder="Confirm password" class="form-control" ng-model="psw1" required/>
+      </div>
     </div>
     <div class="form-group">
-      <button type="submit" class="btn btn-primary btn-reset" ng-disabled="resetForm.$invalid || psw != psw1">
-	      <i class="fa fa-keyboard-o"></i>Change Password
-      </button>
+      <div class="col-sm-offset-4 col-sm-4">
+        <button type="submit" class="btn btn-primary btn-reset" ng-disabled="resetForm.$invalid || psw != psw1">
+          <i class="fa fa-keyboard-o"></i>Change Password
+        </button>
+      </div>
     </div>
   </form>
 </div>

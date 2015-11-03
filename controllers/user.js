@@ -217,6 +217,10 @@ exports.getReset = function(req, res) {
   db.User
     .findOne({ where: { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: new Date() } } })
     .then(function(user) {
+      if(!user) {
+        req.flash('errors', { msg: 'Password reset request is invalid or has expired.' });
+        return res.redirect('/forgot');
+      }
       res.render('account/reset', {
         title: 'Password Reset'
       });
