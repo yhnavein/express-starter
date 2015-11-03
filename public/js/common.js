@@ -25,4 +25,5 @@
 
 /* LIST OF CUSTOM JS CODE FILES */
 //= require common/app
+//= require common/pswStrengthComponent
 //= require common/userController
