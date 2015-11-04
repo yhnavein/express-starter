@@ -7,12 +7,14 @@
   <form novalidate method="POST" action="" name="resetForm" class="form-horizontal">
     <input type="hidden" name="_csrf" value="<%= _csrf %>"/>
 
-    <blockquote><strong>Almost done!</strong> You need to set up your new password now.</blockquote>
+    <blockquote>
+      <strong>Almost done!</strong> You need to set up your new password now. Please note, that the new password has to be at least 4 characters long.
+    </blockquote>
 
     <div class="form-group">
       <label for="password" class="col-sm-4 control-label">New Password</label>
       <div class="col-sm-4">
-        <input type="password" name="password" placeholder="New password" autofocus="autofocus" class="form-control" ng-model="psw" required/>
+        <input type="password" name="password" placeholder="New password" autofocus="autofocus" class="form-control" ng-model="psw" required ng-minlength="4"/>
         <div password-strength value="psw"></div>
       </div>
     </div>

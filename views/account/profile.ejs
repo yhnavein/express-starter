@@ -105,7 +105,7 @@
         <div class="form-group">
           <label for="password" class="col-sm-4 control-label">New Password</label>
           <div class="col-sm-6">
-            <input type="password" name="password" id="password" class="form-control" ng-model="pswChange.psw" required/>
+            <input type="password" name="password" id="password" class="form-control" ng-model="pswChange.psw" required ng-minlength="4"/>
             <div password-strength value="pswChange.psw"></div>
           </div>
         </div>

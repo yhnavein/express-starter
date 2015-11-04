@@ -27,3 +27,4 @@
 //= require common/app
 //= require common/pswStrengthComponent
 //= require common/userController
+//= require common/contactController

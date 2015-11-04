@@ -195,22 +195,6 @@ app.get('/auth/linkedin', passport.authenticate('linkedin', { state: 'SOME STATE
 app.get('/auth/linkedin/callback', passport.authenticate('linkedin', { failureRedirect: '/login' }), safeRedirectToReturnTo);
 
 /**
- * OAuth authorization routes. (API examples)
- */
-// app.get('/auth/foursquare', passport.authorize('foursquare'));
-// app.get('/auth/foursquare/callback', passport.authorize('foursquare', { failureRedirect: '/api' }), function(req, res) {
-//   res.redirect('/api/foursquare');
-// });
-// app.get('/auth/tumblr', passport.authorize('tumblr'));
-// app.get('/auth/tumblr/callback', passport.authorize('tumblr', { failureRedirect: '/api' }), function(req, res) {
-//   res.redirect('/api/tumblr');
-// });
-// app.get('/auth/venmo', passport.authorize('venmo', { scope: 'make_payments access_profile access_balance access_email access_phone' }));
-// app.get('/auth/venmo/callback', passport.authorize('venmo', { failureRedirect: '/api' }), function(req, res) {
-//   res.redirect('/api/venmo');
-// });
-
-/**
  * Error Handler.
  */
 app.use(errorHandler());

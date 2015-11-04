@@ -27,6 +27,10 @@ repo.assignResetPswToken = function(email, token, done) {
     where: { email: email }
   })
   .then(function(user) {
+    if(!user) {
+      done('No account with that email address exists.', null);
+      return;
+    }
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + PSW_RESET_TOKEN_VALID_FOR * ONE_HOUR;
 
@@ -36,7 +40,7 @@ repo.assignResetPswToken = function(email, token, done) {
     done(null, savedUser);
   })
   .catch(function() {
-    done('User was not found!', null);
+    done('No account with that email address exists.', null);
   });
 };
 

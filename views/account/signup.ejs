@@ -4,6 +4,9 @@
   <div class="page-header">
     <h3>Sign up</h3>
   </div>
+  <blockquote>
+    Let's create your brand new account! Please note, that the new password has to be at least 4 characters long.
+  </blockquote>
   <form name="signupForm" method="POST" class="form-horizontal" action="/signup" novalidate>
     <input type="hidden" name="_csrf" value="<%= _csrf %>"/>
     <div class="form-group">
@@ -15,25 +18,29 @@
     <div class="form-group">
       <label for="password" class="col-sm-3 control-label">Password</label>
       <div class="col-sm-7">
-        <input type="password" name="password" id="password" placeholder="Password" class="form-control" ng-model="psw" required/>
+        <input type="password" name="password" id="password" placeholder="Password" class="form-control" ng-model="psw" required ng-minlength="4"/>
         <div password-strength value="psw"></div>
       </div>
     </div>
     <div class="form-group">
       <label for="confirmPassword" class="col-sm-3 control-label">Confirm Password</label>
       <div class="col-sm-7">
-        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" class="form-control" ng-model="psw1" required/>
+        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" class="form-control" ng-model="psw1" required ng-minlength="4"/>
       </div>
     </div>
     <div class="form-group">
       <div class="col-sm-offset-3 col-sm-7">
         <button type="submit" class="btn btn-success" ng-disabled="signupForm.$invalid || psw != psw1">
-          <i class="fa fa-user-plus"></i>Signup
+          <i class="fa fa-user-plus"></i> Signup
         </button>
 
         <div class="alert-container" ng-show="psw != psw1 && psw1">
           <hr>
           <div class="alert alert-danger">Passwords do not match!</div>
+        </div>
+        <div class="alert-container" ng-show="signupForm.password.$error.minlength">
+          <hr>
+          <div class="alert alert-danger">Password has to be at least 4 characters long!</div>
         </div>
       </div>
     </div>

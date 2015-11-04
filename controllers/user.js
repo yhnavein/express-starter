@@ -102,6 +102,7 @@ exports.postSignup = function(req, res, next) {
     .then(function(user) {
       req.logIn(user, function(err) {
         if (err) return next(err);
+        req.flash('success', { msg: 'Your account has been created and you\'ve been logged in.' });
         res.redirect('/');
       });
     })
@@ -303,6 +304,10 @@ exports.postForgot = function(req, res, next) {
     function(token, done) {
       var email = req.body.email.toLowerCase();
       UserRepo.assignResetPswToken(email, token, function(err, user){
+        if(err) {
+          req.flash('errors', { msg: err });
+          return res.redirect('/forgot');
+        }
         done(err, token, user);
       });
     },
