@@ -65,7 +65,8 @@ module.exports = {
     clientSecret: process.env.FACEBOOK_SECRET || '41860e58c256a3d7ad8267d3c1939a4a',
     callbackURL: '/auth/facebook/callback',
     passReqToCallback: true,
-    enableProof: true
+    enableProof: true,
+    authOptions: { scope: ['email', 'user_location'] }
   },
 
   github: {
@@ -73,7 +74,8 @@ module.exports = {
     clientSecret: process.env.GITHUB_SECRET || '815aa4606f476444691c5f1c16b9c70da6714dc6',
     callbackURL: '/auth/github/callback',
     passReqToCallback: true,
-    enableProof: true
+    enableProof: true,
+    authOptions: {}
   },
 
   twitter: {
@@ -81,7 +83,8 @@ module.exports = {
     consumerSecret: process.env.TWITTER_SECRET || 'ZHaYyK3DQCqv49Z9ofsYdqiUgeoICyh6uoBgFfu7OeYC7wTQKa',
     callbackURL: '/auth/twitter/callback',
     passReqToCallback: true,
-    enableProof: true
+    enableProof: true,
+    authOptions: {}
   },
 
   google: {
@@ -89,7 +92,8 @@ module.exports = {
     clientSecret: process.env.GOOGLE_SECRET || 'JdZsIaWhUFIchmC1a_IZzOHb',
     callbackURL: '/auth/google/callback',
     passReqToCallback: true,
-    enableProof: true
+    enableProof: true,
+    authOptions: { scope: 'profile email' }
   },
 
   linkedin: {
@@ -98,7 +102,8 @@ module.exports = {
     callbackURL: process.env.LINKEDIN_CALLBACK_URL || 'http://localhost:3000/auth/linkedin/callback',
     scope: ['r_basicprofile', 'r_emailaddress'],
     passReqToCallback: true,
-    enableProof: true
+    enableProof: true,
+    authOptions: { state: 'SOME STATE' }
   },
 
   steam: {

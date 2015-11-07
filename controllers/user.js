@@ -13,7 +13,9 @@ var emailService = require('../services/emailService.js');
  * Login page.
  */
 exports.getLogin = function(req, res) {
-  if (req.user) return res.redirect('/');
+  if (req.user)
+    return res.redirect('/account');
+
   res.render('account/login', {
     title: 'Login'
   });
@@ -248,15 +250,19 @@ exports.postReset = function(req, res, next) {
 
   async.waterfall([
     function(done) {
-      UserRepo.changeUserPswAndResetToken(req.params.token, req.body.password, function(err, user){
-        req.logIn(user, function(err2) {
-          done(err2, user);
-        });
-      });
+      UserRepo.changeUserPswAndResetToken(req.params.token, req.body.password)
+        .then(function(user){
+          req.logIn(user, function(err2) {
+            done(err2, user);
+          });
+        })
+        .catch(function(err) { done(err, null); });
     },
     function(user, done) {
       emailService.sendPasswordChangeNotificationEmail(user.email, function(err) {
-        req.flash('info', { msg: 'Password has been successfully changed. Notification e-mail has been sent to ' + user.email + ' to inform about this fact.' });
+        req.flash('info', {
+          msg: 'Password has been successfully changed. Notification e-mail has been sent to ' + user.email + ' to inform about this fact.'
+        });
         done(err, 'done');
       });
     }
@@ -303,13 +309,14 @@ exports.postForgot = function(req, res, next) {
     },
     function(token, done) {
       var email = req.body.email.toLowerCase();
-      UserRepo.assignResetPswToken(email, token, function(err, user){
-        if(err) {
+      UserRepo.assignResetPswToken(email, token)
+        .then(function(user){
+          done(null, token, user);
+        })
+        .catch(function(err) {
           req.flash('errors', { msg: err });
           return res.redirect('/forgot');
-        }
-        done(err, token, user);
-      });
+        });
     },
     function(token, user, done) {
       emailService.sendRequestPasswordEmail(user.email, req.headers.host, token, function(err) {

@@ -1,16 +1,14 @@
 'use strict';
 
 var secrets = require('../config/secrets');
-
-var applicationName = 'Express Starter';
-var senderAddress = 'Mailing <mailing@starter.com>';
-
 var mailer = require('sendgrid')(secrets.sendgrid.api_key);
 
 var service = {};
 
-service.sendRequestPasswordEmail = function(email, host, token, done) {
+var applicationName = 'Express Starter';
+var senderAddress = 'Mailing <mailing@starter.com>';
 
+service.sendRequestPasswordEmail = function(email, host, token, done) {
   var mailOptions = {
     to: email,
     from: senderAddress,

@@ -4,8 +4,6 @@ var expect = require('expect.js');
 var userRepo = require('../../repositories/UserRepository');
 var bcrypt = require('bcrypt-nodejs');
 
-var reqMock = { flash: function() {} };
-
 describe('User Repository', function() {
 
   it('should create properly a local account', function (done) {
@@ -15,18 +13,21 @@ describe('User Repository', function() {
       password: 'admin1' //:D
     };
 
-    userRepo.createUser(sampleUser, function (err, user) {
-      expect(err).to.be(null);
-      expect(user).to.be.a('object');
-      expect(user.password).to.not.be(null);
-      expect(user.password).to.not.be(sampleUser.password); //silly check if psw has been hashed
-      expect(user.email).to.be(sampleUser.email);
-      done();
-    });
+    userRepo.createUser(sampleUser)
+      .then(function(user) {
+        expect(user).to.be.a('object');
+        expect(user.password).to.not.be(null);
+        expect(user.password).to.not.be(sampleUser.password); //silly check if psw has been hashed
+        expect(user.email).to.be(sampleUser.email);
+        done();
+      })
+      .catch(function() {
+        expect().fail('It should not happen');
+        done();
+      });
   });
 
   describe('Facebook OAuth', function() {
-
     function createUser() {
       var uniqueness = Date.now();
 
@@ -43,39 +44,46 @@ describe('User Repository', function() {
       var $u = createUser();
       $u.profile._json = {email: $u.email};
 
-      userRepo.createAccFromFacebook(reqMock, $u.accessToken, $u.refreshToken, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.facebookId).to.be($u.uniqueness.toString());
-        expect(user.password).to.be(null);
-        expect(user.email).to.be($u.email);
-        done();
-      });
+      userRepo.createAccFromFacebook($u.accessToken, $u.refreshToken, $u.profile)
+        .then(function (user) {
+          expect(user).to.be.a('object');
+          expect(user.facebookId).to.be($u.uniqueness.toString());
+          expect(user.password).to.be(null);
+          expect(user.email).to.be($u.email);
+          done();
+        })
+        .catch(function() {
+          expect().fail('It should not happen');
+          done();
+        });
     });
 
     it('should handle properly situation when email returned from facebook is empty', function (done) {
       var $u = createUser();
       $u.profile._json = { email: null };
 
-      userRepo.createAccFromFacebook(reqMock, $u.accessToken, $u.refreshToken, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.facebookId).to.be($u.uniqueness.toString());
-        expect(user.password).to.be(null);
-        expect(user.email).to.be(user.facebookId + '@facebook.com');
-        done();
-      });
+      userRepo.createAccFromFacebook($u.accessToken, $u.refreshToken, $u.profile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.facebookId).to.be($u.uniqueness.toString());
+          expect(user.password).to.be(null);
+          expect(user.email).to.be(user.facebookId + '@facebook.com');
+          done();
+        });
     });
 
-    it('should respond with error when empty json property is passed from facebook', function (done) {
-      var $u = createUser();
-
-      userRepo.createAccFromFacebook(reqMock, $u.accessToken, $u.refreshToken, $u.profile, function (err, user) {
-        expect(err).to.not.be(null);
-        expect(user).to.be(null);
-        done();
-      });
-    });
+    //it('should respond with error when empty json property is passed from facebook', function (done) {
+    //  var $u = createUser();
+    //
+    //  userRepo.createAccFromFacebook($u.accessToken, $u.refreshToken, $u.profile)
+    //    .then(function() {
+    //      console.log('Test');
+    //    })
+    //    .catch(function(err) {
+    //      expect(err).to.not.be(null);
+    //      done();
+    //    });
+    //});
 
     it('should create properly a new user from facebook with a full profile', function (done) {
       var $u = createUser();
@@ -114,16 +122,16 @@ describe('User Repository', function() {
         }
       };
 
-      userRepo.createAccFromFacebook(reqMock, $u.accessToken, $u.refreshToken, sampleProfile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.facebookId).to.be(sampleProfile.id);
-        expect(user.email).to.be($u.email);
-        expect(user.profile).to.be.a('object');
-        expect(user.profile.name).to.be(sampleProfile.displayName);
-        expect(user.profile.gender).to.be(sampleProfile.gender);
-        done();
-      });
+      userRepo.createAccFromFacebook($u.accessToken, $u.refreshToken, sampleProfile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.facebookId).to.be(sampleProfile.id);
+          expect(user.email).to.be($u.email);
+          expect(user.profile).to.be.a('object');
+          expect(user.profile.name).to.be(sampleProfile.displayName);
+          expect(user.profile.gender).to.be(sampleProfile.gender);
+          done();
+        });
     });
 
     it('should properly link facebook account to the existing local account', function (done) {
@@ -132,27 +140,23 @@ describe('User Repository', function() {
         email: 'test-local-' + uniqueness + '@puredev.eu',
         password: 'admin1' //:D
       };
-      userRepo.createUser(sampleUser, function (err, user) {
-        var localReqMock = {
-          flash: function () {
-          }, user: user
-        };
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          var $u = createUser();
+          $u.profile._json = {email: $u.email};
+          $u.profile.displayName = "Test FB UserName";
 
-        var $u = createUser();
-        $u.profile._json = {email: $u.email};
-        $u.profile.displayName = "Test FB UserName";
-
-        userRepo.linkFacebookProfile(localReqMock, $u.accessToken, $u.refreshToken, $u.profile, function (fbErr, fbUser) {
-          expect(fbErr).to.be(null);
-          expect(fbUser).to.be.a('object');
-          expect(fbUser.email).to.be(sampleUser.email);
-          expect(fbUser.profile).to.be.a('object');
-          expect(fbUser.profile.name).to.be($u.profile.displayName);
-          expect(fbUser.tokens).to.be.a('object');
-          expect(fbUser.tokens.facebook).to.be($u.accessToken);
-          done();
+          userRepo.linkFacebookProfile(user.id, $u.accessToken, $u.refreshToken, $u.profile)
+            .then(function(fbUser) {
+              expect(fbUser).to.be.a('object');
+              expect(fbUser.email).to.be(sampleUser.email);
+              expect(fbUser.profile).to.be.a('object');
+              expect(fbUser.profile.name).to.be($u.profile.displayName);
+              expect(fbUser.tokens).to.be.a('object');
+              expect(fbUser.tokens.facebook).to.be($u.accessToken);
+              done();
+            });
         });
-      });
     });
 
     it('should properly unlink linked facebook account', function (done) {
@@ -161,36 +165,29 @@ describe('User Repository', function() {
         email: 'test-local-' + uniqueness + '@puredev.eu',
         password: 'admin1' //:D
       };
-      userRepo.createUser(sampleUser, function (err, user) {
-        var localReqMock = {
-          flash: function () { }, user: user
-        };
+      var $u = createUser();
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          $u.profile._json = {email: $u.email};
 
-        var $u = createUser();
-        $u.profile._json = {email: $u.email};
+          return userRepo.linkFacebookProfile(user.id, $u.accessToken, $u.refreshToken, $u.profile);
+        })
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.facebookId).to.not.be(null);
+          expect(user.tokens).to.be.a('object');
+          expect(user.tokens.facebook).to.be($u.accessToken);
 
-        userRepo.linkFacebookProfile(localReqMock, $u.accessToken, $u.refreshToken, $u.profile, function (fbErr, fbUser) {
-          expect(fbErr).to.be(null);
-          expect(fbUser).to.be.a('object');
-          expect(fbUser.facebookId).to.not.be(null);
-          expect(fbUser.tokens).to.be.a('object');
-          expect(fbUser.tokens.facebook).to.be($u.accessToken);
+          return userRepo.unlinkProviderFromAccount('facebook', user.id);
+        })
+        .then(function(user) {
+          expect(user.tokens.facebook).to.be(null);
+          expect(user.facebookId).to.be(null);
 
-          userRepo.unlinkProviderFromAccount('facebook', $u.id)
-            .then(function(savedUser) {
-              expect(savedUser.tokens.facebook).to.be(null);
-              expect(savedUser.facebookId).to.be(null);
-
-              done();
-            })
-            .catch(function() {
-              done();
-            });
+          done();
         });
-      });
     });
   });
-
 
   describe('GitHub OAuth', function() {
     function createUser() {
@@ -209,17 +206,17 @@ describe('User Repository', function() {
       var $u = createUser();
       $u.profile.emails = [ {value: $u.email} ];
 
-      userRepo.createAccFromGithub(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.facebookId).to.be(null);
-        expect(user.githubId).to.be($u.uniqueness.toString());
-        expect(user.password).to.be(null);
-        expect(user.email).to.be($u.email);
-        expect(user.tokens).to.be.a('object');
-        expect(user.tokens.github).to.be($u.accessToken);
-        done();
-      });
+      userRepo.createAccFromGithub($u.accessToken, $u.tokenSecret, $u.profile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.facebookId).to.be(null);
+          expect(user.githubId).to.be($u.uniqueness.toString());
+          expect(user.password).to.be(null);
+          expect(user.email).to.be($u.email);
+          expect(user.tokens).to.be.a('object');
+          expect(user.tokens.github).to.be($u.accessToken);
+          done();
+        });
     });
 
     it('should create properly a new user from github with location', function (done) {
@@ -227,26 +224,26 @@ describe('User Repository', function() {
       $u.profile.emails = [ {value: $u.email} ];
       $u.profile._json = {location: 'Warsaw'};
 
-      userRepo.createAccFromGithub(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.profile).to.be.a('object');
-        expect(user.profile.location).to.be('Warsaw');
-        done();
-      });
+      userRepo.createAccFromGithub($u.accessToken, $u.tokenSecret, $u.profile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.profile).to.be.a('object');
+          expect(user.profile.location).to.be('Warsaw');
+          done();
+        });
     });
 
     it('should create properly a new user where there is no email returned from GitHub', function (done) {
       var $u = createUser();
       $u.profile.emails = [ {value: ''} ];
 
-      userRepo.createAccFromGithub(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.profile).to.be.a('object');
-        expect(user.email).to.be($u.uniqueness + '@github.com');
-        done();
-      });
+      userRepo.createAccFromGithub($u.accessToken, $u.tokenSecret, $u.profile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.profile).to.be.a('object');
+          expect(user.email).to.be($u.uniqueness + '@github.com');
+          done();
+        });
     });
 
     it('should create properly a github full profile', function (done) {
@@ -292,18 +289,17 @@ describe('User Repository', function() {
           updated_at: '2015-07-22T14:44:14Z'
         }
       };
-      userRepo.createAccFromGithub(reqMock, $u.accessToken, $u.tokenSecret, sampleProfile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.profile).to.be.a('object');
-        expect(user.profile.name).to.be(sampleProfile.displayName);
-        expect(user.profile.location).to.be(sampleProfile._json.location);
-        expect(user.profile.picture).to.be(sampleProfile._json.avatar_url);
-        expect(user.profile.website).to.be(sampleProfile._json.blog);
-        done();
-      });
+      userRepo.createAccFromGithub($u.accessToken, $u.tokenSecret, sampleProfile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.profile).to.be.a('object');
+          expect(user.profile.name).to.be(sampleProfile.displayName);
+          expect(user.profile.location).to.be(sampleProfile._json.location);
+          expect(user.profile.picture).to.be(sampleProfile._json.avatar_url);
+          expect(user.profile.website).to.be(sampleProfile._json.blog);
+          done();
+        });
     });
-
 
     it('should properly link github account to the existing local account', function (done) {
       var uniqueness = Date.now();
@@ -311,26 +307,23 @@ describe('User Repository', function() {
         email: 'test-local1-' + uniqueness + '@puredev.eu',
         password: 'admin1' //:D
       };
-      userRepo.createUser(sampleUser, function (err, user) {
-        var localReqMock = {
-          flash: function () {
-          }, user: user
-        };
-        var $u = createUser();
-        $u.profile._json = {email: $u.email};
-        $u.profile.displayName = "Test GH UserName";
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          var $u = createUser();
+          $u.profile._json = {email: $u.email};
+          $u.profile.displayName = "Test GH UserName";
 
-        userRepo.linkGithubProfile(localReqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (ghErr, ghUser) {
-          expect(ghErr).to.be(null);
-          expect(ghUser).to.be.a('object');
-          expect(ghUser.email).to.be(sampleUser.email);
-          expect(ghUser.profile).to.be.a('object');
-          expect(ghUser.profile.name).to.be($u.profile.displayName);
-          expect(ghUser.tokens).to.be.a('object');
-          expect(ghUser.tokens.github).to.be($u.accessToken);
-          done();
+          userRepo.linkGithubProfile(user.id, $u.accessToken, $u.tokenSecret, $u.profile)
+            .then(function(ghUser) {
+              expect(ghUser).to.be.a('object');
+              expect(ghUser.email).to.be(sampleUser.email);
+              expect(ghUser.profile).to.be.a('object');
+              expect(ghUser.profile.name).to.be($u.profile.displayName);
+              expect(ghUser.tokens).to.be.a('object');
+              expect(ghUser.tokens.github).to.be($u.accessToken);
+              done();
+            });
         });
-      });
     });
   });
 
@@ -351,30 +344,30 @@ describe('User Repository', function() {
     it('should create properly a new user from google', function (done) {
       var $u = createUser();
 
-      userRepo.createAccFromGoogle(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.facebookId).to.be(null);
-        expect(user.googleId).to.be($u.uniqueness.toString());
-        expect(user.password).to.be(null);
-        expect(user.email).to.be($u.email);
-        expect(user.tokens).to.be.a('object');
-        expect(user.tokens.google).to.be($u.accessToken);
-        done();
-      });
+      userRepo.createAccFromGoogle($u.accessToken, $u.tokenSecret, $u.profile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.facebookId).to.be(null);
+          expect(user.googleId).to.be($u.uniqueness.toString());
+          expect(user.password).to.be(null);
+          expect(user.email).to.be($u.email);
+          expect(user.tokens).to.be.a('object');
+          expect(user.tokens.google).to.be($u.accessToken);
+          done();
+        });
     });
 
     it('should create properly a new user from google with picture', function (done) {
       var $u = createUser();
       $u.profile._json.image = {url: 'PICTURE_URL'};
 
-      userRepo.createAccFromGoogle(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.profile).to.be.a('object');
-        expect(user.profile.picture).to.be('PICTURE_URL');
-        done();
-      });
+      userRepo.createAccFromGoogle($u.accessToken, $u.tokenSecret, $u.profile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.profile).to.be.a('object');
+          expect(user.profile.picture).to.be('PICTURE_URL');
+          done();
+        });
     });
 
     it('should create properly a new user from a full google profile', function (done) {
@@ -394,17 +387,7 @@ describe('User Repository', function() {
           etag: '"6de4a3e9-645e-4044-87ba-2c25689b58c9"',
           gender: 'male',
           emails: [ [Object] ],
-          urls: [
-            [Object],
-            [Object],
-            [Object],
-            [Object],
-            [Object],
-            [Object],
-            [Object],
-            [Object],
-            [Object]
-          ],
+          urls: [ [Object] ],
           objectType: 'person',
           id: '864852638' + $u.uniqueness,
           displayName: 'Lacy Hucks',
@@ -426,15 +409,15 @@ describe('User Repository', function() {
         }
       };
 
-      userRepo.createAccFromGoogle(reqMock, $u.accessToken, $u.tokenSecret, sampleProfile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.profile).to.be.a('object');
-        expect(user.profile.picture).to.be(sampleProfile._json.image.url);
-        expect(user.profile.name).to.be(sampleProfile.displayName);
-        expect(user.profile.gender).to.be(sampleProfile.gender);
-        done();
-      });
+      userRepo.createAccFromGoogle($u.accessToken, $u.tokenSecret, sampleProfile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.profile).to.be.a('object');
+          expect(user.profile.picture).to.be(sampleProfile._json.image.url);
+          expect(user.profile.name).to.be(sampleProfile.displayName);
+          expect(user.profile.gender).to.be(sampleProfile.gender);
+          done();
+        });
     });
 
     it('should properly link google account to the existing local account', function (done) {
@@ -443,25 +426,22 @@ describe('User Repository', function() {
         email: 'test-local2-' + uniqueness + '@puredev.eu',
         password: 'admin1' //:D
       };
-      userRepo.createUser(sampleUser, function (err, user) {
-        var localReqMock = {
-          flash: function () {
-          }, user: user
-        };
-        var $u = createUser();
-        $u.profile.displayName = "Test GG UserName";
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          var $u = createUser();
+          $u.profile.displayName = "Test GG UserName";
 
-        userRepo.linkGoogleProfile(localReqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (ggErr, ggUser) {
-          expect(ggErr).to.be(null);
-          expect(ggUser).to.be.a('object');
-          expect(ggUser.email).to.be(sampleUser.email);
-          expect(ggUser.profile).to.be.a('object');
-          expect(ggUser.profile.name).to.be($u.profile.displayName);
-          expect(ggUser.tokens).to.be.a('object');
-          expect(ggUser.tokens.google).to.be($u.accessToken);
-          done();
+          userRepo.linkGoogleProfile(user.id, $u.accessToken, $u.tokenSecret, $u.profile)
+            .then(function(ggUser) {
+              expect(ggUser).to.be.a('object');
+              expect(ggUser.email).to.be(sampleUser.email);
+              expect(ggUser.profile).to.be.a('object');
+              expect(ggUser.profile.name).to.be($u.profile.displayName);
+              expect(ggUser.tokens).to.be.a('object');
+              expect(ggUser.tokens.google).to.be($u.accessToken);
+              done();
+            });
         });
-      });
     });
   });
 
@@ -480,31 +460,31 @@ describe('User Repository', function() {
     it('should create properly a new user from twitter', function (done) {
       var $u = createUser();
 
-      userRepo.createAccFromTwitter(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.facebookId).to.be(null);
-        expect(user.twitterId).to.be($u.uniqueness.toString());
-        expect(user.password).to.be(null);
-        expect(user.email).to.be($u.profile.username + '@twitter.com');
-        expect(user.tokens).to.be.a('object');
-        expect(user.tokens.twitter).to.be($u.accessToken);
-        expect(user.tokens.twitterSecret).to.be($u.tokenSecret);
-        done();
-      });
+      userRepo.createAccFromTwitter($u.accessToken, $u.tokenSecret, $u.profile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.facebookId).to.be(null);
+          expect(user.twitterId).to.be($u.uniqueness.toString());
+          expect(user.password).to.be(null);
+          expect(user.email).to.be($u.profile.username + '@twitter.com');
+          expect(user.tokens).to.be.a('object');
+          expect(user.tokens.twitter).to.be($u.accessToken);
+          expect(user.tokens.twitterSecret).to.be($u.tokenSecret);
+          done();
+        });
     });
 
     it('should create properly a new user from twitter with picture', function (done) {
       var $u = createUser();
       $u.profile._json.profile_image_url_https = 'PICTURE_URL';
 
-      userRepo.createAccFromTwitter(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.profile).to.be.a('object');
-        expect(user.profile.picture).to.be('PICTURE_URL');
-        done();
-      });
+      userRepo.createAccFromTwitter($u.accessToken, $u.tokenSecret, $u.profile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.profile).to.be.a('object');
+          expect(user.profile.picture).to.be('PICTURE_URL');
+          done();
+        });
     });
 
     it('should properly link twitter account to the existing local account', function (done) {
@@ -513,14 +493,13 @@ describe('User Repository', function() {
         email: 'test-local2-' + uniqueness + '@puredev.eu',
         password: 'admin1' //:D
       };
-      userRepo.createUser(sampleUser, function (err, user) {
-        var localReqMock = {
-          flash: function () { }, user: user
-        };
-        var $u = createUser();
+      var $u = createUser();
 
-        userRepo.linkTwitterProfile(localReqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (twErr, twUser) {
-          expect(twErr).to.be(null);
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          return userRepo.linkTwitterProfile(user.id, $u.accessToken, $u.tokenSecret, $u.profile);
+        })
+        .then(function(twUser) {
           expect(twUser).to.be.a('object');
           expect(twUser.email).to.be(sampleUser.email);
           expect(twUser.profile).to.be.a('object');
@@ -530,7 +509,6 @@ describe('User Repository', function() {
           expect(twUser.tokens.twitterSecret).to.be($u.tokenSecret);
           done();
         });
-      });
     });
 
     it('should properly unlink linked twitter account', function (done) {
@@ -539,34 +517,28 @@ describe('User Repository', function() {
         email: 'test-local2-' + uniqueness + '@puredev.eu',
         password: 'admin1' //:D
       };
-      userRepo.createUser(sampleUser, function (err, user) {
-        var localReqMock = {
-          flash: function () { }, user: user
-        };
+      var $u = createUser();
 
-        var $u = createUser();
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          return userRepo.linkTwitterProfile(user.id, $u.accessToken, $u.tokenSecret, $u.profile);
+        })
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.twitterId).to.not.be(null);
+          expect(user.tokens).to.be.a('object');
+          expect(user.tokens.twitter).to.be($u.accessToken);
+          expect(user.tokens.twitterSecret).to.be($u.tokenSecret);
 
-        userRepo.linkTwitterProfile(localReqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (twErr, twUser) {
-          expect(twErr).to.be(null);
-          expect(twUser).to.be.a('object');
-          expect(twUser.twitterId).to.not.be(null);
-          expect(twUser.tokens).to.be.a('object');
-          expect(twUser.tokens.twitter).to.be($u.accessToken);
-          expect(twUser.tokens.twitterSecret).to.be($u.tokenSecret);
+          return userRepo.unlinkProviderFromAccount('twitter', user.id);
+        })
+       .then(function(user) {
+          expect(user.tokens.twitter).to.be(null);
+          expect(user.tokens.twitterSecret).to.be(null);
+          expect(user.twitterId).to.be(null);
 
-          userRepo.unlinkProviderFromAccount('twitter', $u.id)
-            .then(function(savedUser) {
-              expect(savedUser.tokens.twitter).to.be(null);
-              expect(savedUser.tokens.twitterSecret).to.be(null);
-              expect(savedUser.twitterId).to.be(null);
-
-              done();
-            })
-            .catch(function() {
-              done();
-            });
+          done();
         });
-      });
     });
   });
 
@@ -587,17 +559,17 @@ describe('User Repository', function() {
     it('should create properly a new user from linkedin', function (done) {
       var $u = createUser();
 
-      userRepo.createAccFromLinkedIn(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.facebookId).to.be(null);
-        expect(user.linkedInId).to.be($u.uniqueness.toString());
-        expect(user.password).to.be(null);
-        expect(user.email).to.be($u.email);
-        expect(user.tokens).to.be.a('object');
-        expect(user.tokens.linkedin).to.be($u.accessToken);
-        done();
-      });
+      userRepo.createAccFromLinkedIn($u.accessToken, $u.tokenSecret, $u.profile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.facebookId).to.be(null);
+          expect(user.linkedInId).to.be($u.uniqueness.toString());
+          expect(user.password).to.be(null);
+          expect(user.email).to.be($u.email);
+          expect(user.tokens).to.be.a('object');
+          expect(user.tokens.linkedin).to.be($u.accessToken);
+          done();
+        });
     });
 
     it('should create properly a new user from linkedin with picture', function (done) {
@@ -605,14 +577,14 @@ describe('User Repository', function() {
       $u.profile._json.pictureUrl = 'PICTURE_URL';
       $u.profile._json.location = { name: 'Warsaw' };
 
-      userRepo.createAccFromLinkedIn(reqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (err, user) {
-        expect(err).to.be(null);
-        expect(user).to.be.a('object');
-        expect(user.profile).to.be.a('object');
-        expect(user.profile.picture).to.be('PICTURE_URL');
-        expect(user.profile.location).to.be('Warsaw');
-        done();
-      });
+      userRepo.createAccFromLinkedIn($u.accessToken, $u.tokenSecret, $u.profile)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.profile).to.be.a('object');
+          expect(user.profile.picture).to.be('PICTURE_URL');
+          expect(user.profile.location).to.be('Warsaw');
+          done();
+        });
     });
 
     it('should properly link linkedin account to the existing local account', function (done) {
@@ -621,25 +593,23 @@ describe('User Repository', function() {
         email: 'test-local2-' + uniqueness + '@puredev.eu',
         password: 'admin1' //:D
       };
-      userRepo.createUser(sampleUser, function (err, user) {
-        var localReqMock = {
-          flash: function () {
-          }, user: user
-        };
-        var $u = createUser();
-        $u.profile.displayName = "Test TW UserName";
+      var $u = createUser();
 
-        userRepo.linkLinkedInProfile(localReqMock, $u.accessToken, $u.tokenSecret, $u.profile, function (liErr, liUser) {
-          expect(liErr).to.be(null);
-          expect(liUser).to.be.a('object');
-          expect(liUser.email).to.be(sampleUser.email);
-          expect(liUser.profile).to.be.a('object');
-          expect(liUser.profile.name).to.be($u.profile.displayName);
-          expect(liUser.tokens).to.be.a('object');
-          expect(liUser.tokens.linkedin).to.be($u.accessToken);
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          $u.profile.displayName = "Test TW UserName";
+
+          return userRepo.linkLinkedInProfile(user.id, $u.accessToken, $u.tokenSecret, $u.profile);
+        })
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.email).to.be(sampleUser.email);
+          expect(user.profile).to.be.a('object');
+          expect(user.profile.name).to.be($u.profile.displayName);
+          expect(user.tokens).to.be.a('object');
+          expect(user.tokens.linkedin).to.be($u.accessToken);
           done();
         });
-      });
     });
   });
 
@@ -655,11 +625,11 @@ describe('User Repository', function() {
         password: 'admin1' //:D
       };
 
-      userRepo.createUser(sampleUser, function (err) {
-        expect(err).to.be(null);
-
-        userRepo.changeUserPswAndResetToken(token, newPassword, function(err2, user) {
-          expect(err2).to.be(null);
+      userRepo.createUser(sampleUser)
+        .then(function() {
+          return userRepo.changeUserPswAndResetToken(token, newPassword);
+        })
+        .then(function(user) {
           expect(user).to.not.be(null);
           expect(user.resetPasswordToken).to.be(null);
           expect(user.resetPasswordExpires).to.be(null);
@@ -669,7 +639,6 @@ describe('User Repository', function() {
             done();
           });
         });
-      });
     });
   });
 
