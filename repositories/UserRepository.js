@@ -17,6 +17,18 @@ function getEmailFromGithubProfile(profile) {
   return email;
 }
 
+function addAvatarToProfile(provider, url, profile) {
+  if(!profile.avatars)
+    profile.avatars = {};
+
+  if(!url || url.length < 1)
+    return;
+
+  profile.avatars[provider] = url;
+  if(!profile.picture)
+    profile.picture = url;
+}
+
 repo.getUserById = function(id) {
   return db.User.findById(id);
 };
@@ -101,7 +113,8 @@ repo.linkFacebookProfile = function(userId, accessToken, refreshToken, profile) 
       user.tokens.facebook = accessToken;
       user.profile.name = user.profile.name || profile.displayName;
       user.profile.gender = user.profile.gender || profile._json.gender;
-      user.profile.picture = user.profile.picture || 'https://graph.facebook.com/' + profileId + '/picture?type=large';
+      addAvatarToProfile('facebook', 'https://graph.facebook.com/' + profileId + '/picture?type=large', user.profile);
+      //user.profile.picture = user.profile.picture || 'https://graph.facebook.com/' + profileId + '/picture?type=large';
       user.set('tokens', user.tokens);
       user.set('profile', user.profile);
 
@@ -160,7 +173,8 @@ repo.linkGithubProfile = function(userId, accessToken, tokenSecret, profile) {
       if(!user.profile) user.profile = {};
       user.tokens.github = accessToken;
       user.profile.name = user.profile.name || profile.displayName;
-      user.profile.picture = user.profile.picture || profile._json.avatar_url;
+      addAvatarToProfile('github', profile._json.avatar_url, user.profile);
+      // user.profile.picture = user.profile.picture || profile._json.avatar_url;
       user.profile.location = user.profile.location || profile._json.location;
       user.profile.website = user.profile.website || profile._json.blog;
       user.set('tokens', user.tokens);
@@ -223,7 +237,8 @@ repo.linkTwitterProfile = function(userId, accessToken, tokenSecret, profile) {
       user.tokens.twitterSecret = tokenSecret;
       user.profile.name = user.profile.name || profile.displayName;
       user.profile.location = user.profile.location || profile._json.location;
-      user.profile.picture = user.profile.picture || profile._json.profile_image_url_https;
+      addAvatarToProfile('twitter', profile._json.profile_image_url_https, user.profile);
+      // user.profile.picture = user.profile.picture || profile._json.profile_image_url_https;
       user.set('tokens', user.tokens);
       user.set('profile', user.profile);
 
@@ -268,7 +283,8 @@ repo.linkGoogleProfile = function(userId, accessToken, tokenSecret, profile) {
       user.tokens.google = accessToken;
       user.profile.name = user.profile.name || profile.displayName;
       user.profile.gender = user.profile.gender || profile.gender;
-      user.profile.picture = user.profile.picture || (profile._json.image ? profile._json.image.url : '');
+      addAvatarToProfile('google', (profile._json.image ? profile._json.image.url : ''), user.profile);
+      // user.profile.picture = user.profile.picture || (profile._json.image ? profile._json.image.url : '');
       user.set('tokens', user.tokens);
       user.set('profile', user.profile);
 
@@ -300,7 +316,6 @@ repo.createAccFromGoogle = function(accessToken, tokenSecret, profile) {
     });
 };
 
-
 /**
  * LinkedIn
  */
@@ -319,7 +334,8 @@ repo.linkLinkedInProfile = function(userId, accessToken, tokenSecret, profile) {
       user.tokens.linkedin = accessToken;
       user.profile.name = user.profile.name || profile.displayName;
       user.profile.location = user.profile.location || (profile._json.location) ? profile._json.location.name : '';
-      user.profile.picture = user.profile.picture || profile._json.pictureUrl;
+      // user.profile.picture = user.profile.picture || profile._json.pictureUrl;
+      addAvatarToProfile('linkedin', profile._json.pictureUrl, user.profile);
       user.profile.website = user.profile.website || profile._json.publicProfileUrl;
       user.set('tokens', user.tokens);
       user.set('profile', user.profile);
