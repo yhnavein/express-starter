@@ -109,7 +109,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use(lusca({
-  csrf: true,
+  csrf: { angular: true },
+  //csrf: true,
   xframe: 'SAMEORIGIN',
   xssProtection: true
 }));
@@ -119,6 +120,10 @@ app.use(function(req, res, next) {
 });
 app.use(function(req, res, next) {
   if (/api/i.test(req.path)) req.session.returnTo = req.path;
+  next();
+});
+app.use(function(req, res, next) {
+  res.cookie('XSRF-TOKEN', res.locals._csrf, {httpOnly: false});
   next();
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
@@ -142,7 +147,7 @@ app.post('/contact', contactController.postContact);
 app.get('/account', passportConf.isAuthenticated, userController.getAccount);
 app.post('/account/profile', passportConf.isAuthenticated, userController.postUpdateProfile);
 app.post('/account/password', passportConf.isAuthenticated, userController.postUpdatePassword);
-app.post('/account/delete', passportConf.isAuthenticated, userController.postDeleteAccount);
+app.delete('/account', passportConf.isAuthenticated, userController.deleteAccount);
 app.get('/account/unlink/:provider', passportConf.isAuthenticated, userController.getOauthUnlink);
 
 /**

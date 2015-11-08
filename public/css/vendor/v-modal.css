@@ -1,0 +1,239 @@
+/**
+ * vModal - Simple, flexible and beautiful modal dialogs in AngularJS
+ * @version v1.3.4
+ * @link http://lukaszwatroba.github.io/v-modal
+ * @author Łukasz Wątroba <l@lukaszwatroba.com>
+ * @license MIT License, http://www.opensource.org/licenses/MIT
+ */
+
+/***************************************
+  vModal
+ ***************************************/
+/**
+ * Example HTML:
+ *
+  <v-modal class="vModal--default" close="[ctrl method]">
+    <v-dialog role="dialog" fit middle>
+      <button aria-label="close" v-close></button>
+      [content]
+    </v-dialog>
+  </v-modal>
+ */
+/* Base
+ ***************************************/
+v-modal {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  position: fixed;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px; }
+  v-modal v-close {
+    position: absolute;
+    top: 0;
+    right: 0; }
+
+v-dialog {
+  -webkit-align-self: flex-start;
+      -ms-flex-item-align: start;
+          align-self: flex-start;
+  display: block;
+  position: relative;
+  pointer-events: auto;
+  background: white;
+  z-index: 0;
+  min-width: 240px;
+  outline: 0; }
+  v-dialog:focus {
+    outline: 0; }
+
+v-dialog[middle] {
+  -webkit-align-self: center;
+      -ms-flex-item-align: center;
+          align-self: center;
+  max-height: 100%;
+  overflow-y: auto; }
+
+v-dialog[fit] {
+  width: 100%; }
+
+v-dialog[small] {
+  max-width: 380px; }
+  @media (min-width: 380px) {
+    v-dialog[small] {
+      min-width: 380px; } }
+
+v-dialog[medium] {
+  max-width: 640px; }
+  @media (min-width: 640px) {
+    v-dialog[medium] {
+      min-width: 640px; } }
+
+v-dialog[large] {
+  max-width: 860px; }
+  @media (min-width: 860px) {
+    v-dialog[large] {
+      min-width: 860px; } }
+
+v-close {
+  display: inline-block;
+  z-index: 10;
+  cursor: pointer;
+  outline: 0;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none; }
+  v-close:hover, v-close:focus {
+    outline: 0; }
+
+[v-modal-open] {
+  overflow: hidden; }
+
+/* Theme: default
+   ***************************************/
+.vModal--default {
+  will-change: opacity;
+  -webkit-transition: opacity 0.375s;
+          transition: opacity 0.375s; }
+  .vModal--default v-dialog {
+    will-change: transform;
+    padding: 20px;
+    border-radius: 2px;
+    -webkit-animation: vDialog-enterDown 0.75s;
+            animation: vDialog-enterDown 0.75s; }
+  .vModal--default v-dialog[middle] {
+    -webkit-animation: vDialog-enterZoom 0.5625s;
+            animation: vDialog-enterZoom 0.5625s; }
+  .vModal--default v-close {
+    width: 40px;
+    height: 40px; }
+    .vModal--default v-close::after, .vModal--default v-close::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      height: 1px;
+      width: 16px;
+      -webkit-transform-origin: 50% 50%;
+          -ms-transform-origin: 50% 50%;
+              transform-origin: 50% 50%; }
+    .vModal--default v-close::before {
+      -webkit-transform: rotate(-45deg);
+          -ms-transform: rotate(-45deg);
+              transform: rotate(-45deg); }
+    .vModal--default v-close::after {
+      -webkit-transform: rotate(45deg);
+          -ms-transform: rotate(45deg);
+              transform: rotate(45deg); }
+    .vModal--default v-close::after, .vModal--default v-close::before {
+      background-color: #2196F3;
+      -webkit-transition: background-color 0.25s;
+              transition: background-color 0.25s; }
+    .vModal--default v-close:hover::after, .vModal--default v-close:hover::before, .vModal--default v-close:focus::after, .vModal--default v-close:focus::before {
+      background-color: #F44336; }
+  .vModal--default.ng-enter {
+    opacity: 0; }
+  .vModal--default.ng-enter-active {
+    opacity: 1; }
+  .vModal--default.ng-leave {
+    opacity: 1; }
+  .vModal--default.ng-leave-active {
+    opacity: 0; }
+
+/* Theme: default (animations) */
+@-webkit-keyframes vDialog-enterDown {
+  0%, 60%, 75%, 90%, 100% {
+    -webkit-transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+            transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+
+  0% {
+    -webkit-transform: translate3d(0, -3000px, 0);
+            transform: translate3d(0, -3000px, 0); }
+
+  60% {
+    -webkit-transform: translate3d(0, 25px, 0);
+            transform: translate3d(0, 25px, 0); }
+
+  75% {
+    -webkit-transform: translate3d(0, -10px, 0);
+            transform: translate3d(0, -10px, 0); }
+
+  90% {
+    -webkit-transform: translate3d(0, 5px, 0);
+            transform: translate3d(0, 5px, 0); }
+
+  100% {
+    -webkit-transform: none;
+            transform: none; } }
+@keyframes vDialog-enterDown {
+  0%, 60%, 75%, 90%, 100% {
+    -webkit-transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+            transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+
+  0% {
+    -webkit-transform: translate3d(0, -3000px, 0);
+            transform: translate3d(0, -3000px, 0); }
+
+  60% {
+    -webkit-transform: translate3d(0, 25px, 0);
+            transform: translate3d(0, 25px, 0); }
+
+  75% {
+    -webkit-transform: translate3d(0, -10px, 0);
+            transform: translate3d(0, -10px, 0); }
+
+  90% {
+    -webkit-transform: translate3d(0, 5px, 0);
+            transform: translate3d(0, 5px, 0); }
+
+  100% {
+    -webkit-transform: none;
+            transform: none; } }
+
+@-webkit-keyframes vDialog-enterZoom {
+  0%, 60%, 100% {
+    -webkit-transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+            transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+
+  0% {
+    -webkit-transform: scale3d(.3, .3, .3);
+            transform: scale3d(.3, .3, .3); }
+
+  60% {
+    -webkit-transform: scale3d(1.05, 1.05, 1.05);
+            transform: scale3d(1.05, 1.05, 1.05); }
+
+  100% {
+    -webkit-transform: scale3d(1, 1, 1);
+            transform: scale3d(1, 1, 1); } }
+
+@keyframes vDialog-enterZoom {
+  0%, 60%, 100% {
+    -webkit-transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+            transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+
+  0% {
+    -webkit-transform: scale3d(.3, .3, .3);
+            transform: scale3d(.3, .3, .3); }
+
+  60% {
+    -webkit-transform: scale3d(1.05, 1.05, 1.05);
+            transform: scale3d(1.05, 1.05, 1.05); }
+
+  100% {
+    -webkit-transform: scale3d(1, 1, 1);
+            transform: scale3d(1, 1, 1); } }

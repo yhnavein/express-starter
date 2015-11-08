@@ -11,10 +11,42 @@ app.controller('UserSignUpCtrl', ['$rootScope', '$scope', '$routeParams', '$loca
 
 }]);
 
-app.controller('UserProfileCtrl', ['$rootScope', '$scope', '$routeParams', '$location',
-	function($rootScope, $scope, $routeParams, $location) {
+app.service('UserService', ['$http', function ($http) {
+	return {
+		removeAccount: function() {
+			$http({ method: 'DELETE', url: '/account' })
+				.success(function () {
+					window.location = '/';
+				}).error(function (data) {
+					console.log('Error occured', data);
+				});
+		}
+	};
+}]);
+
+app.factory('accRemovalModal', function (vModal) {
+  return vModal({
+    controller: 'ConfirmAccRemovalCtrl',
+    controllerAs: 'ctrl',
+    templateUrl: '/views/confirm-acc-removal.html'
+  });
+});
+
+app.controller('ConfirmAccRemovalCtrl', function (accRemovalModal, UserService) {
+  this.close = accRemovalModal.deactivate;
+
+  this.removeAccount = function() {
+  	UserService.removeAccount();
+  };
+});
+
+app.controller('UserProfileCtrl', ['$rootScope', '$scope', '$routeParams', 'accRemovalModal',
+	function($rootScope, $scope, $routeParams, modal) {
 		$scope.pswChange = {};
 
+		$scope.deactivateAccount = function() {
+			modal.activate();
+		};
 }]);
 
 app.controller('UserForgetPswCtrl', ['$rootScope', '$scope', '$routeParams', '$location',

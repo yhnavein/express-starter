@@ -1,0 +1,16 @@
+<v-modal class="vModal--default" onclose="ctrl.close()">
+  <v-dialog heading="My modal" medium middle>
+    <v-close label="Close"></v-close>
+
+    <h1>Confirm your action</h1>
+
+    <p>This action is <strong>irreversible</strong>! Do you really want to proceed?</p>
+    <hr>
+
+    <button class="btn btn-danger" ng-click="ctrl.removeAccount()">
+	    <i class="fa fa-trash"></i>
+    	Remove the account
+    </button>
+    <button class="btn btn-default pull-right" ng-click="ctrl.close()">Cancel</button>
+  </v-dialog>
+</v-modal>

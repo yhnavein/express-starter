@@ -178,16 +178,16 @@ exports.postUpdatePassword = function(req, res, next) {
 };
 
 /**
- * POST /account/delete
+ * DELETE /account
  * Delete user account.
  */
-exports.postDeleteAccount = function(req, res, next) {
+exports.deleteAccount = function(req, res, next) {
   db.User
     .destroy({ where: { id: req.user.id } })
     .then(function() {
       req.logout();
       req.flash('info', { msg: 'Your account has been deleted.' });
-      res.redirect('/');
+      res.json({ success: true });
     });
 };
 

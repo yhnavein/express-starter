@@ -134,10 +134,9 @@
         <h3>Delete Account</h3>
       </div>
       <p>You can delete your account, but keep in mind this action is irreversible.</p>
-      <form action="/account/delete" method="POST">
-        <input type="hidden" name="_csrf" value="<%= _csrf %>"/>
-        <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i>Delete my account</button>
-      </form>
+      <button class="btn btn-danger" ng-click="deactivateAccount()">
+        <i class="fa fa-trash"></i> Delete my account
+      </button>
     </div>
   </div>
 </div>
