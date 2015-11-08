@@ -117,9 +117,8 @@ repo.createAccFromFacebook = function(accessToken, refreshToken, profile) {
 
   return db.User.findOne({ where: { facebookId: profileId } })
     .then(function(existingUser) {
-      if (existingUser) {
-        return Promise.resolve(existingUser);
-      }
+      if (existingUser)
+        return existingUser;
 
       return db.User.findOne({ where: { email: profile._json.email } })
         .then(function(emailUser) {
@@ -150,9 +149,9 @@ repo.linkGithubProfile = function(userId, accessToken, tokenSecret, profile) {
 
   return db.User.findOne({ where: { githubId: profileId } })
     .then(function(existingUser) {
-      if (existingUser) {
+      if (existingUser)
         throw 'There is already a GitHub account that belongs to you. Sign in with that account or delete it, then link it with your current account.';
-      }
+
       return db.User.findById(userId);
     })
     .then(function(user) {
@@ -181,7 +180,7 @@ repo.createAccFromGithub = function(accessToken, tokenSecret, profile) {
   return db.User.findOne({ where: { githubId: profileId } })
     .then(function(existingUser) {
       if (existingUser)
-        return Promise.resolve(existingUser);
+        return existingUser;
 
       return db.User.findOne({ where: { email: email } })
         .then(function(emailUser) {
@@ -236,7 +235,7 @@ repo.createAccFromTwitter = function(accessToken, tokenSecret, profile) {
   return db.User.findOne({ where: { twitterId: profile.id.toString() } })
     .then(function(existingUser) {
       if (existingUser)
-        return Promise.resolve(existingUser);
+        return existingUser;
 
       var user = db.User.build({ twitterId: profile.id.toString() });
       user.email = profile.username + "@twitter.com";
@@ -281,7 +280,7 @@ repo.createAccFromGoogle = function(accessToken, tokenSecret, profile) {
   return db.User.findOne({ where: { googleId: profile.id.toString() } })
     .then(function(existingUser) {
       if (existingUser)
-        return Promise.resolve(existingUser);
+        return existingUser;
 
       return db.User.findOne({ where: { email: profile.emails[0].value } })
         .then(function(existingEmailUser) {
@@ -333,7 +332,7 @@ repo.createAccFromLinkedIn = function(accessToken, tokenSecret, profile) {
   return db.User.findOne({ where: { linkedInId: profile.id.toString() } })
     .then(function(existingUser) {
       if (existingUser)
-        return Promise.resolve(existingUser);
+        return existingUser;
 
       return db.User.findOne({ where: { email: profile._json.emailAddress } })
         .then(function(existingEmailUser) {

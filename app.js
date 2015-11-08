@@ -2,7 +2,7 @@
 /**
  * Module dependencies.
  */
-var toobusy = require('toobusy-js');
+// var toobusy = require('toobusy-js');
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var compress = require('compression');
@@ -16,6 +16,7 @@ var lusca = require('lusca');
 var methodOverride = require('method-override');
 var multer = require('multer');
 var ejsEngine = require('ejs-mate');
+var Promise = require('bluebird');
 
 //var MySQLStore = require('connect-mysql')({ session: session });
 var flash = require('express-flash');
@@ -72,6 +73,8 @@ app.use(multer({ dest: path.join(__dirname, 'uploads') }).single());
 app.use(expressValidator());
 app.use(methodOverride());
 app.use(cookieParser());
+
+Promise.longStackTraces();
 
 var db = require('./models/sequelize');
 

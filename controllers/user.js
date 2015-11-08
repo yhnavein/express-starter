@@ -89,10 +89,8 @@ exports.postSignup = function(req, res, next) {
 
   db.User.findOne({ where: { email: req.body.email } })
     .then(function(existingUser) {
-      if (existingUser) {
-        req.flash('errors', { msg: 'Account with that email address already exists.' });
-        return res.redirect('/login');
-      }
+      if (existingUser)
+        throw 'Account with that email address already exists.';
 
       return db.User.create({
         email: req.body.email,
@@ -109,7 +107,9 @@ exports.postSignup = function(req, res, next) {
       });
     })
     .catch(function(err) {
-      return next(err);
+      req.flash('errors', { msg: err });
+      return res.redirect('/login');
+      //return next(err);
     });
 };
 
