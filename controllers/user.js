@@ -123,11 +123,17 @@ exports.getAccount = function(req, res) {
   });
 };
 
+function checkEmailAddressAvailability(email) {
+  return db.User.findOne({ where: { email: email } });
+}
+
 /**
  * POST /account/profile
  * Update profile information.
  */
-exports.postUpdateProfile = function(req, res, next) {
+exports.postUpdateProfile = function(req, res) {
+  req.assert('email', 'Email is not valid').isEmail();
+
   db.User.findById(req.user.id)
     .then(function(user) {
       user.email = req.body.email || '';
@@ -137,7 +143,15 @@ exports.postUpdateProfile = function(req, res, next) {
       user.profile.website = req.body.website || '';
       user.set('profile', user.profile);
 
-      console.log('changed', user.changed('profile'));
+      if(user.changed('email')) {
+        return checkEmailAddressAvailability(user.email)
+          .then(function(emailUser) {
+            if(emailUser)
+              throw 'Cannot change e-mail address, because address ' + user.email + ' already exists';
+
+            return user.save();
+          });
+      }
       return user.save();
     })
     .then(function() {
@@ -145,7 +159,8 @@ exports.postUpdateProfile = function(req, res, next) {
       res.redirect('/account');
     })
     .catch(function(err) {
-      return next(err);
+      req.flash('errors', { msg: err });
+      res.redirect('/account');
     });
 };
 
@@ -174,14 +189,17 @@ exports.postUpdatePassword = function(req, res, next) {
       req.flash('success', { msg: 'Password has been changed.' });
       res.redirect('/account');
     })
-    .catch(function(err) { return next(err); });
+    .catch(function(err) {
+      req.flash('errors', { msg: err });
+      res.redirect('/account');
+    });
 };
 
 /**
  * DELETE /account
  * Delete user account.
  */
-exports.deleteAccount = function(req, res, next) {
+exports.deleteAccount = function(req, res) {
   db.User
     .destroy({ where: { id: req.user.id } })
     .then(function() {
@@ -219,16 +237,15 @@ exports.getReset = function(req, res) {
   db.User
     .findOne({ where: { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: new Date() } } })
     .then(function(user) {
-      if(!user) {
-        req.flash('errors', { msg: 'Password reset request is invalid or has expired.' });
-        return res.redirect('/forgot');
-      }
+      if(!user)
+        throw 'Password reset request is invalid or has expired.';
+
       res.render('account/reset', {
         title: 'Password Reset'
       });
     })
     .catch(function(err) {
-      req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
+      req.flash('errors', { msg: err });
       return res.redirect('/forgot');
     });
 };
