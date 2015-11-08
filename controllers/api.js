@@ -534,7 +534,7 @@ exports.getPayPal = function(req, res, next) {
       cancel_url: secrets.paypal.cancelUrl
     },
     transactions: [{
-      description: 'Hackathon Starter',
+      description: 'Express Starter',
       amount: {
         currency: 'USD',
         total: '1.99'
@@ -549,7 +549,9 @@ exports.getPayPal = function(req, res, next) {
     for (var i = 0; i < links.length; i++) {
       if (links[i].rel === 'approval_url') {
         res.render('api/paypal', {
-          approvalUrl: links[i].href
+          approvalUrl: links[i].href,
+          result: null,
+          title: 'PayPal API'
         });
       }
     }
@@ -567,12 +569,14 @@ exports.getPayPalSuccess = function(req, res) {
     if (err) {
       res.render('api/paypal', {
         result: true,
-        success: false
+        success: false,
+        title: 'PayPal API'
       });
     } else {
       res.render('api/paypal', {
         result: true,
-        success: true
+        success: true,
+        title: 'PayPal API'
       });
     }
   });
