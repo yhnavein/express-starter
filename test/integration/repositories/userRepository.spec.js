@@ -1,7 +1,7 @@
 'use strict';
 
 var expect = require('expect.js');
-var userRepo = require('../../repositories/UserRepository');
+var userRepo = require('../../../repositories/UserRepository');
 var bcrypt = require('bcrypt-nodejs');
 
 describe('User Repository', function() {
