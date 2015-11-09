@@ -17,9 +17,7 @@ With this boilerplate you can start a brand new application using **node.js** wi
 
 Take a look on the [Features](#features) section to see what's already done for you!
 
-<h4 align="center">Modern Theme</h4>
-
-![](https://lh6.googleusercontent.com/-KQTmCFNK6MM/U7OZpznjDuI/AAAAAAAAERc/h3jR27Uy1lE/w1366-h1006-no/Screenshot+2014-07-02+01.32.22.png)
+![](https://cloud.githubusercontent.com/assets/516709/11047844/c489c3d2-8734-11e5-92b7-d73b7d39c304.png)
 
 Table of Contents
 -----------------
