@@ -36,6 +36,9 @@ repo.getUserById = function(id) {
 repo.createUser = function(user) {
   var dbUser = db.User.build(user);
 
+  dbUser.set('tokens', {});
+  dbUser.set('profile', {});
+
   return dbUser.save();
 };
 
