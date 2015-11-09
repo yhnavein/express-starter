@@ -52,6 +52,29 @@ repo.assignResetPswToken = function(email, token) {
     });
 };
 
+repo.changeProfileData = function(userId, reqBody) {
+  return db.User.findById(userId)
+    .then(function(user) {
+      user.email = reqBody.email || '';
+      user.profile.name = reqBody.name || '';
+      user.profile.gender = reqBody.gender || '';
+      user.profile.location = reqBody.location || '';
+      user.profile.website = reqBody.website || '';
+      user.set('profile', user.profile);
+
+      if(user.changed('email')) {
+        return db.User.count({ where: { email: user.email } })
+          .then(function(c) {
+            if(c > 0)
+              throw 'Cannot change e-mail address, because address ' + user.email + ' already exists';
+
+            return user.save();
+          });
+      }
+      return user.save();
+    });
+};
+
 repo.changeUserPswAndResetToken = function(token, newPassword) {
   if(!token || token.length < 1)
     throw 'Token cannot be empty!';
@@ -114,7 +137,6 @@ repo.linkFacebookProfile = function(userId, accessToken, refreshToken, profile) 
       user.profile.name = user.profile.name || profile.displayName;
       user.profile.gender = user.profile.gender || profile._json.gender;
       addAvatarToProfile('facebook', 'https://graph.facebook.com/' + profileId + '/picture?type=large', user.profile);
-      //user.profile.picture = user.profile.picture || 'https://graph.facebook.com/' + profileId + '/picture?type=large';
       user.set('tokens', user.tokens);
       user.set('profile', user.profile);
 
@@ -135,19 +157,17 @@ repo.createAccFromFacebook = function(accessToken, refreshToken, profile) {
 
       return db.User.findOne({ where: { email: profile._json.email } })
         .then(function(emailUser) {
-          if (emailUser) {
+          if (emailUser)
             throw 'There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings.';
-          }
 
-          console.log('Facebook Profile', profile);
           var user = db.User.build({ facebookId: profileId });
           user.email = profile._json.email || ( profileId + '@facebook.com' );
           user.tokens = { facebook: accessToken };
           user.profile = {
             name: profile.displayName,
-            gender: profile.gender,
-            picture: 'https://graph.facebook.com/' + profileId + '/picture?type=large'
+            gender: profile.gender
           };
+          addAvatarToProfile('facebook', 'https://graph.facebook.com/' + profileId + '/picture?type=large', user.profile);
           return user.save();
         });
     });
@@ -173,10 +193,9 @@ repo.linkGithubProfile = function(userId, accessToken, tokenSecret, profile) {
       if(!user.profile) user.profile = {};
       user.tokens.github = accessToken;
       user.profile.name = user.profile.name || profile.displayName;
-      addAvatarToProfile('github', profile._json.avatar_url, user.profile);
-      // user.profile.picture = user.profile.picture || profile._json.avatar_url;
       user.profile.location = user.profile.location || profile._json.location;
       user.profile.website = user.profile.website || profile._json.blog;
+      addAvatarToProfile('github', profile._json.avatar_url, user.profile);
       user.set('tokens', user.tokens);
       user.set('profile', user.profile);
 
@@ -198,25 +217,22 @@ repo.createAccFromGithub = function(accessToken, tokenSecret, profile) {
 
       return db.User.findOne({ where: { email: email } })
         .then(function(emailUser) {
-          if (emailUser) {
+          if (emailUser)
             throw 'There is already an account using this email address. Sign in to that account and link it with GitHub manually from Account Settings.';
-          }
 
-          console.log(profile);
           var user = db.User.build({ githubId: profileId });
           user.email = email;
           user.tokens = { github: accessToken };
           user.profile = {
             name: profile.displayName,
-            picture: profile._json.avatar_url,
             location: profile._json.location,
             website: profile._json.blog
           };
+          addAvatarToProfile('github', profile._json.avatar_url, user.profile);
           return user.save();
         });
     });
 };
-
 
 /**
  * Twitter
@@ -238,7 +254,6 @@ repo.linkTwitterProfile = function(userId, accessToken, tokenSecret, profile) {
       user.profile.name = user.profile.name || profile.displayName;
       user.profile.location = user.profile.location || profile._json.location;
       addAvatarToProfile('twitter', profile._json.profile_image_url_https, user.profile);
-      // user.profile.picture = user.profile.picture || profile._json.profile_image_url_https;
       user.set('tokens', user.tokens);
       user.set('profile', user.profile);
 
@@ -257,9 +272,9 @@ repo.createAccFromTwitter = function(accessToken, tokenSecret, profile) {
       user.tokens = { twitter: accessToken, twitterSecret: tokenSecret };
       user.profile = {
         name: profile.displayName,
-        picture: profile._json.profile_image_url_https,
         location: profile._json.location
       };
+      addAvatarToProfile('twitter', profile._json.profile_image_url_https, user.profile);
       return user.save();
     });
 };
@@ -284,7 +299,6 @@ repo.linkGoogleProfile = function(userId, accessToken, tokenSecret, profile) {
       user.profile.name = user.profile.name || profile.displayName;
       user.profile.gender = user.profile.gender || profile.gender;
       addAvatarToProfile('google', (profile._json.image ? profile._json.image.url : ''), user.profile);
-      // user.profile.picture = user.profile.picture || (profile._json.image ? profile._json.image.url : '');
       user.set('tokens', user.tokens);
       user.set('profile', user.profile);
 
@@ -308,9 +322,9 @@ repo.createAccFromGoogle = function(accessToken, tokenSecret, profile) {
           user.tokens = { google: accessToken };
           user.profile = {
             name: profile.displayName,
-            gender: profile.gender,
-            picture: (profile._json.image ? profile._json.image.url : '')
+            gender: profile.gender
           };
+          addAvatarToProfile('google', (profile._json.image ? profile._json.image.url : ''), user.profile);
           return user.save();
         });
     });
@@ -334,7 +348,6 @@ repo.linkLinkedInProfile = function(userId, accessToken, tokenSecret, profile) {
       user.tokens.linkedin = accessToken;
       user.profile.name = user.profile.name || profile.displayName;
       user.profile.location = user.profile.location || (profile._json.location) ? profile._json.location.name : '';
-      // user.profile.picture = user.profile.picture || profile._json.pictureUrl;
       addAvatarToProfile('linkedin', profile._json.pictureUrl, user.profile);
       user.profile.website = user.profile.website || profile._json.publicProfileUrl;
       user.set('tokens', user.tokens);
@@ -361,9 +374,9 @@ repo.createAccFromLinkedIn = function(accessToken, tokenSecret, profile) {
           user.profile = {
             name: profile.displayName,
             location: (profile._json.location) ? profile._json.location.name : '',
-            picture: profile._json.pictureUrl,
             website: profile._json.publicProfileUrl
           };
+          addAvatarToProfile('linkedin', profile._json.pictureUrl, user.profile);
           return user.save();
         });
     });

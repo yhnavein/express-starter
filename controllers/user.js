@@ -123,10 +123,6 @@ exports.getAccount = function(req, res) {
   });
 };
 
-function checkEmailAddressAvailability(email) {
-  return db.User.findOne({ where: { email: email } });
-}
-
 /**
  * POST /account/profile
  * Update profile information.
@@ -134,26 +130,7 @@ function checkEmailAddressAvailability(email) {
 exports.postUpdateProfile = function(req, res) {
   req.assert('email', 'Email is not valid').isEmail();
 
-  db.User.findById(req.user.id)
-    .then(function(user) {
-      user.email = req.body.email || '';
-      user.profile.name = req.body.name || '';
-      user.profile.gender = req.body.gender || '';
-      user.profile.location = req.body.location || '';
-      user.profile.website = req.body.website || '';
-      user.set('profile', user.profile);
-
-      if(user.changed('email')) {
-        return checkEmailAddressAvailability(user.email)
-          .then(function(emailUser) {
-            if(emailUser)
-              throw 'Cannot change e-mail address, because address ' + user.email + ' already exists';
-
-            return user.save();
-          });
-      }
-      return user.save();
-    })
+  UserRepo.changeProfileData(req.user.id, req.body)
     .then(function() {
       req.flash('success', { msg: 'Profile information updated.' });
       res.redirect('/account');

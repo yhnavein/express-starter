@@ -27,6 +27,69 @@ describe('User Repository', function() {
       });
   });
 
+  it('should successfully change profile data', function (done) {
+    var uniqueness = Date.now();
+    var sampleUser = {
+      email: 'test-local-' + uniqueness + '@puredev.eu',
+      password: 'admin1' //:D
+    };
+
+    var newProfile = {
+      email: sampleUser.email,
+      name: 'Test name',
+      gender: 'male',
+      location: 'Helsinki',
+      website: 'http://microsoft.com',
+    };
+
+    userRepo.createUser(sampleUser)
+      .then(function(user) {
+        expect(user.email).to.be(sampleUser.email);
+
+        return userRepo.changeProfileData(user.id, newProfile);
+      })
+      .then(function(user) {
+        expect(user.email).to.be(newProfile.email);
+        expect(user.profile.name).to.be(newProfile.name);
+        expect(user.profile.gender).to.be(newProfile.gender);
+        expect(user.profile.location).to.be(newProfile.location);
+        expect(user.profile.website).to.be(newProfile.website);
+
+        done();
+      })
+      .catch(function() {
+        expect().fail('It should not happen');
+        done();
+      });
+  });
+
+  it('should successfully change e-mail to the different one', function (done) {
+    var uniqueness = Date.now();
+    var sampleUser = {
+      email: 'test-local-' + uniqueness + '@puredev.eu',
+      password: 'admin1' //:D
+    };
+
+    var newProfile = {
+      email: 'new-test-local-' + uniqueness + '@puredev.eu',
+    };
+
+    userRepo.createUser(sampleUser)
+      .then(function(user) {
+        expect(user.email).to.be(sampleUser.email);
+
+        return userRepo.changeProfileData(user.id, newProfile);
+      })
+      .then(function(user) {
+        expect(user.email).to.be(newProfile.email);
+        done();
+      })
+      .catch(function() {
+        expect().fail('It should not happen');
+        done();
+      });
+  });
+
   describe('Facebook OAuth', function() {
     function createUser() {
       var uniqueness = Date.now();
