@@ -6,88 +6,141 @@ var bcrypt = require('bcrypt-nodejs');
 
 describe('User Repository', function() {
 
-  it('should create properly a local account', function (done) {
-    var uniqueness = Date.now();
-    var sampleUser = {
-      email: 'test-local-' + uniqueness + '@puredev.eu',
-      password: 'admin1' //:D
-    };
+  describe('Basic Stuff', function() {
+    it('should create properly a local account', function (done) {
+      var uniqueness = Date.now();
+      var sampleUser = {
+        email: 'test-local-' + uniqueness + '@puredev.eu',
+        password: 'admin1' //:D
+      };
 
-    userRepo.createUser(sampleUser)
-      .then(function(user) {
-        expect(user).to.be.a('object');
-        expect(user.password).to.not.be(null);
-        expect(user.password).to.not.be(sampleUser.password); //silly check if psw has been hashed
-        expect(user.email).to.be(sampleUser.email);
-        done();
-      })
-      .catch(function() {
-        expect().fail('It should not happen');
-        done();
-      });
-  });
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.password).to.not.be(null);
+          expect(user.email).to.be(sampleUser.email);
 
-  it('should successfully change profile data', function (done) {
-    var uniqueness = Date.now();
-    var sampleUser = {
-      email: 'test-local-' + uniqueness + '@puredev.eu',
-      password: 'admin1' //:D
-    };
+          bcrypt.compare(sampleUser.password, user.password, function(err, res) {
+            expect(res).to.be(true);
+            done();
+          });
+        })
+        .catch(function() {
+          expect().fail('It should not happen');
+          done();
+        });
+    });
 
-    var newProfile = {
-      email: sampleUser.email,
-      name: 'Test name',
-      gender: 'male',
-      location: 'Helsinki',
-      website: 'http://microsoft.com',
-    };
+    it('should properly change password in DB', function (done) {
+      var uniqueness = Date.now();
+      var sampleUser = {
+        email: 'test-local-' + uniqueness + '@puredev.eu',
+        password: 'admin1' //:D
+      };
+      var newPassword = 'admin2';
 
-    userRepo.createUser(sampleUser)
-      .then(function(user) {
-        expect(user.email).to.be(sampleUser.email);
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          return userRepo.changeUserPassword(user.id, newPassword);
+        })
+        .then(function(user) {
+          expect(user).to.be.a('object');
+          expect(user.password).to.not.be(null);
 
-        return userRepo.changeProfileData(user.id, newProfile);
-      })
-      .then(function(user) {
-        expect(user.email).to.be(newProfile.email);
-        expect(user.profile.name).to.be(newProfile.name);
-        expect(user.profile.gender).to.be(newProfile.gender);
-        expect(user.profile.location).to.be(newProfile.location);
-        expect(user.profile.website).to.be(newProfile.website);
+          bcrypt.compare(newPassword, user.password, function(err, res) {
+            expect(res).to.be(true);
+            done();
+          });
+        })
+        .catch(function() {
+          expect().fail('It should not happen');
+          done();
+        });
+    });
 
-        done();
-      })
-      .catch(function() {
-        expect().fail('It should not happen');
-        done();
-      });
-  });
+    it('should handle properly creation of account with an existing email', function (done) {
+      var uniqueness = Date.now();
+      var sampleUser = {
+        email: 'test-l1-' + uniqueness + '@puredev.eu',
+        password: 'admin1' //:D
+      };
 
-  it('should successfully change e-mail to the different one', function (done) {
-    var uniqueness = Date.now();
-    var sampleUser = {
-      email: 'test-local-' + uniqueness + '@puredev.eu',
-      password: 'admin1' //:D
-    };
+      userRepo.createUser(sampleUser)
+        .then(function() {
+          return userRepo.createUser(sampleUser);
+        })
+        .then(function() {
+          expect().fail('It should not happen');
+          done();
+        })
+        .catch(function(err) {
+          expect(err).to.be('Account with that email address already exists.');
+          done();
+        });
+    });
 
-    var newProfile = {
-      email: 'new-test-local-' + uniqueness + '@puredev.eu',
-    };
+    it('should successfully change profile data', function (done) {
+      var uniqueness = Date.now();
+      var sampleUser = {
+        email: 'test-local-' + uniqueness + '@puredev.eu',
+        password: 'admin1' //:D
+      };
 
-    userRepo.createUser(sampleUser)
-      .then(function(user) {
-        expect(user.email).to.be(sampleUser.email);
+      var newProfile = {
+        email: sampleUser.email,
+        name: 'Test name',
+        gender: 'male',
+        location: 'Helsinki',
+        website: 'http://microsoft.com',
+      };
 
-        return userRepo.changeProfileData(user.id, newProfile);
-      })
-      .then(function(user) {
-        expect(user.email).to.be(newProfile.email);
-        done();
-      })
-      .catch(function() {
-        expect().fail('It should not happen');
-        done();
-      });
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          expect(user.email).to.be(sampleUser.email);
+
+          return userRepo.changeProfileData(user.id, newProfile);
+        })
+        .then(function(user) {
+          expect(user.email).to.be(newProfile.email);
+          expect(user.profile.name).to.be(newProfile.name);
+          expect(user.profile.gender).to.be(newProfile.gender);
+          expect(user.profile.location).to.be(newProfile.location);
+          expect(user.profile.website).to.be(newProfile.website);
+
+          done();
+        })
+        .catch(function() {
+          expect().fail('It should not happen');
+          done();
+        });
+    });
+
+    it('should successfully change e-mail to the different one', function (done) {
+      var uniqueness = Date.now();
+      var sampleUser = {
+        email: 'test-local-' + uniqueness + '@puredev.eu',
+        password: 'admin1' //:D
+      };
+
+      var newProfile = {
+        email: 'new-test-local-' + uniqueness + '@puredev.eu',
+      };
+
+      userRepo.createUser(sampleUser)
+        .then(function(user) {
+          expect(user.email).to.be(sampleUser.email);
+
+          return userRepo.changeProfileData(user.id, newProfile);
+        })
+        .then(function(user) {
+          expect(user.email).to.be(newProfile.email);
+          done();
+        })
+        .catch(function() {
+          expect().fail('It should not happen');
+          done();
+        });
+    });
   });
 
   describe('Facebook OAuth', function() {
@@ -667,7 +720,7 @@ describe('User Repository', function() {
   });
 
   describe('Reset Password Functionality', function() {
-    it('should remove token after assigning new password', function(done) {
+    it('should password be changed properly', function(done) {
       var uniqueness = Date.now();
       var newPassword = 'admin2';
       var token = 'abcdef0123456789' + uniqueness;
@@ -687,8 +740,8 @@ describe('User Repository', function() {
           expect(user.resetPasswordToken).to.be(null);
           expect(user.resetPasswordExpires).to.be(null);
 
-          bcrypt.compare(newPassword, user.password, function(err3, res) {
-            expect(res).to.not.be(null);
+          bcrypt.compare(newPassword, user.password, function(err, res) {
+            expect(res).to.be(true);
             done();
           });
         });

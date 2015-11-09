@@ -3,15 +3,11 @@
 var crypto;
 var async = require('neo-async');
 var passport = require('passport');
-var db = require('../models/sequelize');
-var UserRepo = require('../repositories/UserRepository.js');
 
+var UserRepo = require('../repositories/UserRepository.js');
 var emailService = require('../services/emailService.js');
 
-/**
- * GET /login
- * Login page.
- */
+
 exports.getLogin = function(req, res) {
   if (req.user)
     return res.redirect('/account');
@@ -21,10 +17,6 @@ exports.getLogin = function(req, res) {
   });
 };
 
-/**
- * POST /login
- * Sign in using email and password.
- */
 exports.postLogin = function(req, res, next) {
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password cannot be blank').notEmpty();
@@ -51,19 +43,11 @@ exports.postLogin = function(req, res, next) {
   })(req, res, next);
 };
 
-/**
- * GET /logout
- * Log out.
- */
 exports.logout = function(req, res) {
   req.logout();
   res.redirect('/');
 };
 
-/**
- * GET /signup
- * Signup page.
- */
 exports.getSignup = function(req, res) {
   if (req.user) return res.redirect('/');
   res.render('account/signup', {
@@ -71,10 +55,6 @@ exports.getSignup = function(req, res) {
   });
 };
 
-/**
- * POST /signup
- * Create a new local account.
- */
 exports.postSignup = function(req, res, next) {
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password must be at least 4 characters long').len(4);
@@ -87,17 +67,11 @@ exports.postSignup = function(req, res, next) {
     return res.redirect('/signup');
   }
 
-  db.User.findOne({ where: { email: req.body.email } })
-    .then(function(existingUser) {
-      if (existingUser)
-        throw 'Account with that email address already exists.';
-
-      return db.User.create({
-        email: req.body.email,
-        password: req.body.password,
-        profile: {},
-        tokens: {}
-      });
+  UserRepo.createUser({
+      email: req.body.email,
+      password: req.body.password,
+      profile: {},
+      tokens: {}
     })
     .then(function(user) {
       req.logIn(user, function(err) {
@@ -109,24 +83,15 @@ exports.postSignup = function(req, res, next) {
     .catch(function(err) {
       req.flash('errors', { msg: err });
       return res.redirect('/login');
-      //return next(err);
     });
 };
 
-/**
- * GET /account
- * Profile page.
- */
 exports.getAccount = function(req, res) {
   res.render('account/profile', {
     title: 'Account Management'
   });
 };
 
-/**
- * POST /account/profile
- * Update profile information.
- */
 exports.postUpdateProfile = function(req, res) {
   req.assert('email', 'Email is not valid').isEmail();
 
@@ -141,11 +106,7 @@ exports.postUpdateProfile = function(req, res) {
     });
 };
 
-/**
- * POST /account/password
- * Update current password.
- */
-exports.postUpdatePassword = function(req, res, next) {
+exports.postUpdatePassword = function(req, res) {
   req.assert('password', 'Password must be at least 4 characters long').len(4);
   req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
 
@@ -156,12 +117,7 @@ exports.postUpdatePassword = function(req, res, next) {
     return res.redirect('/account');
   }
 
-  db.User.findById(req.user.id)
-    .then(function(user) {
-      user.password = req.body.password;
-
-      return user.save();
-    })
+  UserRepo.changeUserPassword(req.user.id, req.body.password)
     .then(function() {
       req.flash('success', { msg: 'Password has been changed.' });
       res.redirect('/account');
@@ -172,13 +128,8 @@ exports.postUpdatePassword = function(req, res, next) {
     });
 };
 
-/**
- * DELETE /account
- * Delete user account.
- */
 exports.deleteAccount = function(req, res) {
-  db.User
-    .destroy({ where: { id: req.user.id } })
+  UserRepo.removeUserById(req.user.id)
     .then(function() {
       req.logout();
       req.flash('info', { msg: 'Your account has been deleted.' });
@@ -186,10 +137,6 @@ exports.deleteAccount = function(req, res) {
     });
 };
 
-/**
- * GET /account/unlink/:provider
- * Unlink OAuth provider.
- */
 exports.getOauthUnlink = function(req, res, next) {
   var provider = req.params.provider;
 
@@ -203,16 +150,12 @@ exports.getOauthUnlink = function(req, res, next) {
     });
 };
 
-/**
- * GET /reset/:token
- * Reset Password page.
- */
 exports.getReset = function(req, res) {
   if (req.isAuthenticated()) {
     return res.redirect('/');
   }
-  db.User
-    .findOne({ where: { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: new Date() } } })
+
+  UserRepo.findUserByResetPswToken(req.params.token)
     .then(function(user) {
       if(!user)
         throw 'Password reset request is invalid or has expired.';
@@ -227,10 +170,6 @@ exports.getReset = function(req, res) {
     });
 };
 
-/**
- * POST /reset/:token
- * Process the reset password request.
- */
 exports.postReset = function(req, res, next) {
   req.assert('password', 'Password must be at least 4 characters long.').len(4);
   req.assert('confirm', 'Passwords must match.').equals(req.body.password);
@@ -266,10 +205,6 @@ exports.postReset = function(req, res, next) {
   });
 };
 
-/**
- * GET /forgot
- * Forgot Password page.
- */
 exports.getForgot = function(req, res) {
   if (req.isAuthenticated()) {
     return res.redirect('/');
@@ -279,10 +214,6 @@ exports.getForgot = function(req, res) {
   });
 };
 
-/**
- * POST /forgot
- * Create a random token, then the send user an email with a reset link.
- */
 exports.postForgot = function(req, res, next) {
   crypto = require('crypto');
 

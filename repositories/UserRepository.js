@@ -34,12 +34,18 @@ repo.getUserById = function(id) {
 };
 
 repo.createUser = function(user) {
-  var dbUser = db.User.build(user);
+  return db.User.count({ where: { email: user.email } })
+    .then(function(c) {
+      if (c > 0)
+        throw 'Account with that email address already exists.';
 
-  dbUser.set('tokens', {});
-  dbUser.set('profile', {});
+      var dbUser = db.User.build(user);
 
-  return dbUser.save();
+      dbUser.set('tokens', {});
+      dbUser.set('profile', {});
+
+      return dbUser.save();
+    });
 };
 
 repo.assignResetPswToken = function(email, token) {
@@ -74,6 +80,31 @@ repo.changeProfileData = function(userId, reqBody) {
             return user.save();
           });
       }
+      return user.save();
+    });
+};
+
+repo.findUserByResetPswToken = function(token) {
+  return db.User.findOne({
+    where: {
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() }
+    }
+  });
+};
+
+repo.removeUserById = function(userId) {
+  return db.User.destroy({ where: { id: userId } });
+};
+
+repo.changeUserPassword = function(userId, newPassword) {
+  return db.User.findById(userId)
+    .then(function(user) {
+      if(!user)
+        throw 'Account not found';
+
+      user.password = newPassword;
+
       return user.save();
     });
 };
@@ -126,11 +157,10 @@ repo.linkFacebookProfile = function(userId, accessToken, refreshToken, profile) 
 
   return db.User.findOne({ where: { facebookId: profileId } })
     .then(function(existingUser) {
-      if (existingUser) {
+      if (existingUser)
         throw 'There is already a Facebook account that belongs to you. Sign in with that account or delete it, then link it with your current account.';
-      } else {
-        return db.User.findById(userId);
-      }
+
+      return db.User.findById(userId);
     })
     .then(function(user) {
       user.facebookId = profileId;
