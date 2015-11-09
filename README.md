@@ -77,11 +77,12 @@ Features
  - Change Password
  - Forgot Password
  - Reset Password
+ - Password Strength Meter (based on [zxcvbn](https://github.com/dropbox/zxcvbn))
  - Link multiple OAuth strategies to one account
  - Unlink OAuth accounts
  - Delete Account
 - CSRF protection
-- **API Examples**: Facebook, Foursquare, Last.fm, Twitter, Stripe, LinkedIn and more.
+- **API Examples**: Facebook, Steam, Twitter, Stripe, LinkedIn and more.
 - Unit and Integrational Tests
 
 Prerequisites
