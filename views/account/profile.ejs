@@ -1,6 +1,6 @@
 <% layout('layout') -%>
 
-<div class="custom-container" ng-controller="UserProfileCtrl">
+<div class="custom-container" ng-controller="UserProfileCtrl" ng-cloak>
   <div class="row">
     <div class="col-sm-6">
       <div class="page-header">
@@ -25,10 +25,10 @@
           <label for="gender" class="col-sm-4 control-label">Gender</label>
           <div class="col-sm-6">
             <label class="radio col-sm-4">
-              <input type="radio" name="gender" checked="<%= user.profile.gender == 'male' %>" value="male" data-toggle="radio"/><span>Male</span>
+              <input type="radio" name="gender" <%= user.profile.gender == 'male' ? 'checked' : '' %> value="male" data-toggle="radio"/><span>Male</span>
             </label>
             <label class="radio col-sm-4">
-              <input type="radio" name="gender" checked="<%= user.profile.gender == 'female' %>" value="female" data-toggle="radio"/><span>Female</span>
+              <input type="radio" name="gender" <%= user.profile.gender == 'female' ? 'checked' : '' %> value="female" data-toggle="radio"/><span>Female</span>
             </label>
           </div>
         </div>
