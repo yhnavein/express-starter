@@ -24,21 +24,21 @@ app.service('UserService', ['$http', function ($http) {
 	};
 }]);
 
-app.factory('accRemovalModal', function (vModal) {
+app.factory('accRemovalModal', ['vModal', function (vModal) {
   return vModal({
     controller: 'ConfirmAccRemovalCtrl',
     controllerAs: 'ctrl',
     templateUrl: '/views/confirm-acc-removal.html'
   });
-});
+}]);
 
-app.controller('ConfirmAccRemovalCtrl', function (accRemovalModal, UserService) {
+app.controller('ConfirmAccRemovalCtrl', ['accRemovalModal', 'UserService', function (accRemovalModal, UserService) {
   this.close = accRemovalModal.deactivate;
 
   this.removeAccount = function() {
   	UserService.removeAccount();
   };
-});
+}]);
 
 app.controller('UserProfileCtrl', ['$rootScope', '$scope', '$routeParams', 'accRemovalModal',
 	function($rootScope, $scope, $routeParams, modal) {
