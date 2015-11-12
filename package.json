@@ -1,6 +1,7 @@
 {
   "name": "express-starter",
   "version": "0.1.5",
+  "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/yhnavein/express-starter.git"
@@ -70,5 +71,24 @@
     "mocha": "^2.2.5",
     "supertest": "^1.0.1"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "author": "Piotr Dabrowski, PureDev (http://blog.puredev.eu/)",
+  "contributors": [
+    "Piotr Dabrowski, PureDev",
+    "Sahat Yalkabov"
+  ],
+  "bugs": "https://github.com/yhnavein/express-starter/issues",
+  "keywords": [
+    "express",
+    "node.js",
+    "postgresql",
+    "psql",
+    "MySQL",
+    "RDBMS",
+    "relational database",
+    "OAuth",
+    "security",
+    "bcrypt",
+    "zxcvbn"
+  ]
 }
