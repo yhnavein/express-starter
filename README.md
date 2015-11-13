@@ -106,10 +106,15 @@ $ cd myproject
 $ git remote rm origin
 
 # Install NPM dependencies
-$ npm install
+$ npm install -d
+
+# Adjust settings to your needs
+$ vim config/secrets.js
 
 $ node app.js
 ```
+
+In `config/secrets.js` you may want to change database configuration. You don't have to change all API keys, because they will work on your localhost without any hassle. You will need to change API keys, when deploying application to the server.
 
 **Note:** I highly recommend installing [Nodemon](https://github.com/remy/nodemon).
 It watches for any changes in your  node.js app and automatically restarts the

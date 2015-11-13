@@ -78,6 +78,9 @@
     "Sahat Yalkabov"
   ],
   "bugs": "https://github.com/yhnavein/express-starter/issues",
+  "description": "A boilerplate for Node.js web applications which use PostgreSQL by default instead of MongoDB",
+  "engines": { "node" : ">=0.8.0" },
+  "homepage": "https://express-starter.herokuapp.com/",
   "keywords": [
     "express",
     "node.js",
