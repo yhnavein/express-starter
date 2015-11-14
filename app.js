@@ -110,12 +110,12 @@ app.use(passport.session());
 app.use(flash());
 app.use(lusca({
   csrf: { angular: true },
-  //csrf: true,
   xframe: 'SAMEORIGIN',
   xssProtection: true
 }));
 app.use(function(req, res, next) {
   res.locals.user = req.user;
+  res.locals.gaCode = secrets.googleAnalyticsCode;
   next();
 });
 app.use(function(req, res, next) {

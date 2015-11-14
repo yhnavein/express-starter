@@ -24,19 +24,12 @@ module.exports = {
 
   sessionSecret: process.env.SESSION_SECRET || 'Your Session Secret goes here',
 
-  //mysql: {
-  //  host: '127.0.0.1',
-  //  user: 'root',
-  //  password: '',
-  //  database: 'test_db',
-  //  dialect: 'mysql',
-  //  sessionTable: 'session'
-  //},
-
   //will be generated. Take a look at the bottom of this file
   postgres: {},
   sessionTable: 'session',
+  googleAnalyticsCode: process.env.GOOGLE_ANALYTICS_CODE || null,
 
+  /*  */
   mailgun: {
     user: process.env.MAILGUN_USER || 'postmaster@sandbox697fcddc09814c6b83718b9fd5d4e5dc.mailgun.org',
     password: process.env.MAILGUN_PASSWORD || '29eldds1uri6'
