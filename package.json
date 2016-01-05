@@ -42,7 +42,7 @@
     "method-override": "^2.3.5",
     "morgan": "^1.6.1",
     "multer": "^1.1.0",
-    "neo-async": "^1.7.1",
+    "neo-async": "^1.7.2",
     "node-linkedin": "^0.5.3",
     "passport": "^0.3.2",
     "passport-facebook": "^2.0.0",
