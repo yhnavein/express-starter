@@ -45,7 +45,10 @@ exports.postLogin = function(req, res, next) {
 
 exports.logout = function(req, res) {
   req.logout();
-  res.redirect('/');
+  res.locals.user = null;
+  res.render('home', {
+    title: 'Home'
+  });
 };
 
 exports.getSignup = function(req, res) {
