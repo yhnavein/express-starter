@@ -118,18 +118,18 @@ In `config/secrets.js` you may want to change database configuration. You don't 
 
 **Note:** It is recommended to store your API keys and other sensitive data as environment variables. This project uses the 'dotenv' package to retrieve the contents of a '.env' file in your root directory. To store your variables create a '.env' file in the root directory (the same place that app.js is) and place you environment variables in the following format:
 
+```bash
 SESSION_SECRET=YourSessionSecretGoesHere
-
+```
 Then, make sure you add this line
-
+```bash
 .env
-
+```
 to your .gitignore file.
-
 and you can now access the SESSION_SECRET variable in the secrets.js file as:
-
+```bash
 process.env.SESSION_SECRET
-
+```
 **Note:** I highly recommend installing [Nodemon](https://github.com/remy/nodemon).
 It watches for any changes in your  node.js app and automatically restarts the
 server. Once installed, instead of `node app.js` use `nodemon app.js`. It will
