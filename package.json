@@ -24,6 +24,7 @@
     "connect-pg-simple": "^3.1.0",
     "cookie-parser": "^1.4.1",
     "csso": "^1.5.4",
+    "dotenv": "^2.0.0",
     "ejs": "^2.4.1",
     "ejs-mate": "^2.3.0",
     "errorhandler": "^1.4.3",

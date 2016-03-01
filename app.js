@@ -4,6 +4,7 @@
  */
 // var toobusy = require('toobusy-js');
 var express = require('express');
+require('dotenv').config();
 var cookieParser = require('cookie-parser');
 var compress = require('compression');
 var favicon = require('serve-favicon');
@@ -98,7 +99,7 @@ app.use(session({
   }),
   secret: secrets.sessionSecret,
   saveUninitialized: true,
-  resave: true,
+  resave: false,
   cookie: {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     httpOnly: true
